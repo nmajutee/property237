@@ -1,0 +1,54 @@
+/* Move your existing index.css content here */
+/* ===============================
+   PROPERTY237 - GLOBAL STYLES
+================================= */
+
+/* Design tokens */
+:root {
+    --brand-emerald: 16 185 129;              /* #10b981 */
+    --brand-emerald-600: 5 150 105;
+    --muted-600: 107 114 128;                 /* #6b7280 */
+    --surface: 249 250 251;                   /* #f9fafb */
+    --text: 17 24 39;                         /* #111827 */
+    --border: 229 231 235;                    /* #e5e7eb */
+
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-pill: 9999px;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Reset / base */
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+    margin: 0;
+    font-family: 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: rgb(var(--surface));
+    color: rgb(var(--text));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.45;
+    font-size: 16px;
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+
+/* App container */
+.property237-app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ... rest of your existing CSS ... */

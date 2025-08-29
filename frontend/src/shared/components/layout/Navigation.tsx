@@ -65,8 +65,8 @@ export const Navigation: React.FC<NavigationProps> = ({
         items: [
             { label: "Bungalows", href: "/buy/bungalows" },
             { label: "Villa / Duplex", href: "/buy/villa-duplex" },
-            { label: "Commercial Properties / Offices / Shops", href: "/buy/commercial" },
-            { label: "Land (plots, family land, private, community, reclaimed)", href: "/buy/land" },
+            { label: "Commercial Properties", href: "/buy/commercial" },
+            { label: "Land / plots", href: "/buy/land" },
             { label: "Warehouses", href: "/buy/warehouses" },
         ],
     };
@@ -74,13 +74,13 @@ export const Navigation: React.FC<NavigationProps> = ({
     const tenantsMenu: MenuGroup = {
         label: "For Tenants",
         items: [
-            { label: "Chambre Moderne / Rooms", href: "/rent/rooms" },
+            { label: "Modern Rooms", href: "/rent/rooms" },
             { label: "Studio", href: "/rent/studio" },
             { label: "Apartments", href: "/rent/apartments" },
             { label: "Bungalows", href: "/rent/bungalows" },
             { label: "Villa / Duplex", href: "/rent/villa-duplex" },
-            { label: "Guest Houses (short stays, vacation homes, furnished rentals)", href: "/rent/guest-houses" },
-            { label: "Commercial Properties / Offices / Shops", href: "/rent/commercial" },
+            { label: "Guest Houses", href: "/rent/guest-houses" },
+            { label: "Commercial Properties", href: "/rent/commercial-properties" },
             { label: "Land (lease options)", href: "/rent/land" },
             { label: "Warehouses", href: "/rent/warehouses" },
         ],

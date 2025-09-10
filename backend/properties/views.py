@@ -2,6 +2,7 @@ from rest_framework import generics, filters, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from utils.permissions import IsAgentOrReadOnly, IsOwnerOrReadOnly
 from .models import Property, PropertyType, PropertyStatus, PropertyViewing
@@ -39,7 +40,7 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
         if self.request.user.user_type == 'agent':
             serializer.save(agent=self.request.user.agent_profile)
         else:
-            raise PermissionError("Only agents can create properties")
+            raise PermissionDenied("Only agents can create properties")
 
 
 class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -70,7 +71,7 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             self.request.user.is_staff):
             serializer.save()
         else:
-            raise PermissionError("You can only update your own properties")
+            raise PermissionDenied("You can only update your own properties")
 
     def perform_destroy(self, instance):
         # Soft delete - mark as inactive
@@ -79,7 +80,7 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             instance.is_active = False
             instance.save()
         else:
-            raise PermissionError("You can only delete your own properties")
+            raise PermissionDenied("You can only delete your own properties")
 
 
 @api_view(['GET'])

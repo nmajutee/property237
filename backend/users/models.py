@@ -72,14 +72,11 @@ class CustomUser(AbstractUser):
     id_card_front = models.ImageField(upload_to='kyc_documents/', blank=True, null=True)
     id_card_back = models.ImageField(upload_to='kyc_documents/', blank=True, null=True)
 
-    # Account Status
-    is_active = models.BooleanField(default=True)
+    # Account Status (is_active is already in AbstractUser)
     is_suspended = models.BooleanField(default=False)
     suspension_reason = models.TextField(blank=True)
 
-    # Timestamps
-    date_joined = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField(blank=True, null=True)
+    # Timestamps (date_joined and last_login are already in AbstractUser)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'

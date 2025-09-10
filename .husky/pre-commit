@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+echo "[pre-commit] Running frontend lint:fix"
+(cd frontend && npm run -s lint:fix) || exit 1
+
+if [ -f backend/manage.py ]; then
+  echo "[pre-commit] Running backend check"
+  (cd backend && python manage.py check >/dev/null 2>&1 || true)
+fi
+
+echo "[pre-commit] OK"

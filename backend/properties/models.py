@@ -347,37 +347,6 @@ class Property(models.Model):
         if errors:
             raise ValidationError(errors)
 
-    def clean(self):
-        """
-        Custom validation logic
-        """
-        from django.core.exceptions import ValidationError
-        errors = {}
-
-        # Validate floor_number for apartments
-        if self.floor_number and self.floor_number > self.no_of_floors:
-            errors['floor_number'] = "Floor number cannot exceed total number of floors"
-
-        # Validate listing type specific fields
-        if self.listing_type == 'rent':
-            if self.initial_months_payable and self.initial_months_payable < 1:
-                errors['initial_months_payable'] = "Must specify at least 1 month payable for rent"
-
-        elif self.listing_type == 'sale':
-            if not self.land_size_sqm:
-                errors['land_size_sqm'] = "Land size is required for sale properties"
-
-        elif self.listing_type == 'guest_house':
-            if not self.price_per_day:
-                errors['price_per_day'] = "Daily price is required for guest houses"
-
-        # Validate commission fields
-        if self.agent_commission_percentage and self.agent_commission_months:
-            errors['agent_commission_percentage'] = "Specify either percentage or months commission, not both"
-
-        if errors:
-            raise ValidationError(errors)
-
 
 class PropertyFeature(models.Model):
     """

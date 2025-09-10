@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Move custom styles to components layer so they override Tailwind base */
 @layer components {
@@ -70,7 +70,7 @@
   .property237-header {
     background: rgb(var(--property237-brand-red));
     color: white;
-    box-shadow: 0 2px 0 rgba(0,0,0,0.06);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
     position: sticky;
     top: 0;
     z-index: 60;
@@ -104,7 +104,7 @@
   }
 
   .property237-nav-link {
-    color: rgba(255,255,255,0.95);
+    color: rgba(255, 255, 255, 0.95);
     text-decoration: none;
     font-weight: 600;
     padding: 0.45rem 0.6rem;
@@ -116,7 +116,7 @@
   }
 
   .property237-nav-link:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     transform: translateY(-1px);
   }
 
@@ -134,7 +134,7 @@
     align-items: center;
     padding: 0.35rem 0.6rem;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.18);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     color: white;
     background: transparent;
     text-decoration: none;
@@ -142,7 +142,7 @@
   }
 
   .property237-sign-in-btn:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   /* small language switcher pill */
@@ -157,11 +157,11 @@
     border-radius: 50%;
     display: inline-grid;
     place-items: center;
-    background: rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.12);
     color: white;
     font-weight: 700;
     font-size: 0.8rem;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
   .property237-lang .lang-btn.active {
     background: white;
@@ -171,7 +171,7 @@
   /* Hero / hero search */
   .property237-hero-section {
     /* optionally replace this linear-gradient with a background-image for a full-bleed photo */
-    background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.02));
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02));
     padding: 3.5rem 0 4.5rem 0;
     text-align: center;
     color: rgb(var(--property237-color-text));
@@ -220,7 +220,7 @@
     border-radius: var(--property237-radius-pill);
     padding: 0.6rem;
     box-shadow: var(--property237-shadow-md);
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     position: relative;
     gap: 0.5rem;
   }
@@ -240,7 +240,11 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgb(var(--property237-color-primary-light)), rgb(var(--property237-color-primary)));
+    background: linear-gradient(
+      135deg,
+      rgb(var(--property237-color-primary-light)),
+      rgb(var(--property237-color-primary))
+    );
     color: white;
     border: none;
     display: inline-grid;
@@ -282,7 +286,11 @@
     align-items: center;
     justify-content: center;
     color: white;
-    background: linear-gradient(90deg, rgb(var(--property237-color-primary-light)), rgb(var(--property237-color-primary)));
+    background: linear-gradient(
+      90deg,
+      rgb(var(--property237-color-primary-light)),
+      rgb(var(--property237-color-primary))
+    );
   }
 
   .property237-property-price {

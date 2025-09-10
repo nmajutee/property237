@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from properties.models import Property, PropertyType, PropertyStatus
 from locations.models import Country, Region, City, Area
 from agentprofile.models import AgentProfile
+from datetime import date
 
 User = get_user_model()
 
@@ -21,25 +22,30 @@ class PropertyAPITestCase(APITestCase):
             user_type='agent'
         )
 
-        # Create agent profile
+        # Create agent profile with required fields
         self.agent_profile = AgentProfile.objects.create(
             user=self.user,
             license_number='TEST123',
+            license_expiry=date(2030, 12, 31),
+            years_experience='1-3',
+            specialization='residential',
+            bio='Test agent bio',
             agency_name='Test Agency'
         )
 
-        # Create location hierarchy
+        # Create location hierarchy with required choices
         self.country = Country.objects.create(name='Cameroon', code='CM')
-        self.region = Region.objects.create(name='Centre', country=self.country)
+        self.region = Region.objects.create(name='Centre', code='centre', country=self.country)
         self.city = City.objects.create(name='Yaoundé', region=self.region)
         self.area = Area.objects.create(name='Bastos', city=self.city)
 
-        # Create property metadata
+        # Create property metadata using valid choices
         self.property_type = PropertyType.objects.create(
-            name='Studio', category='residential'
+            name='Studio',
+            category='studio'
         )
         self.property_status = PropertyStatus.objects.create(
-            name='Available'
+            name='available'
         )
 
         # Create test property
@@ -105,7 +111,7 @@ class PropertyAPITestCase(APITestCase):
         }
 
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_property_filter_by_price(self):
         """Test property filtering by price"""

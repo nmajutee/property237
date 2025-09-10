@@ -54,7 +54,7 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating properties"""
     class Meta:
         model = Property
-        exclude = ['created_at', 'updated_at', 'slug', 'views_count']
+        exclude = ['created_at', 'updated_at', 'slug', 'views_count', 'agent']
 
     def create(self, validated_data):
         # Set the agent from the authenticated user

@@ -30,3 +30,49 @@ Property237 is a robust web application enabling users to find, filter, and cont
 - **Other:** Celery (async tasks), Gunicorn/Nginx (production), Swagger/OpenAPI (API docs)
 
 ---
+
+## Local development
+
+- Backend (SQLite dev):
+	- cd backend
+	- python -m venv .venv && source .venv/bin/activate
+	- pip install -r requirements.txt
+	- export USE_SQLITE=true
+	- python manage.py migrate
+	- python manage.py runserver
+
+- Frontend:
+	- cd frontend
+	- npm ci
+	- npm run dev
+
+## Production configuration
+
+Copy `.env.production.example` to your environment (or secret manager) and set values:
+
+- DEBUG=False
+- SECRET_KEY: long, random, kept secret
+- ALLOWED_HOSTS: your domain(s)
+- Database: POSTGRES_DB/USER/PASSWORD/HOST/PORT
+- CORS/CSRF: include your frontend origin(s)
+- HTTPS: SECURE_SSL_REDIRECT=True, HSTS enabled, secure cookies
+- If behind a proxy: SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO:https
+
+Then:
+
+- Apply migrations: `python manage.py migrate`
+- Collect static: `python manage.py collectstatic --noinput`
+- Run under Gunicorn/Uvicorn with a reverse proxy (Nginx/Caddy) serving static and forwarding to Django.
+
+Frontend production:
+
+- Set `VITE_API_BASE_URL` to your API URL (e.g., https://yourdomain.com/api)
+- Build with `npm run build` and serve `frontend/dist` via your web server or CDN.
+
+## Deployment notes
+
+- Use a process manager (systemd, Supervisor) to run Gunicorn/Uvicorn.
+- Put Nginx/Caddy in front to terminate TLS and serve static assets with proper caching.
+- Set the security env vars from `.env.production.example`.
+- Enable logging/monitoring, database backups, and periodic security updates.
+

@@ -8,28 +8,40 @@ User = get_user_model()
 
 class PropertyType(models.Model):
     """
-    Cameroon-specific property classifications
+    Standardized property classifications for residential and commercial
     """
     PROPERTY_CATEGORIES = (
+        ('residential', 'Residential'),
+        ('commercial', 'Commercial'),
+    )
+
+    PROPERTY_SUBTYPES = (
+        # Residential subtypes
         ('chambre_modern', 'Chambre Modern/Room'),
         ('studio', 'Studio'),
         ('apartment', 'Apartment'),
         ('bungalow', 'Bungalow'),
         ('villa_duplex', 'Villa/Duplex'),
-        ('commercial', 'Commercial Property/Office/Shop'),
-        ('land', 'Land'),
-        ('warehouse', 'Warehouse'),
         ('guest_house', 'Guest House'),
+        ('land_plot', 'Land Plot'),
+
+        # Commercial subtypes
+        ('office', 'Office'),
+        ('shop', 'Shop/Store'),
+        ('warehouse', 'Warehouse'),
+        ('commercial_land', 'Commercial Land'),
+        ('industrial', 'Industrial Space'),
     )
 
     name = models.CharField(max_length=50, unique=True)
     category = models.CharField(max_length=20, choices=PROPERTY_CATEGORIES)
+    subtype = models.CharField(max_length=20, choices=PROPERTY_SUBTYPES, blank=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['category', 'name']
 
     def __str__(self):
         return self.name
@@ -37,20 +49,23 @@ class PropertyType(models.Model):
 
 class PropertyStatus(models.Model):
     """
-    Property availability status
+    Enhanced property availability status with listing status
     """
     STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
         ('available', 'Available'),
+        ('under_offer', 'Under Offer'),
         ('pending', 'Pending'),
         ('sold', 'Sold'),
         ('rented', 'Rented'),
         ('withdrawn', 'Withdrawn'),
-        ('under_offer', 'Under Offer'),
     )
 
     name = models.CharField(max_length=20, choices=STATUS_CHOICES, unique=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+    allows_inquiries = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "Property Statuses"
@@ -226,7 +241,23 @@ class Property(models.Model):
         ],
         blank=True
     )
+    cadastral_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Official cadastral registry ID"
+    )
     other_documentation = models.TextField(blank=True)
+
+    # Verification Status
+    is_verified = models.BooleanField(default=False)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    verified_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='verified_properties'
+    )
 
     # For Land specific
     land_type = models.CharField(max_length=20, choices=LAND_TYPES, blank=True)
@@ -275,6 +306,38 @@ class Property(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+
+    # Verification & Cadastral (Cameroon-specific)
+    verified = models.BooleanField(default=False)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    verified_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='verified_properties'
+    )
+    cadastral_id = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Official registry/cadastral ID"
+    )
+    registry_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending Verification'),
+            ('verified', 'Registry Verified'),
+            ('disputed', 'Disputed'),
+            ('invalid', 'Invalid/Not Found'),
+        ],
+        blank=True
+    )
+    title_document = models.FileField(
+        upload_to='property_titles/',
+        blank=True,
+        null=True,
+        help_text="Upload land title certificate"
+    )
 
     # SEO and Marketing
     slug = models.SlugField(max_length=250, unique=True, blank=True)
@@ -401,3 +464,74 @@ class PropertyViewing(models.Model):
 
         if self.scheduled_date and self.scheduled_date <= timezone.now():
             raise ValidationError({'scheduled_date': 'Viewing date must be in the future'})
+
+
+class PropertyVerification(models.Model):
+    """
+    Property verification and document management
+    """
+    DOCUMENT_TYPES = (
+        ('land_title', 'Land Title Certificate'),
+        ('survey_plan', 'Survey Plan'),
+        ('building_permit', 'Building Permit'),
+        ('occupancy_certificate', 'Certificate of Occupancy'),
+        ('tax_receipt', 'Property Tax Receipt'),
+        ('ownership_proof', 'Proof of Ownership'),
+    )
+
+    VERIFICATION_STATUS = (
+        ('pending', 'Pending Review'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+        ('expired', 'Document Expired'),
+    )
+
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='verifications')
+    document_type = models.CharField(max_length=25, choices=DOCUMENT_TYPES)
+    document_file = models.FileField(upload_to='property_documents/')
+    document_number = models.CharField(max_length=100, blank=True)
+
+    verification_status = models.CharField(max_length=10, choices=VERIFICATION_STATUS, default='pending')
+    verified_at = models.DateTimeField(null=True, blank=True)
+    verified_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='property_document_verifications'
+    )
+    rejection_reason = models.TextField(blank=True)
+
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['property', 'document_type']
+
+    def __str__(self):
+        return f"{self.property.title} - {self.get_document_type_display()}"
+
+
+class Parcel(models.Model):
+    """
+    Cadastral parcels for geospatial queries (PostGIS)
+    """
+    cadastral_id = models.CharField(max_length=50, unique=True)
+    # geometry = models.PolygonField(srid=4326)  # PostGIS field - uncomment when PostGIS is installed
+    area_sqm = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+
+    # Ownership tracking
+    current_owner = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='owned_parcels'
+    )
+    ownership_verified = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Parcel {self.cadastral_id}"

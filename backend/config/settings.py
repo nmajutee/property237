@@ -42,17 +42,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',  # For TokenAuthentication
+    'rest_framework_simplejwt',  # JWT Authentication
+    'django_filters',
+    'corsheaders',
+    # Custom apps (microservice-ready)
     'users',
     'properties',
+    'tenants',
+    'leases',
+    'maintenance',
+    'analytics',
+    'notifications',
+    'chat',
     'agentprofile',
     'ad',
     'payment',
     'tariffplans',
     'media',
     'locations',
-    'django_filters',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -157,13 +164,18 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework settings
+# Django REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
@@ -208,5 +220,216 @@ if os.getenv('SECURE_PROXY_SSL_HEADER'):
         SECURE_PROXY_SSL_HEADER = None
 else:
     SECURE_PROXY_SSL_HEADER = None
+
+# ==============================
+# JWT Authentication Configuration
+# ==============================
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    # Token lifetimes (enterprise security)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_ACCESS_TOKEN_MINUTES', '15'))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=int(os.getenv('JWT_REFRESH_TOKEN_DAYS', '7'))),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+
+    # Security settings
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.getenv('JWT_SIGNING_KEY', SECRET_KEY),
+    'VERIFYING_KEY': None,
+    'AUDIENCE': os.getenv('JWT_AUDIENCE', 'property237-api'),
+    'ISSUER': os.getenv('JWT_ISSUER', 'property237'),
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    # Token format
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    # Claims
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    # Sliding token settings (not used with access/refresh pattern)
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+# ==============================
+# CORS Configuration (for frontend)
+# ==============================
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # Next.js dev server
+    'http://127.0.0.1:3000',
+    'https://property237.com',
+    'https://www.property237.com',
+    'https://admin.property237.com',
+] + os.getenv('ADDITIONAL_CORS_ORIGINS', '').split(',') if os.getenv('ADDITIONAL_CORS_ORIGINS') else []
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.property237\.com$",  # All subdomains
+    r"^http://localhost:\d+$",  # Local development
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
+
+# Headers exposed to frontend
+CORS_EXPOSE_HEADERS = [
+    'X-Total-Count',
+    'X-Page-Count',
+    'Link',
+]
+
+# ==============================
+# Role-Based Access Control
+# ==============================
+# Enterprise roles (matching architecture spec)
+USER_ROLES = {
+    'admin': 'System Administrator',
+    'realtor': 'Real Estate Agent',
+    'landlord': 'Property Owner',
+    'tenant': 'Property Renter',
+    'visitor': 'Guest User',
+}
+
+# Permission levels
+ROLE_PERMISSIONS = {
+    'admin': ['*'],  # Full access
+    'realtor': ['listings.manage', 'clients.view', 'reports.view'],
+    'landlord': ['properties.manage', 'tenants.manage', 'payments.view'],
+    'tenant': ['profile.manage', 'payments.view', 'maintenance.create'],
+    'visitor': ['listings.view', 'properties.search'],
+}
+
+# ==============================
+# API Security & Rate Limiting
+# ==============================
+# Rate limiting (implement with django-ratelimit or external service)
+API_RATE_LIMITS = {
+    'anonymous': '100/hour',
+    'authenticated': '1000/hour',
+    'premium': '5000/hour',
+}
+
+# API versioning
+API_VERSION = 'v1'
+API_BASE_URL = f'/api/{API_VERSION}/'
+
+# ==============================
+# Cache Configuration
+# ==============================
+# Redis for sessions and caching (production)
+if os.getenv('REDIS_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'PARSER_CLASS': 'redis.connection.HiredisParser',
+                'CONNECTION_POOL_KWARGS': {
+                    'max_connections': 50,
+                    'retry_on_timeout': True,
+                },
+            },
+            'KEY_PREFIX': 'property237',
+            'TIMEOUT': 300,  # 5 minutes default
+        }
+    }
+
+    # Use Redis for sessions
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+else:
+    # Local development cache
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'property237-cache',
+        }
+    }
+
+# ==============================
+# File Storage & Media (S3-ready)
+# ==============================
+if os.getenv('AWS_STORAGE_BUCKET_NAME'):
+    # Production S3 storage
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.StaticS3Boto3Storage'
+
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ca-central-1')  # Canada region
+    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN')  # CDN domain
+    AWS_DEFAULT_ACL = 'private'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_ENCRYPTION = True
+
+    # Media files configuration
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"}/media/'
+else:
+    # Local development
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# ==============================
+# Logging Configuration
+# ==============================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'json': {
+            'format': '{"level": "%(levelname)s", "time": "%(asctime)s", "module": "%(module)s", "message": "%(message)s"}',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'property237': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Create logs directory
+import pathlib
+(BASE_DIR / 'logs').mkdir(exist_ok=True)
 
 CSRF_TRUSTED_ORIGINS = [o for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o]

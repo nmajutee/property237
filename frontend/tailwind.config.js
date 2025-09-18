@@ -22,6 +22,11 @@ module.exports = {
         error: colors.colors.error,
         cameroon: colors.cameroon,
 
+        // Property237 brand colors
+        'property237-primary': '#1ed266',
+        'background-light': '#f6f8f7',
+        'background-dark': '#112117',
+
         // Theme-aware colors (CSS variables)
         background: 'var(--color-background)',
         foreground: 'var(--color-foreground)',
@@ -39,7 +44,10 @@ module.exports = {
         'visitation-pass': '#00d4aa',
         'escrow': '#6366f1',
       },
-      fontFamily: typography.fontFamily,
+      fontFamily: {
+        ...typography.fontFamily,
+        'display': ['Manrope', 'system-ui', 'sans-serif'],
+      },
       fontSize: typography.fontSize,
       borderRadius: typography.borderRadius,
       spacing: typography.spacing,

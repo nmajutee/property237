@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react/no-unescaped-entities": ["warn", { "forbid": [">", "}" ] }]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.stories.@(js|jsx|ts|tsx)", "**/*.stories.mdx"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "react/no-unescaped-entities": "off"
+      }
+    },
+    {
+      "files": ["src/app/**/*.tsx"],
+      "rules": {
+        "react/no-unescaped-entities": "warn"
+      }
+    }
+  ]
+}

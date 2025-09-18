@@ -1,0 +1,25 @@
+# Build outputs
+.next/
+out/
+build/
+dist/
+storybook-static/
+
+# Dependencies
+node_modules/
+
+# Generated files
+next-env.d.ts
+
+# Config files that should use CommonJS
+*.config.js
+*.config.ts
+postcss.config.js
+tailwind.config.js
+tailwind.config.livest.js
+
+# Other generated/external files
+public/
+.storybook/manager-head.html
+coverage/
+.nyc_output/

@@ -1,0 +1,178 @@
+/* Livest Design System - CSS Variables for Runtime Theming */
+/* Generated from tokens.json - DO NOT EDIT MANUALLY */
+
+:root {
+  /* Brand Colors */
+  --color-brand-50: #F2FAF3;
+  --color-brand-100: #E6F6E7;
+  --color-brand-200: #BFE8C4;
+  --color-brand-300: #9EE19A;
+  --color-brand-400: #6BD470;
+  --color-brand-500: #32B768;
+  --color-brand-600: #28A05A;
+  --color-brand-700: #1A7A3F;
+  --color-brand-800: #135A2F;
+  --color-brand-900: #0B3F20;
+
+  /* Accent Colors */
+  --color-accent-50: #F4FCF6;
+  --color-accent-100: #E9F8ED;
+  --color-accent-200: #C8EECE;
+  --color-accent-300: #A7E4B0;
+  --color-accent-400: #88D692;
+  --color-accent-500: #7ACB9B;
+  --color-accent-600: #5BB07C;
+  --color-accent-700: #3C945D;
+  --color-accent-800: #2D703E;
+  --color-accent-900: #1E4C1F;
+
+  /* Neutral Colors */
+  --color-neutral-50: #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+
+  /* Semantic Colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Surface Colors */
+  --color-surface-primary: #FFFFFF;
+  --color-surface-secondary: #F8FBF9;
+  --color-surface-tertiary: #F1F5F9;
+  --color-surface-elevated: #FFFFFF;
+
+  /* Text Colors */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748B;
+  --color-text-inverse: #FFFFFF;
+  --color-text-muted: #6B7280;
+
+  /* Typography */
+  --font-family-base: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-heading: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'JetBrains Mono', Menlo, Monaco, 'Cascadia Code', 'Roboto Mono', 'Courier New', monospace;
+
+  /* Font Sizes */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 36px;
+  --font-size-5xl: 48px;
+  --font-size-6xl: 64px;
+
+  /* Spacing */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(15, 23, 42, 0.1), 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+  /* Animation */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  --easing-ease: ease;
+  --easing-ease-in: ease-in;
+  --easing-ease-out: ease-out;
+  --easing-ease-in-out: ease-in-out;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  /* Surface Colors - Dark Mode */
+  --color-surface-primary: #0B1220;
+  --color-surface-secondary: #071114;
+  --color-surface-tertiary: #1E293B;
+  --color-surface-elevated: #334155;
+
+  /* Text Colors - Dark Mode */
+  --color-text-primary: #E6EEF3;
+  --color-text-secondary: #CBD5E1;
+  --color-text-tertiary: #94A3B8;
+  --color-text-inverse: #0F172A;
+  --color-text-muted: #64748B;
+
+  /* Neutral Colors - Dark Mode Adjustments */
+  --color-neutral-50: #1E293B;
+  --color-neutral-100: #334155;
+  --color-neutral-200: #475569;
+  --color-neutral-300: #64748B;
+  --color-neutral-700: #CBD5E1;
+  --color-neutral-800: #E2E8F0;
+  --color-neutral-900: #F1F5F9;
+
+  /* Shadows - Dark Mode */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* High Contrast Theme */
+[data-theme='high-contrast'] {
+  --color-text-primary: #000000;
+  --color-text-secondary: #000000;
+  --color-surface-primary: #FFFFFF;
+  --color-brand-500: #000000;
+  --color-neutral-200: #000000;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+}
+
+/* Focus Styles */
+.livest-focus-ring {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+.livest-focus-ring-inset {
+  box-shadow: inset 0 0 0 2px var(--color-brand-500);
+}

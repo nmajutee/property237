@@ -1,22 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-  },
+  // Move from experimental to main config
+  typedRoutes: true,
+
   images: {
     domains: ['localhost', 'property237.com'],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
-      },
-    ]
+    // Only add rewrite if API URL is defined
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL
+    if (apiUrl) {
+      return [
+        {
+          source: '/api/:path*',
+          destination: `${apiUrl}/:path*`,
+        },
+      ]
+    }
+    return []
   },
+
   webpack: (config) => {
     // Optimize bundle size for icons
     config.resolve.alias = {

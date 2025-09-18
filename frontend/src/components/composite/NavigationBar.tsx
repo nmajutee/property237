@@ -17,7 +17,7 @@ import {
 import { Button } from '../primitives/Button'
 import { Input } from '../primitives/Input'
 import { Avatar } from '../primitives/Avatar'
-import { Badge } from '../primitives/Badge'
+import { Badge } from '../primitives'
 import { useClickOutside } from '../../hooks/useClickOutside'
 
 // Navigation item interface

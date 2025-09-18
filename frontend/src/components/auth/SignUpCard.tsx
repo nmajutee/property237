@@ -15,7 +15,7 @@ interface RoleOptionProps {
 }
 
 const RoleOption: React.FC<RoleOptionProps> = ({
-  role,
+  role, // eslint-disable-line @typescript-eslint/no-unused-vars
   icon,
   title,
   onClick,
@@ -55,13 +55,11 @@ export const SignUpCard: React.FC<SignUpCardProps> = ({
   error
 }) => {
   const [termsAccepted, setTermsAccepted] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
 
   const handleRoleSelect = (role: UserRole) => {
     if (!termsAccepted) {
       return
     }
-    setSelectedRole(role)
     onSelectRole(role)
   }
 

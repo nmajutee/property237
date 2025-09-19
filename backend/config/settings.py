@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'analytics',
     'notifications',
     'chat',
-    'agentprofile',
+    # 'agentprofile',  # Removed - replaced by 'agents' app
+    'agents',  # New agents app
     'ad',
     'payment',
     'tariffplans',

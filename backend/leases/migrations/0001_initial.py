@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('agentprofile', '0002_initial'),
+        ('agents', '0001_initial'),
         ('properties', '0004_alter_propertytype_options_property_cadastral_id_and_more'),
         ('tenants', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('activated_at', models.DateTimeField(blank=True, null=True)),
-                ('agent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='agentprofile.agentprofile')),
+                ('agent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='agents.agentprofile')),
                 ('landlord', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='landlord_leases', to=settings.AUTH_USER_MODEL)),
                 ('rental_property', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lease_agreements', to='properties.property')),
                 ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='leases', to='tenants.tenantprofile')),

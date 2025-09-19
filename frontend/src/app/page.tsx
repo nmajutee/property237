@@ -27,11 +27,11 @@ export default function HomePage() {
 
           {/* Quick Navigation */}
           <div className="flex gap-4 justify-center">
-            <Button onClick={() => window.location.href = '/signup'}>
+            <Button onClick={() => window.location.href = '/sign-up'}>
               Try Sign Up Flow
             </Button>
-            <Button variant="outline" onClick={() => window.location.href = '/login'}>
-              Login Demo
+            <Button variant="outline" onClick={() => window.location.href = '/sign-in'}>
+              Sign In Demo
             </Button>
           </div>
         </header>

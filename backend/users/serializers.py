@@ -3,10 +3,12 @@ Enterprise User Serializers
 Secure serialization for authentication and user management
 """
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from locations.serializers import CitySerializer
+from .models import CustomUser, UserPreferences
 import re
 
 User = get_user_model()
@@ -22,8 +24,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'email', 'first_name', 'last_name', 'user_type',
-            'phone_number', 'password', 'password_confirm', 'terms_accepted'
+            'email', 'username', 'first_name', 'last_name', 'full_legal_name',
+            'display_name', 'date_of_birth', 'language', 'country_code',
+            'user_type', 'phone_number', 'password', 'password_confirm', 'terms_accepted'
         ]
 
     def validate_email(self, value):
@@ -45,7 +48,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def validate_user_type(self, value):
         """Validate user type"""
-        valid_types = ['tenant', 'landlord', 'realtor']  # visitor and admin set programmatically
+        valid_types = ['tenant', 'agent', 'admin']
         if value not in valid_types:
             raise serializers.ValidationError(
                 f"Invalid user type. Choose from: {', '.join(valid_types)}"
@@ -165,14 +168,20 @@ def validate_cameroon_phone(phone_number):
     pattern = r'^(\+237)?[6-9]\d{8}$'
 
     return bool(re.match(pattern, cleaned))
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
             user = authenticate(username=email, password=password)  # Many auth backends use username field for email too
 
-        if not user:
-            raise serializers.ValidationError('Invalid credentials')
-        if not user.is_active:
-            raise serializers.ValidationError('User account is disabled')
+            if not user:
+                raise serializers.ValidationError('Invalid credentials')
+            if not user.is_active:
+                raise serializers.ValidationError('User account is disabled')
 
-        attrs['user'] = user
+            attrs['user'] = user
         return attrs
 
 

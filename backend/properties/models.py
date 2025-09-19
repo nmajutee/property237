@@ -286,7 +286,7 @@ class Property(models.Model):
 
     # Agent Information
     agent = models.ForeignKey(
-        'agentprofile.AgentProfile',
+        'agents.AgentProfile',
         on_delete=models.CASCADE,
         related_name='properties'
     )

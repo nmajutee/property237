@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from properties.models import Property, PropertyType, PropertyStatus
 from locations.models import Country, Region, City, Area
-from agentprofile.models import AgentProfile
+from agents.models import AgentProfile
 from datetime import date
 
 User = get_user_model()

@@ -14,6 +14,8 @@ interface TenantProfileData {
   countryCode: string
   language: 'en' | 'fr'
   locationPermission: boolean
+  taxCardPhoto: File | null
+  bankStatement: File | null
 }
 
 interface TenantProfileFormProps {
@@ -33,7 +35,9 @@ export const TenantProfileForm: React.FC<TenantProfileFormProps> = ({
     email: '',
     countryCode: '+237',
     language: 'en',
-    locationPermission: false
+    locationPermission: false,
+    taxCardPhoto: null,
+    bankStatement: null
   })
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
@@ -60,10 +64,13 @@ export const TenantProfileForm: React.FC<TenantProfileFormProps> = ({
     } else if (!/^\d{9}$/.test(formData.phone.replace(/\s/g, ''))) {
       errors.phone = 'Please enter a valid 9-digit phone number'
     }
-
-    // Email validation (optional but must be valid if provided)
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address'
+    // Tax Card Photo validation
+    if (!formData.taxCardPhoto) {
+      errors.taxCardPhoto = "Tax payer's card photo is required"
+    }
+    // Bank Statement validation
+    if (!formData.bankStatement) {
+      errors.bankStatement = 'Bank statement or proof of address is required'
     }
 
     setFormErrors(errors)
@@ -161,6 +168,28 @@ export const TenantProfileForm: React.FC<TenantProfileFormProps> = ({
             required
           />
 
+          {/* Tax Payer's Card Photo */}
+          <Input
+            type="file"
+            label="Tax Payer's Card Photo"
+            accept="image/*"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateFormData('taxCardPhoto', e.target.files?.[0] || null)}
+            required
+            helperText="Upload a clear photo of your tax payer's card"
+            error={formErrors.taxCardPhoto}
+          />
+
+          {/* Bank Statement (Proof of Address) */}
+          <Input
+            type="file"
+            label="Bank Statement (Proof of Address)"
+            accept="application/pdf,image/*"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateFormData('bankStatement', e.target.files?.[0] || null)}
+            required
+            helperText="Upload a recent bank statement or utility bill as proof of address"
+            error={formErrors.bankStatement}
+          />
+
           {/* Email (Optional) */}
           <Input
             type="email"
@@ -242,7 +271,7 @@ export const TenantProfileForm: React.FC<TenantProfileFormProps> = ({
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Already have an account?{' '}
-            <a href="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+            <a href="/sign-in" className="text-primary-600 hover:text-primary-700 font-medium">
               Sign in here
             </a>
           </p>

@@ -8,8 +8,7 @@ class CustomUser(AbstractUser):
     Custom User model with Cameroon-specific features
     """
     USER_TYPES = (
-        ('client', 'Property Seeker'),
-        ('landlord', 'Landlord'),
+        ('tenant', 'Tenant'),
         ('agent', 'Real Estate Agent'),
         ('admin', 'Admin'),
     )
@@ -20,8 +19,18 @@ class CustomUser(AbstractUser):
         ('both', 'WhatsApp & Calls'),
     )
 
+    LANGUAGE_CHOICES = (
+        ('en', 'English'),
+        ('fr', 'French'),
+    )
+
     # Basic Information
     email = models.EmailField(unique=True)
+    full_legal_name = models.CharField(max_length=200, blank=True, help_text="Full legal name as on official documents")
+    display_name = models.CharField(max_length=100, blank=True, help_text="Public display name")
+    date_of_birth = models.DateField(null=True, blank=True)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
+    country_code = models.CharField(max_length=5, default='+237')
     phone_regex = RegexValidator(
         regex=r'^\+237[67]\d{8}$',
         message="Enter a valid Cameroon phone number: +237XXXXXXXXX"
@@ -44,7 +53,7 @@ class CustomUser(AbstractUser):
         default='both'
     )
 
-    user_type = models.CharField(max_length=10, choices=USER_TYPES, default='client')
+    user_type = models.CharField(max_length=10, choices=USER_TYPES, default='tenant')
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     # Location

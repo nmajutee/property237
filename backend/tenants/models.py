@@ -32,7 +32,29 @@ class TenantProfile(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='tenant_profile',
-        limit_choices_to={'user_type': 'client'}
+        limit_choices_to={'user_type': 'tenant'}
+    )
+
+    # Property Preferences (from frontend wizard)
+    preferred_location = models.CharField(max_length=200, blank=True)
+    budget_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+    budget_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+    property_category = models.CharField(max_length=50, blank=True)
+    property_type = models.CharField(max_length=50, blank=True)
+    land_type = models.CharField(max_length=50, blank=True)
+    preferred_amenities = models.TextField(blank=True, help_text="Comma-separated list of preferred amenities")
+
+    # Agreement and Verification (from frontend wizard)
+    lease_agreement_acceptance = models.BooleanField(default=False)
+    government_id_upload = models.FileField(upload_to='tenant_documents/government_id/', blank=True, null=True)
+    verification_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('verified', 'Verified'),
+            ('rejected', 'Rejected'),
+        ],
+        default='pending'
     )
 
     # Personal Information
@@ -87,6 +109,7 @@ class TenantProfile(models.Model):
     employment_certificate = models.FileField(upload_to='tenant_documents/employment/', blank=True, null=True)
     income_statement = models.FileField(upload_to='tenant_documents/income/', blank=True, null=True)
     bank_statement = models.FileField(upload_to='tenant_documents/bank/', blank=True, null=True)
+    taxpayer_card = models.FileField(upload_to='tenant_documents/taxpayer/', blank=True, null=True)
 
     # Rental Preferences
     preferred_property_type = models.CharField(max_length=50, blank=True)

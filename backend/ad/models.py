@@ -245,7 +245,7 @@ class PromotedProperty(models.Model):
     )
 
     property_listing = models.ForeignKey('properties.Property', on_delete=models.CASCADE, related_name='promotions')
-    agent = models.ForeignKey('agentprofile.AgentProfile', on_delete=models.CASCADE, related_name='promoted_properties')
+    agent = models.ForeignKey('agents.AgentProfile', on_delete=models.CASCADE, related_name='promoted_properties')
     promotion_type = models.CharField(max_length=15, choices=PROMOTION_TYPES)
 
     # Scheduling

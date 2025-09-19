@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { SimpleAgentWizard } from '../../../components/auth/SimpleAgentWizard'
+import { AgentOnboardingWizard, AgentOnboardingData } from '../../../components/auth/AgentOnboardingWizard'
 import { AgentOnboardingSuccess } from '../../../components/auth/AgentOnboardingSuccess'
 import { ArrowLeftIcon } from 'lucide-react'
 
@@ -14,7 +14,7 @@ export default function AgentOnboardingPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>('')
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: AgentOnboardingData) => {
     setLoading(true)
 
     try {
@@ -46,7 +46,7 @@ export default function AgentOnboardingPage() {
     }
   }
 
-  const handleSaveDraft = (data: any) => {
+  const handleSaveDraft = (data: AgentOnboardingData) => {
     // In a real app, this would save to backend
     console.log('Saving draft:', data)
   }
@@ -56,7 +56,7 @@ export default function AgentOnboardingPage() {
   }
 
   const handleBackToSignup = () => {
-    router.push('/signup')
+    router.push('/sign-up')
   }
 
   if (isSubmitted) {
@@ -64,7 +64,7 @@ export default function AgentOnboardingPage() {
       <AgentOnboardingSuccess
         applicationId={applicationId}
         email={submittedEmail}
-        onBackToDashboard={handleBackToDashboard}
+        onContactSupport={handleBackToDashboard}
       />
     )
   }
@@ -82,10 +82,11 @@ export default function AgentOnboardingPage() {
         </button>
       </div>
 
-      <SimpleAgentWizard
+      <AgentOnboardingWizard
         onSubmit={handleSubmit}
         onSaveDraft={handleSaveDraft}
         loading={loading}
+        error={error}
       />
     </div>
   )

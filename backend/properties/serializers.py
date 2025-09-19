@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import PropertyType, PropertyStatus, Property, PropertyFeature, PropertyViewing
 from locations.serializers import AreaSerializer
-from agentprofile.serializers import AgentProfileSerializer
+from agents.serializers import AgentProfileSerializer
 
 
 class PropertyTypeSerializer(serializers.ModelSerializer):

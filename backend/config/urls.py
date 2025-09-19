@@ -15,13 +15,12 @@ api_v1_patterns = [
     # Core Services (Microservice-ready)
     path('users/', include('users.urls')),
     path('properties/', include('properties.urls')),
-    path('listings/', include('properties.urls')),  # Alias for listings service
     path('tenants/', include('tenants.urls')),
     path('leases/', include('leases.urls')),
     path('maintenance/', include('maintenance.urls')),
     path('payments/', include('payment.urls')),
     path('locations/', include('locations.urls')),
-    path('agents/', include('agentprofile.urls')),
+    path('agents/', include('agents.urls')),  # Updated to use new agents app
     path('media/', include('media.urls')),
     path('chat/', include('chat.urls')),
     path('analytics/', include('analytics.urls')),
@@ -35,13 +34,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # API v1 (current)
-    path('api/v1/', include(api_v1_patterns)),
+    path('api/', include(api_v1_patterns)),
 
     # Health check endpoint
     path('health/', lambda request: HttpResponse('OK')),
-
-    # Legacy API support (temporary)
-    path('api/', include(api_v1_patterns)),
 ]
 
 # Import HttpResponse for health check

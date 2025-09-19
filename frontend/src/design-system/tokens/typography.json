@@ -62,8 +62,8 @@
     "9xl": ["8rem", { "lineHeight": "1" }]
   },
   "fontFamily": {
-    "sans": ["Inter", "system-ui", "sans-serif"],
+    "sans": ["Manrope", "system-ui", "sans-serif"],
     "serif": ["Georgia", "serif"],
-    "mono": ["JetBrains Mono", "monospace"]
+    "mono": ["Manrope", "monospace"]
   }
 }

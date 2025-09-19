@@ -149,9 +149,9 @@ export const variants = {
 export const focusRing = cn(
   'outline-none',
   'focus-visible:ring-2',
-  'focus-visible:ring-primary-500',
+  'focus-visible:ring-property237-primary',
   'focus-visible:ring-offset-2',
-  'focus-visible:ring-offset-background'
+  'focus-visible:ring-offset-background-light dark:focus-visible:ring-offset-background-dark'
 )
 
 /**

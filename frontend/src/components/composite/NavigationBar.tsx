@@ -175,7 +175,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
             <div className="flex-shrink-0 flex items-center">
               <a
                 href={brand.href}
-                className="flex items-center space-x-2 text-xl font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-property237-primary transition-colors"
               >
                 {brand.logo && (
                   <img
@@ -184,7 +184,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                     className="h-8 w-8 object-contain"
                   />
                 )}
-                <span>{brand.name}</span>
+                <span className="font-display">{brand.name}</span>
               </a>
             </div>
 

@@ -10,13 +10,6 @@ class MaintenanceCategory(models.Model):
 		return self.name
 
 
-class ServiceProvider(models.Model):
-	name = models.CharField(max_length=255)
-	contact_email = models.EmailField(blank=True)
-	contact_phone = models.CharField(max_length=50, blank=True)
-
-	def __str__(self):
-		return self.name
 
 
 class MaintenanceRequest(models.Model):
@@ -44,7 +37,7 @@ class MaintenanceRequest(models.Model):
 	completed_date = models.DateField(null=True, blank=True)
 	estimated_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 	actual_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-	assigned_to = models.ForeignKey(ServiceProvider, on_delete=models.SET_NULL, null=True, blank=True)
+	assigned_to = models.ForeignKey('ServiceProvider', on_delete=models.SET_NULL, null=True, blank=True)
 
 	def __str__(self):
 		return f"{self.title} ({self.get_status_display()})"

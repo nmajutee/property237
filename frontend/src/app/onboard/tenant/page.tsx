@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { TenantProfileForm } from '../../../components/auth/TenantProfileForm'
+import { TenantProfileForm } from '../../../components/auth/tenant/TenantProfileForm'
 import { OTPVerification } from '../../../components/auth/OTPVerification'
 
 type OnboardingStep = 'profile' | 'otp' | 'success'

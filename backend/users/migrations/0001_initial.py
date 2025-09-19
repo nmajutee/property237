@@ -15,7 +15,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ("auth", "0012_alter_user_first_name_max_length"),
         ("locations", "0001_initial"),
-        ("properties", "0001_initial"),
     ]
 
     operations = [
@@ -256,14 +255,6 @@ class Migration(migrations.Migration):
                         blank=True,
                         help_text="Preferred areas for property alerts",
                         to="locations.area",
-                    ),
-                ),
-                (
-                    "preferred_property_types",
-                    models.ManyToManyField(
-                        blank=True,
-                        help_text="Preferred property types for alerts",
-                        to="properties.propertytype",
                     ),
                 ),
                 (

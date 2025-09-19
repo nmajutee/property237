@@ -1,37 +1,21 @@
 'use client'
 
-import React from 'react'
-import { SignUpCard, UserRole } from '../../components/auth/SignUpCard'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-export default function SignUpPage() {
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState('')
+export default function SignUpRedirect() {
+  const router = useRouter()
 
-  const handleRoleSelect = async (role: UserRole) => {
-    setLoading(true)
-    setError('')
-
-    try {
-      // Simulate API call to register role selection
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Route to appropriate onboarding flow
-      if (role === 'tenant') {
-        window.location.href = '/onboard/tenant'
-      } else if (role === 'agent') {
-        window.location.href = '/onboard/agent'
-      }
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
-      setLoading(false)
-    }
-  }
+  useEffect(() => {
+    router.replace('/sign-up')
+  }, [router])
 
   return (
-    <SignUpCard
-      onSelectRole={handleRoleSelect}
-      loading={loading}
-      error={error}
-    />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-property237-primary mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Redirecting to Sign Up...</p>
+      </div>
+    </div>
   )
 }

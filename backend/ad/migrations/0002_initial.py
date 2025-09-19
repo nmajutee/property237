@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("ad", "0001_initial"),
-        ("agentprofile", "0001_initial"),
+        ("agents", "0001_initial"),
         ("properties", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="promoted_properties",
-                to="agentprofile.agentprofile",
+                to="agents.agentprofile",
             ),
         ),
         migrations.AddField(

@@ -6,9 +6,10 @@ import { cn, focusRing, disabledState } from '../../design-system/utils'
 const buttonVariants = cva(
   cn(
     // Base styles
-    'inline-flex items-center justify-center gap-2',
-    'whitespace-nowrap rounded-md text-sm font-medium',
-    'transition-colors duration-150 ease-in-out',
+    'inline-flex items-center justify-center gap-3',
+    'whitespace-nowrap rounded-lg text-lg font-bold',
+    'transition-all duration-200 ease-in-out',
+    'border-2 border-transparent',
     focusRing,
     disabledState
   ),
@@ -16,36 +17,43 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: cn(
-          'bg-primary-600 text-primary-foreground shadow',
-          'hover:bg-primary-700',
-          'active:bg-primary-800'
+          'bg-property237-primary/10 dark:bg-property237-primary/20',
+          'text-black dark:text-white',
+          'hover:bg-property237-primary/20 dark:hover:bg-property237-primary/30 hover:border-property237-primary',
+          'disabled:hover:bg-property237-primary/10 disabled:hover:border-transparent'
         ),
         destructive: cn(
-          'bg-destructive text-destructive-foreground shadow-sm',
-          'hover:bg-destructive/90'
+          'bg-red-500/10 dark:bg-red-500/20 text-red-700 dark:text-red-300',
+          'hover:bg-red-500/20 dark:hover:bg-red-500/30 hover:border-red-500',
+          'disabled:hover:bg-red-500/10 disabled:hover:border-transparent'
         ),
         outline: cn(
-          'border border-input bg-background shadow-sm',
-          'hover:bg-accent hover:text-accent-foreground'
+          'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600',
+          'text-gray-700 dark:text-gray-300',
+          'hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500',
+          'disabled:hover:bg-white disabled:hover:border-gray-300 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600'
         ),
         secondary: cn(
-          'bg-secondary text-secondary-foreground shadow-sm',
-          'hover:bg-secondary/80'
+          'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+          'hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
+          'disabled:hover:bg-gray-100 disabled:hover:border-transparent'
         ),
         ghost: cn(
-          'hover:bg-accent hover:text-accent-foreground'
+          'bg-transparent text-gray-600 dark:text-gray-300',
+          'hover:bg-gray-100 dark:hover:bg-gray-800',
+          'disabled:hover:bg-transparent'
         ),
         link: cn(
-          'text-primary underline-offset-4',
-          'hover:underline'
+          'text-property237-primary underline-offset-4 bg-transparent border-0 font-medium',
+          'hover:underline hover:bg-transparent'
         ),
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
-        xl: 'h-12 rounded-md px-10 text-base',
-        icon: 'h-9 w-9',
+        default: 'px-6 py-4',
+        sm: 'px-4 py-2 text-sm rounded-md',
+        lg: 'px-8 py-5 text-xl',
+        xl: 'px-10 py-6 text-2xl',
+        icon: 'h-12 w-12 p-3',
       },
       fullWidth: {
         true: 'w-full',

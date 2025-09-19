@@ -54,7 +54,7 @@ class LeaseAgreement(models.Model):
     rental_property = models.ForeignKey('properties.Property', on_delete=models.CASCADE, related_name='lease_agreements')
     tenant = models.ForeignKey('tenants.TenantProfile', on_delete=models.CASCADE, related_name='leases')
     landlord = models.ForeignKey(User, on_delete=models.CASCADE, related_name='landlord_leases')
-    agent = models.ForeignKey('agentprofile.AgentProfile', on_delete=models.SET_NULL, null=True, blank=True)
+    agent = models.ForeignKey('agents.AgentProfile', on_delete=models.SET_NULL, null=True, blank=True)
 
     # Lease Terms
     start_date = models.DateField()

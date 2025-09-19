@@ -39,7 +39,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
-            className="bg-primary-600 h-2 rounded-full transition-all duration-300 ease-out"
+            className="bg-property237-primary h-2 rounded-full transition-all duration-300 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -64,7 +64,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                   className={cn(
                     'absolute top-4 left-1/2 w-full h-0.5 -z-10',
                     isCompleted || (isCurrent && index < steps.length - 1)
-                      ? 'bg-primary-600'
+                      ? 'bg-property237-primary'
                       : 'bg-gray-200 dark:bg-gray-700'
                   )}
                 />
@@ -74,8 +74,8 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
               <div
                 className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mb-2 transition-colors',
-                  isCompleted && 'bg-primary-600 text-white',
-                  isCurrent && 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 ring-2 ring-primary-600',
+                  isCompleted && 'bg-property237-primary text-white',
+                  isCurrent && 'bg-property237-primary/10 dark:bg-property237-primary/20 text-property237-primary ring-2 ring-property237-primary',
                   isFuture && 'bg-gray-100 dark:bg-gray-800 text-gray-400'
                 )}
               >
@@ -91,7 +91,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                 <div
                   className={cn(
                     'text-xs font-medium mb-1',
-                    isCurrent && 'text-primary-600 dark:text-primary-400',
+                    isCurrent && 'text-property237-primary',
                     isCompleted && 'text-gray-700 dark:text-gray-300',
                     isFuture && 'text-gray-400'
                   )}

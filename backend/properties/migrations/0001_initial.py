@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("agentprofile", "0001_initial"),
+        ("agents", "0001_initial"),
         ("locations", "0001_initial"),
     ]
 
@@ -343,7 +343,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="properties",
-                        to="agentprofile.agentprofile",
+                        to="agents.agentprofile",
                     ),
                 ),
                 (

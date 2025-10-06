@@ -842,7 +842,7 @@ export const AgentOnboardingWizard: React.FC<AgentOnboardingWizardProps> = ({
                     id="terms"
                     checked={formData.verification?.termsAccepted || false}
                     onChange={(e) => handleVerificationChange({ termsAccepted: e.target.checked })}
-                    className="mt-1 h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="mt-1 h-4 w-4 text-property237-primary border-gray-300 dark:border-gray-600 rounded focus:ring-property237-primary focus:ring-offset-2"
                   />
                   <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
                     I accept the <span className="text-green-600 font-medium">Terms of Service</span> and <span className="text-green-600 font-medium">Privacy Policy</span>
@@ -855,7 +855,7 @@ export const AgentOnboardingWizard: React.FC<AgentOnboardingWizardProps> = ({
                     id="dataConsent"
                     checked={formData.verification?.dataConsentAccepted || false}
                     onChange={(e) => handleVerificationChange({ dataConsentAccepted: e.target.checked })}
-                    className="mt-1 h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="mt-1 h-4 w-4 text-property237-primary border-gray-300 dark:border-gray-600 rounded focus:ring-property237-primary focus:ring-offset-2"
                   />
                   <label htmlFor="dataConsent" className="text-sm text-gray-700 dark:text-gray-300">
                     I consent to the processing of my personal data for verification and platform services
@@ -868,7 +868,7 @@ export const AgentOnboardingWizard: React.FC<AgentOnboardingWizardProps> = ({
                     id="marketing"
                     checked={formData.verification?.marketingConsent || false}
                     onChange={(e) => handleVerificationChange({ marketingConsent: e.target.checked })}
-                    className="mt-1 h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="mt-1 h-4 w-4 text-property237-primary border-gray-300 dark:border-gray-600 rounded focus:ring-property237-primary focus:ring-offset-2"
                   />
                   <label htmlFor="marketing" className="text-sm text-gray-700 dark:text-gray-300">
                     I would like to receive marketing communications and updates (optional)
@@ -918,7 +918,7 @@ export const AgentOnboardingWizard: React.FC<AgentOnboardingWizardProps> = ({
                     id="leaseTerms"
                     checked={formData.leaseAgreement?.leaseTermsAccepted || false}
                     onChange={(e) => handleLeaseAgreementChange({ leaseTermsAccepted: e.target.checked })}
-                    className="mt-1 h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="mt-1 h-4 w-4 text-property237-primary border-gray-300 dark:border-gray-600 rounded focus:ring-property237-primary focus:ring-offset-2"
                   />
                   <label htmlFor="leaseTerms" className="text-sm text-gray-700 dark:text-gray-300">
                     I confirm that I have a valid lease agreement for the property I will be managing
@@ -931,7 +931,7 @@ export const AgentOnboardingWizard: React.FC<AgentOnboardingWizardProps> = ({
                     id="propertyManagement"
                     checked={formData.leaseAgreement?.propertyManagementAccepted || false}
                     onChange={(e) => handleLeaseAgreementChange({ propertyManagementAccepted: e.target.checked })}
-                    className="mt-1 h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="mt-1 h-4 w-4 text-property237-primary border-gray-300 dark:border-gray-600 rounded focus:ring-property237-primary focus:ring-offset-2"
                   />
                   <label htmlFor="propertyManagement" className="text-sm text-gray-700 dark:text-gray-300">
                     I understand my responsibilities as a property management agent on this platform

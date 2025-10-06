@@ -40,10 +40,10 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             {label}
-            {props.required && <span className="text-destructive ml-1">*</span>}
+            {props.required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
           </label>
         )}
 
@@ -53,11 +53,13 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
             value={countryCode}
             onChange={(e) => onCountryChange?.(e.target.value)}
             className={cn(
-              'flex h-10 items-center rounded-l-md border border-r-0 border-input bg-background px-3 py-2',
-              'text-sm ring-offset-background transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+              'flex h-10 items-center rounded-l-md border border-r-0',
+              'border-gray-300 dark:border-gray-600',
+              'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+              'px-3 py-2 text-sm ring-offset-background transition-colors',
+              'focus:outline-none focus:ring-2 focus:ring-property237-primary focus:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
-              error && 'border-destructive focus:ring-destructive'
+              error && 'border-red-500 focus:ring-red-500'
             )}
           >
             {countries.map((country) => (
@@ -72,12 +74,14 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
             id={inputId}
             type="tel"
             className={cn(
-              'flex h-10 w-full rounded-r-md border border-input bg-background px-3 py-2',
-              'text-sm ring-offset-background transition-colors',
-              'placeholder:text-muted-foreground',
-              'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+              'flex h-10 w-full rounded-r-md border',
+              'border-gray-300 dark:border-gray-600',
+              'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+              'px-3 py-2 text-sm ring-offset-background transition-colors',
+              'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+              'focus:outline-none focus:ring-2 focus:ring-property237-primary focus:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
-              error && 'border-destructive focus:ring-destructive',
+              error && 'border-red-500 focus:ring-red-500',
               className
             )}
             ref={ref}
@@ -92,13 +96,13 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         </div>
 
         {error && (
-          <p id={errorId} className="text-sm text-destructive" role="alert">
+          <p id={errorId} className="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">
             {error}
           </p>
         )}
 
         {helperText && !error && (
-          <p id={helpId} className="text-sm text-muted-foreground">
+          <p id={helpId} className="text-sm text-gray-600 dark:text-gray-400">
             {helperText}
           </p>
         )}

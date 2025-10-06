@@ -5,11 +5,12 @@ import { cn } from '../../design-system/utils'
 
 const inputVariants = cva(
   cn(
-    'flex w-full rounded-md border border-input bg-background px-3 py-2',
-    'text-sm ring-offset-background transition-colors',
+    'flex w-full rounded-md border border-gray-300 dark:border-gray-600',
+    'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+    'px-3 py-2 text-sm ring-offset-background transition-colors',
     'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-    'placeholder:text-muted-foreground',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+    'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-property237-primary focus-visible:ring-offset-2',
     'disabled:cursor-not-allowed disabled:opacity-50'
   ),
   {
@@ -21,8 +22,8 @@ const inputVariants = cva(
       },
       variant: {
         default: 'border-input',
-        error: 'border-destructive focus-visible:ring-destructive',
-        success: 'border-green-500 focus-visible:ring-green-500',
+        error: 'border-red-500 focus-visible:ring-red-500',
+        success: 'border-property237-primary focus-visible:ring-property237-primary',
       }
     },
     defaultVariants: {
@@ -68,16 +69,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             {label}
-            {props.required && <span className="text-destructive ml-1">*</span>}
+            {props.required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
           </label>
         )}
 
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
               {leftIcon}
             </div>
           )}
@@ -101,20 +102,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           />
 
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
               {rightIcon}
             </div>
           )}
         </div>
 
         {error && (
-          <p id={errorId} className="text-sm text-destructive" role="alert">
+          <p id={errorId} className="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">
             {error}
           </p>
         )}
 
         {helperText && !error && (
-          <p id={helpId} className="text-sm text-muted-foreground">
+          <p id={helpId} className="text-sm text-gray-600 dark:text-gray-400">
             {helperText}
           </p>
         )}

@@ -47,10 +47,10 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             {label}
-            {props.required && <span className="text-destructive ml-1">*</span>}
+            {props.required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
           </label>
         )}
 
@@ -58,12 +58,14 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             id={selectId}
             className={cn(
-              'flex w-full rounded-md border border-input bg-background text-sm ring-offset-background',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'flex w-full rounded-md border border-gray-300 dark:border-gray-600',
+              'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+              'text-sm ring-offset-background',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-property237-primary focus-visible:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
               'appearance-none pr-8',
               sizeClasses[size],
-              error && 'border-destructive focus-visible:ring-destructive',
+              error && 'border-red-500 focus-visible:ring-red-500',
               className
             )}
             ref={ref}
@@ -90,17 +92,17 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
 
-          <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
         </div>
 
         {error && (
-          <p id={errorId} className="text-sm text-destructive" role="alert">
+          <p id={errorId} className="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">
             {error}
           </p>
         )}
 
         {helperText && !error && (
-          <p id={helpId} className="text-sm text-muted-foreground">
+          <p id={helpId} className="text-sm text-gray-600 dark:text-gray-400">
             {helperText}
           </p>
         )}

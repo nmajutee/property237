@@ -155,7 +155,7 @@ export const CompanyStep: React.FC<CompanyStepProps> = ({ data, onChange }) => {
             onChange={(e) => onChange({ businessDescription: e.target.value })}
             placeholder="Describe your business activities, services, and expertise..."
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white resize-none"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-property237-primary focus:ring-offset-2 dark:bg-gray-700 dark:text-white resize-none"
             required
           />
           <p className="text-xs text-gray-500 dark:text-gray-400">

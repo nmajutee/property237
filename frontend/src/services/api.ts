@@ -3,7 +3,7 @@
  * Connects frontend to Django backend with authentication and credit management
  */
 
-const API_BASE_URL = (import.meta.env?.VITE_API_URL as string) || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'property237_access_token';

@@ -100,8 +100,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # DATABASE CONFIGURATION (Auto Switch)
 # ===================================
 
-import dj_database_url
-
 # Default: SQLite for local development
 DATABASES = {
     'default': {
@@ -114,6 +112,8 @@ DATABASES = {
 DATABASE_URL = os.getenv('INTERNAL_URL') or os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
+    # Import only when needed
+    import dj_database_url
     # On Render: automatically use PostgreSQL via INTERNAL_URL
     DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 

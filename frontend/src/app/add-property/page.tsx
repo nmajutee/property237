@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
-import { PhotoIcon, XMarkIcon, DocumentIcon } from '@heroicons/react/24/outline'
+import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 // Interfaces matching backend models
 interface PropertyType {

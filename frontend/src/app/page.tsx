@@ -220,8 +220,8 @@ export default function HomePage() {
             <div>
               <h4 className="font-semibold mb-4">For Tenants</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="/properties" className="hover:text-property237-primary">Browse Properties</a></li>
-                <li><a href="/saved" className="hover:text-property237-primary">Saved Properties</a></li>
+                <li><Link href="/properties" className="hover:text-property237-primary">Browse Properties</Link></li>
+                <li><Link href="/saved" className="hover:text-property237-primary">Saved Properties</Link></li>
               </ul>
             </div>
             <div>

@@ -7,8 +7,6 @@ import {
   HomeIcon,
   EyeIcon,
   DocumentTextIcon,
-  CheckCircleIcon,
-  ClockIcon,
   ChartBarIcon,
   CurrencyDollarIcon,
   BuildingOfficeIcon

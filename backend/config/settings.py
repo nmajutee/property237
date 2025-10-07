@@ -29,7 +29,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dw6k&j^^y6w#(!$4(-z*!vesg%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
+# Allow hosts from environment variable or use defaults
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,property237.onrender.com').split(',')
+# Strip whitespace from each host
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]
 
 # Application definition
 AUTH_USER_MODEL = 'users.CustomUser'

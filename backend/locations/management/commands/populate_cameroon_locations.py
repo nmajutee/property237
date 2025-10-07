@@ -23,12 +23,18 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f'Country already exists: {cameroon.name}')
 
-        # Create Regions
+        # Create ALL 10 Regions of Cameroon
         regions_data = [
             ('centre', 'Centre'),
             ('littoral', 'Littoral'),
             ('northwest', 'Northwest'),
             ('southwest', 'Southwest'),
+            ('west', 'West'),
+            ('adamawa', 'Adamawa'),
+            ('east', 'East'),
+            ('far_north', 'Far North'),
+            ('north', 'North'),
+            ('south', 'South'),
         ]
 
         regions = {}
@@ -44,50 +50,61 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'Region already exists: {region.name}')
 
-        # Create Cities
+        # Create Cities - Major cities from all 10 regions
         cities_data = [
             # Littoral Region
-            {
-                'name': 'Douala',
-                'region': 'littoral',
-                'is_major': True,
-                'lat': 4.0511,
-                'lng': 9.7679
-            },
+            {'name': 'Douala', 'region': 'littoral', 'is_major': True, 'lat': 4.0511, 'lng': 9.7679},
+            {'name': 'Nkongsamba', 'region': 'littoral', 'is_major': False, 'lat': 4.9547, 'lng': 9.9400},
+            {'name': 'Edéa', 'region': 'littoral', 'is_major': False, 'lat': 3.7833, 'lng': 10.1333},
 
             # Centre Region
-            {
-                'name': 'Yaoundé',
-                'region': 'centre',
-                'is_major': True,
-                'lat': 3.8480,
-                'lng': 11.5021
-            },
+            {'name': 'Yaoundé', 'region': 'centre', 'is_major': True, 'lat': 3.8480, 'lng': 11.5021},
+            {'name': 'Mbalmayo', 'region': 'centre', 'is_major': False, 'lat': 3.5167, 'lng': 11.5000},
+            {'name': 'Obala', 'region': 'centre', 'is_major': False, 'lat': 4.1667, 'lng': 11.5333},
 
             # Northwest Region
-            {
-                'name': 'Bamenda',
-                'region': 'northwest',
-                'is_major': True,
-                'lat': 5.9631,
-                'lng': 10.1591
-            },
+            {'name': 'Bamenda', 'region': 'northwest', 'is_major': True, 'lat': 5.9631, 'lng': 10.1591},
+            {'name': 'Kumbo', 'region': 'northwest', 'is_major': False, 'lat': 6.2028, 'lng': 10.6764},
+            {'name': 'Ndop', 'region': 'northwest', 'is_major': False, 'lat': 5.9667, 'lng': 10.4500},
 
             # Southwest Region
-            {
-                'name': 'Limbe',
-                'region': 'southwest',
-                'is_major': True,
-                'lat': 4.0186,
-                'lng': 9.2006
-            },
-            {
-                'name': 'Buea',
-                'region': 'southwest',
-                'is_major': True,
-                'lat': 4.1544,
-                'lng': 9.2349
-            },
+            {'name': 'Buea', 'region': 'southwest', 'is_major': True, 'lat': 4.1544, 'lng': 9.2349},
+            {'name': 'Limbe', 'region': 'southwest', 'is_major': True, 'lat': 4.0186, 'lng': 9.2006},
+            {'name': 'Kumba', 'region': 'southwest', 'is_major': True, 'lat': 4.6333, 'lng': 9.4500},
+            {'name': 'Tiko', 'region': 'southwest', 'is_major': False, 'lat': 4.0833, 'lng': 9.3667},
+
+            # West Region
+            {'name': 'Bafoussam', 'region': 'west', 'is_major': True, 'lat': 5.4781, 'lng': 10.4175},
+            {'name': 'Dschang', 'region': 'west', 'is_major': False, 'lat': 5.4500, 'lng': 10.0667},
+            {'name': 'Foumban', 'region': 'west', 'is_major': False, 'lat': 5.7286, 'lng': 10.9008},
+            {'name': 'Mbouda', 'region': 'west', 'is_major': False, 'lat': 5.6264, 'lng': 10.2544},
+
+            # Adamawa Region
+            {'name': 'Ngaoundéré', 'region': 'adamawa', 'is_major': True, 'lat': 7.3167, 'lng': 13.5833},
+            {'name': 'Meiganga', 'region': 'adamawa', 'is_major': False, 'lat': 6.5167, 'lng': 14.3000},
+            {'name': 'Tibati', 'region': 'adamawa', 'is_major': False, 'lat': 6.4667, 'lng': 12.6333},
+
+            # East Region
+            {'name': 'Bertoua', 'region': 'east', 'is_major': True, 'lat': 4.5833, 'lng': 13.6833},
+            {'name': 'Batouri', 'region': 'east', 'is_major': False, 'lat': 4.4333, 'lng': 14.3667},
+            {'name': 'Abong-Mbang', 'region': 'east', 'is_major': False, 'lat': 3.9833, 'lng': 13.1833},
+
+            # Far North Region
+            {'name': 'Maroua', 'region': 'far_north', 'is_major': True, 'lat': 10.5908, 'lng': 14.3158},
+            {'name': 'Kousseri', 'region': 'far_north', 'is_major': False, 'lat': 12.0781, 'lng': 15.0311},
+            {'name': 'Mokolo', 'region': 'far_north', 'is_major': False, 'lat': 10.7333, 'lng': 13.8000},
+            {'name': 'Yagoua', 'region': 'far_north', 'is_major': False, 'lat': 10.3333, 'lng': 15.2333},
+
+            # North Region
+            {'name': 'Garoua', 'region': 'north', 'is_major': True, 'lat': 9.3000, 'lng': 13.4000},
+            {'name': 'Guider', 'region': 'north', 'is_major': False, 'lat': 9.9333, 'lng': 13.9500},
+            {'name': 'Poli', 'region': 'north', 'is_major': False, 'lat': 8.5167, 'lng': 13.2500},
+
+            # South Region
+            {'name': 'Ebolowa', 'region': 'south', 'is_major': True, 'lat': 2.9000, 'lng': 11.1500},
+            {'name': 'Kribi', 'region': 'south', 'is_major': True, 'lat': 2.9500, 'lng': 9.9083},
+            {'name': 'Sangmélima', 'region': 'south', 'is_major': False, 'lat': 2.9333, 'lng': 11.9833},
+            {'name': 'Ambam', 'region': 'south', 'is_major': False, 'lat': 2.3833, 'lng': 11.2667},
         ]
 
         cities = {}
@@ -197,6 +214,80 @@ class Command(BaseCommand):
             {'name': 'Lower Farms', 'city': 'Buea'},
             {'name': 'Upper Farms', 'city': 'Buea'},
             {'name': 'Clerks Quarters', 'city': 'Buea'},
+
+            # Kumba Areas (Southwest)
+            {'name': 'Fiango', 'city': 'Kumba'},
+            {'name': 'Mile 4', 'city': 'Kumba'},
+            {'name': 'Kosala', 'city': 'Kumba'},
+            {'name': 'Mbonge Road', 'city': 'Kumba'},
+            {'name': 'New Layout', 'city': 'Kumba'},
+
+            # Bafoussam Areas (West Region)
+            {'name': 'Marché A', 'city': 'Bafoussam', 'is_commercial': True},
+            {'name': 'Marché B', 'city': 'Bafoussam', 'is_commercial': True},
+            {'name': 'Tamdja', 'city': 'Bafoussam'},
+            {'name': 'Famla', 'city': 'Bafoussam'},
+            {'name': 'Djeleng', 'city': 'Bafoussam'},
+            {'name': 'Koptchou', 'city': 'Bafoussam'},
+
+            # Garoua Areas (North Region)
+            {'name': 'Centre Ville', 'city': 'Garoua', 'is_commercial': True},
+            {'name': 'Ouro-Kessoum', 'city': 'Garoua'},
+            {'name': 'Plateau', 'city': 'Garoua'},
+            {'name': 'Doualaré', 'city': 'Garoua'},
+            {'name': 'Roumdé-Adjia', 'city': 'Garoua'},
+
+            # Maroua Areas (Far North Region)
+            {'name': 'Domayo', 'city': 'Maroua'},
+            {'name': 'Djarengol', 'city': 'Maroua'},
+            {'name': 'Centre Ville', 'city': 'Maroua', 'is_commercial': True},
+            {'name': 'Pitoaré', 'city': 'Maroua'},
+            {'name': 'Hardé', 'city': 'Maroua'},
+
+            # Ngaoundéré Areas (Adamawa Region)
+            {'name': 'Centre Ville', 'city': 'Ngaoundéré', 'is_commercial': True},
+            {'name': 'Petit Marché', 'city': 'Ngaoundéré', 'is_commercial': True},
+            {'name': 'Dang', 'city': 'Ngaoundéré'},
+            {'name': 'Bamyanga', 'city': 'Ngaoundéré'},
+            {'name': 'Haoussa', 'city': 'Ngaoundéré'},
+
+            # Bertoua Areas (East Region)
+            {'name': 'Centre Ville', 'city': 'Bertoua', 'is_commercial': True},
+            {'name': 'Nkolbikon', 'city': 'Bertoua'},
+            {'name': 'Mokolo', 'city': 'Bertoua'},
+            {'name': 'Ndokayo', 'city': 'Bertoua'},
+
+            # Ebolowa Areas (South Region)
+            {'name': 'Centre Ville', 'city': 'Ebolowa', 'is_commercial': True},
+            {'name': 'Angale', 'city': 'Ebolowa'},
+            {'name': 'Nkoabang', 'city': 'Ebolowa'},
+            {'name': 'Nko\'ovos', 'city': 'Ebolowa'},
+
+            # Kribi Areas (Coastal South)
+            {'name': 'Centre Ville', 'city': 'Kribi', 'is_commercial': True},
+            {'name': 'Grand Batanga', 'city': 'Kribi'},
+            {'name': 'Mboro', 'city': 'Kribi'},
+            {'name': 'Bongahele', 'city': 'Kribi'},
+
+            # Dschang Areas (West Region)
+            {'name': 'Centre Ville', 'city': 'Dschang', 'is_commercial': True},
+            {'name': 'Fongo-Tongo', 'city': 'Dschang'},
+            {'name': 'Foto', 'city': 'Dschang'},
+
+            # Foumban Areas (West Region)
+            {'name': 'Palais Royal', 'city': 'Foumban', 'is_commercial': True},
+            {'name': 'Massif', 'city': 'Foumban'},
+            {'name': 'Njinka', 'city': 'Foumban'},
+
+            # Nkongsamba Areas (Littoral)
+            {'name': 'Centre Ville', 'city': 'Nkongsamba', 'is_commercial': True},
+            {'name': 'New Town', 'city': 'Nkongsamba'},
+            {'name': 'Mbouda', 'city': 'Nkongsamba'},
+
+            # Kumbo Areas (Northwest)
+            {'name': 'Town', 'city': 'Kumbo', 'is_commercial': True},
+            {'name': 'Tobin', 'city': 'Kumbo'},
+            {'name': 'Tatum', 'city': 'Kumbo'},
         ]
 
         areas_created = 0

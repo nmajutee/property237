@@ -132,7 +132,6 @@ class Property(models.Model):
 
     # Location
     area = models.ForeignKey('locations.Area', on_delete=models.PROTECT)
-    google_pin_location = models.TextField(blank=True, help_text="Google Maps pin drop coordinates")
     distance_from_main_road = models.PositiveIntegerField(
         null=True, blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(50000)],
@@ -307,21 +306,7 @@ class Property(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    # Verification & Cadastral (Cameroon-specific)
-    verified = models.BooleanField(default=False)
-    verified_at = models.DateTimeField(null=True, blank=True)
-    verified_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='verified_properties'
-    )
-    cadastral_id = models.CharField(
-        max_length=50,
-        blank=True,
-        help_text="Official registry/cadastral ID"
-    )
+    # Registry Status (Cameroon-specific)
     registry_status = models.CharField(
         max_length=20,
         choices=[
@@ -535,3 +520,19 @@ class Parcel(models.Model):
 
     def __str__(self):
         return f"Parcel {self.cadastral_id}"
+
+
+class PropertyFavorite(models.Model):
+    """
+    User favorite properties for quick access
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_properties')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'property']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.property.title}"

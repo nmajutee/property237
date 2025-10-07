@@ -1,11 +1,13 @@
 from rest_framework import generics, filters, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 from utils.permissions import IsAgentOrReadOnly, IsOwnerOrReadOnly
-from .models import Property, PropertyType, PropertyStatus, PropertyViewing
+from agents.models import AgentProfile
+from .models import Property, PropertyType, PropertyStatus, PropertyViewing, PropertyFavorite
 from .serializers import (
     PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer,
     PropertyTypeSerializer, PropertyStatusSerializer, PropertyViewingSerializer
@@ -38,7 +40,19 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # Ensure only agents can create properties
         if self.request.user.user_type == 'agent':
-            serializer.save(agent=self.request.user.agent_profile)
+            # Try to get agent profile, create if doesn't exist
+            try:
+                agent_profile = self.request.user.agents_profile
+            except AgentProfile.DoesNotExist:
+                from agents.models import AgentProfile
+                agent_profile = AgentProfile.objects.create(
+                    user=self.request.user,
+                    bio='Real estate agent',
+                    is_verified=True,
+                    terms_accepted=True,
+                    data_consent_accepted=True
+                )
+            serializer.save(agent=agent_profile)
         else:
             raise PermissionDenied("Only agents can create properties")
 
@@ -121,3 +135,81 @@ class PropertyViewingCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(viewer=self.request.user)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_properties_list(request):
+    """
+    Get properties owned by the current user (agent)
+    Returns all properties created by the authenticated agent
+    """
+    try:
+        # Get agent profile for current user
+        agent_profile = request.user.agents_profile
+
+        # Get all properties owned by this agent (both active and inactive)
+        properties = Property.objects.filter(
+            agent=agent_profile
+        ).select_related(
+            'property_type', 'status', 'area__city__region'
+        ).prefetch_related('images').order_by('-created_at')
+
+        # Serialize and return
+        serializer = PropertyListSerializer(
+            properties,
+            many=True,
+            context={'request': request}
+        )
+
+        return Response({
+            'count': properties.count(),
+            'results': serializer.data
+        })
+
+    except AgentProfile.DoesNotExist:
+        return Response({
+            'error': 'Agent profile not found. Please complete your agent registration.'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': f'Error fetching properties: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def favorites_list(request):
+    """Get user's favorite properties"""
+    favorites = PropertyFavorite.objects.filter(
+        user=request.user
+    ).select_related('property', 'property__area__city')
+
+    properties = [fav.property for fav in favorites]
+    serializer = PropertyListSerializer(properties, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def toggle_favorite(request, slug):
+    """Add or remove property from favorites"""
+    property_obj = get_object_or_404(Property, slug=slug)
+
+    if request.method == 'POST':
+        favorite, created = PropertyFavorite.objects.get_or_create(
+            user=request.user,
+            property=property_obj
+        )
+        if created:
+            return Response({'message': 'Added to favorites'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Already in favorites'}, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        deleted_count, _ = PropertyFavorite.objects.filter(
+            user=request.user,
+            property=property_obj
+        ).delete()
+        if deleted_count:
+            return Response({'message': 'Removed from favorites'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Not in favorites'}, status=status.HTTP_404_NOT_FOUND)

@@ -43,10 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',  # JWT Authentication
+    'rest_framework_simplejwt.token_blacklist',  # JWT token blacklist
     'django_filters',
     'corsheaders',
     # Custom apps (microservice-ready)
     'users',
+    'authentication',  # New simplified authentication system
+    'credits',  # New credit management system
     'properties',
     'tenants',
     'leases',

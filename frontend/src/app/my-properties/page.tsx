@@ -12,21 +12,57 @@ import {
   MapPinIcon,
 } from '@heroicons/react/24/outline'
 
+interface PropertyType {
+  id: number
+  name: string
+  category: string
+}
+
+interface PropertyStatus {
+  id: number
+  name: string
+}
+
+interface PropertyArea {
+  id: number
+  name: string
+  city: {
+    id: number
+    name: string
+    region: {
+      id: number
+      name: string
+      code: string
+    }
+  }
+}
+
+interface PropertyImage {
+  id: number
+  image: string
+  image_url: string
+  is_primary: boolean
+  order: number
+}
+
 interface Property {
   id: number
+  slug: string
   title: string
-  property_type: string
-  location: string
-  price: number
-  bedrooms: number
-  bathrooms: number
-  area: number
-  images: string[]
-  is_featured: boolean
-  is_available: boolean
+  property_type: PropertyType
+  status: PropertyStatus
+  listing_type: string
+  price: string
+  currency: string
+  area: PropertyArea
+  no_of_bedrooms: number
+  no_of_bathrooms: number
+  featured: boolean
+  is_active: boolean
   views_count: number
-  applications_count: number
   created_at: string
+  images: PropertyImage[]
+  primary_image: string | null
 }
 
 export default function MyPropertiesPage() {
@@ -73,7 +109,7 @@ export default function MyPropertiesPage() {
     }
   }
 
-  const deleteProperty = async (propertyId: number) => {
+  const deleteProperty = async (propertySlug: string) => {
     if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
       return
     }
@@ -82,15 +118,16 @@ export default function MyPropertiesPage() {
     if (!token) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/properties/${propertyId}/`, {
+      const response = await fetch(`http://localhost:8000/api/properties/${propertySlug}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       })
 
-      if (response.ok) {
-        setProperties(properties.filter((prop) => prop.id !== propertyId))
+      if (response.ok || response.status === 204) {
+        // Re-fetch properties to update list
+        fetchProperties(token)
         alert('Property deleted successfully')
       } else {
         alert('Failed to delete property')
@@ -101,28 +138,27 @@ export default function MyPropertiesPage() {
     }
   }
 
-  const toggleAvailability = async (propertyId: number, currentStatus: boolean) => {
+  const toggleAvailability = async (propertySlug: string, currentStatus: boolean) => {
     const token = localStorage.getItem('property237_access_token')
     if (!token) return
 
     try {
+      // Update is_active status via PATCH
       const response = await fetch(
-        `http://localhost:8000/api/properties/${propertyId}/toggle-availability/`,
+        `http://localhost:8000/api/properties/${propertySlug}/`,
         {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ is_active: !currentStatus })
         }
       )
 
       if (response.ok) {
-        setProperties(
-          properties.map((prop) =>
-            prop.id === propertyId ? { ...prop, is_available: !currentStatus } : prop
-          )
-        )
+        // Re-fetch properties to get updated data
+        fetchProperties(token)
       }
     } catch (error) {
       console.error('Error toggling availability:', error)
@@ -131,9 +167,9 @@ export default function MyPropertiesPage() {
 
   const filteredProperties = properties.filter((prop) => {
     if (filter === 'all') return true
-    if (filter === 'available') return prop.is_available
-    if (filter === 'unavailable') return !prop.is_available
-    if (filter === 'featured') return prop.is_featured
+    if (filter === 'available') return prop.is_active
+    if (filter === 'unavailable') return !prop.is_active
+    if (filter === 'featured') return prop.featured
     return true
   })
 
@@ -188,19 +224,19 @@ export default function MyPropertiesPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">Available</p>
             <p className="text-3xl font-bold text-green-600">
-              {properties.filter((p) => p.is_available).length}
+              {properties.filter((p) => p.is_active).length}
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">Unavailable</p>
             <p className="text-3xl font-bold text-red-600">
-              {properties.filter((p) => !p.is_available).length}
+              {properties.filter((p) => !p.is_active).length}
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">Featured</p>
             <p className="text-3xl font-bold text-yellow-600">
-              {properties.filter((p) => p.is_featured).length}
+              {properties.filter((p) => p.featured).length}
             </p>
           </div>
         </div>
@@ -251,23 +287,23 @@ export default function MyPropertiesPage() {
                 {/* Property Image */}
                 <div className="relative h-56">
                   <img
-                    src={property.images[0] || '/placeholder-property.jpg'}
+                    src={property.primary_image || property.images[0]?.image_url || '/placeholder-property.jpg'}
                     alt={property.title}
                     className="w-full h-full object-cover"
                   />
-                  {property.is_featured && (
+                  {property.featured && (
                     <span className="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       Featured
                     </span>
                   )}
                   <span
                     className={`absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-semibold ${
-                      property.is_available
+                      property.is_active
                         ? 'bg-green-500 text-white'
                         : 'bg-red-500 text-white'
                     }`}
                   >
-                    {property.is_available ? 'Available' : 'Unavailable'}
+                    {property.is_active ? 'Available' : 'Unavailable'}
                   </span>
                 </div>
 
@@ -279,14 +315,18 @@ export default function MyPropertiesPage() {
 
                   <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
                     <MapPinIcon className="w-5 h-5 mr-2" />
-                    <span className="text-sm">{property.location}</span>
+                    <span className="text-sm">
+                      {property.area.name}, {property.area.city.name}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span>{property.bedrooms} bed</span>
-                      <span>{property.bathrooms} bath</span>
-                      <span>{property.area} m²</span>
+                      <span>{property.no_of_bedrooms} bed</span>
+                      <span>{property.no_of_bathrooms} bath</span>
+                      <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                        {property.property_type.name}
+                      </span>
                     </div>
                   </div>
 
@@ -297,33 +337,33 @@ export default function MyPropertiesPage() {
                       <span>{property.views_count || 0} views</span>
                     </div>
                     <div>
-                      <span>{property.applications_count || 0} applications</span>
+                      <span>{property.listing_type}</span>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <p className="text-2xl font-bold text-property237-primary mb-4">
-                      {property.price.toLocaleString()} XAF
+                      {parseFloat(property.price).toLocaleString()} {property.currency}
                     </p>
 
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => router.push(`/properties/${property.id}`)}
+                        onClick={() => router.push(`/properties/${property.slug}`)}
                         className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
                       >
                         <EyeIcon className="w-4 h-4 mr-1" />
                         View
                       </button>
                       <button
-                        onClick={() => router.push(`/edit-property/${property.id}`)}
+                        onClick={() => router.push(`/edit-property/${property.slug}`)}
                         className="flex-1 px-3 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors flex items-center justify-center"
                       >
                         <PencilIcon className="w-4 h-4 mr-1" />
                         Edit
                       </button>
                       <button
-                        onClick={() => deleteProperty(property.id)}
+                        onClick={() => deleteProperty(property.slug)}
                         className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                       >
                         <TrashIcon className="w-4 h-4" />
@@ -331,14 +371,14 @@ export default function MyPropertiesPage() {
                     </div>
 
                     <button
-                      onClick={() => toggleAvailability(property.id, property.is_available)}
+                      onClick={() => toggleAvailability(property.slug, property.is_active)}
                       className={`w-full mt-2 px-3 py-2 rounded-lg transition-colors ${
-                        property.is_available
+                        property.is_active
                           ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200'
                           : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200'
                       }`}
                     >
-                      Mark as {property.is_available ? 'Unavailable' : 'Available'}
+                      Mark as {property.is_active ? 'Unavailable' : 'Available'}
                     </button>
                   </div>
                 </div>

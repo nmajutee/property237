@@ -265,3 +265,78 @@ elasticsearch/
 # Whoosh index
 whoosh_index/
 private/
+
+# ============================================================================
+# PROPERTY237 SPECIFIC IGNORES
+# ============================================================================
+
+# Development documentation (internal use only)
+*_ANALYSIS.md
+*_FIX*.md
+*_COMPLETE.md
+*_DEBUGGING.md
+*_SUMMARY.md
+FINAL_*.md
+QUICK_*.md
+TEST_*.md
+UPGRADE_*.md
+
+# Keep only these docs
+!README.md
+!API_REFERENCE.md
+
+# Local backup files
+.env.local.backup
+*.backup
+
+# Development logs
+debug.log
+error.log
+
+# IDE and editor files
+.vscode/settings.json
+.idea/workspace.xml
+
+# Test coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# Mac specific
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Media files (user uploads)
+backend/media/property_images/
+backend/media/profile_pics/
+backend/media/documents/
+
+# Static files
+backend/staticfiles/
+backend/static_collected/
+
+# Database
+*.sqlite3
+db.sqlite3
+*.db
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local

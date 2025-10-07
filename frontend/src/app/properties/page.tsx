@@ -31,14 +31,54 @@ export default function PropertiesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
   const [priceRange, setPriceRange] = useState({ min: '', max: '' })
+  const [propertyTypes, setPropertyTypes] = useState<any[]>([])
 
   useEffect(() => {
+    fetchPropertyTypes()
     fetchProperties()
   }, [])
 
-  const fetchProperties = async () => {
+  const fetchPropertyTypes = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/properties/')
+      const response = await fetch('http://localhost:8000/api/properties/types/')
+      const data = await response.json()
+      setPropertyTypes([
+        { id: 'all', name: 'All Types' },
+        ...data
+      ])
+    } catch (error) {
+      console.error('Error fetching property types:', error)
+    }
+  }
+
+  const fetchProperties = async (filters?: any) => {
+    setLoading(true)
+    try {
+      // Build query parameters
+      const params = new URLSearchParams()
+
+      if (filters?.searchTerm) {
+        params.append('search', filters.searchTerm)
+      }
+
+      if (filters?.selectedType && filters.selectedType !== 'all') {
+        params.append('property_type', filters.selectedType)
+      }
+
+      if (filters?.priceRange?.min) {
+        params.append('price_min', filters.priceRange.min)
+      }
+
+      if (filters?.priceRange?.max) {
+        params.append('price_max', filters.priceRange.max)
+      }
+
+      const queryString = params.toString()
+      const url = queryString
+        ? `http://localhost:8000/api/properties/?${queryString}`
+        : 'http://localhost:8000/api/properties/'
+
+      const response = await fetch(url)
       const data = await response.json()
       setProperties(data.results || [])
     } catch (error) {
@@ -48,14 +88,20 @@ export default function PropertiesPage() {
     }
   }
 
-  const propertyTypes = [
-    { value: 'all', label: 'All Types' },
-    { value: 'apartment', label: 'Apartment' },
-    { value: 'house', label: 'House' },
-    { value: 'studio', label: 'Studio' },
-    { value: 'villa', label: 'Villa' },
-    { value: 'commercial', label: 'Commercial' }
-  ]
+  const handleSearch = () => {
+    fetchProperties({
+      searchTerm,
+      selectedType,
+      priceRange
+    })
+  }
+
+  const handleClearFilters = () => {
+    setSearchTerm('')
+    setSelectedType('all')
+    setPriceRange({ min: '', max: '' })
+    fetchProperties()
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -103,8 +149,8 @@ export default function PropertiesPage() {
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
               >
                 {propertyTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
+                  <option key={type.id} value={type.id}>
+                    {type.name}
                   </option>
                 ))}
               </select>
@@ -112,18 +158,48 @@ export default function PropertiesPage() {
 
             {/* Search Button */}
             <div className="flex items-end">
-              <Button className="w-full">
+              <Button onClick={handleSearch} className="w-full">
                 <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
                 Search
               </Button>
             </div>
           </div>
 
-          {/* Advanced Filters */}
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <button className="flex items-center text-sm text-property237-primary hover:text-property237-dark">
-              <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
-              Advanced Filters
+          {/* Price Range Filter */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Min Price
+              </label>
+              <input
+                type="number"
+                value={priceRange.min}
+                onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                placeholder="0"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Max Price
+              </label>
+              <input
+                type="number"
+                value={priceRange.max}
+                onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                placeholder="Any"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Clear Filters */}
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <button
+              onClick={handleClearFilters}
+              className="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-property237-primary"
+            >
+              Clear All Filters
             </button>
           </div>
         </div>
@@ -161,7 +237,7 @@ export default function PropertiesPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Try adjusting your search criteria
             </p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={handleClearFilters}>
               Clear Filters
             </Button>
           </div>

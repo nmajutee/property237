@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Navbar from '../../../components/navigation/Navbar'
 import { creditsAPI, authAPI } from '../../../services/api'
 import { CreditBalance, User } from '../../../types/api'
@@ -20,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function AgentDashboardPage() {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [balance, setBalance] = useState<CreditBalance | null>(null)
   const [loading, setLoading] = useState(true)
@@ -111,7 +113,11 @@ export default function AgentDashboardPage() {
               <p className="text-green-100 mb-4">
                 Reach thousands of potential tenants across Cameroon
               </p>
-              <Button variant="outline" className="bg-white text-property237-primary hover:bg-gray-100">
+              <Button
+                variant="outline"
+                className="bg-white text-property237-primary hover:bg-gray-100"
+                onClick={() => router.push('/add-property')}
+              >
                 <PlusCircleIcon className="h-5 w-5 mr-2" />
                 Add Property
               </Button>
@@ -149,9 +155,12 @@ export default function AgentDashboardPage() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Recent Listings</h3>
-                <a href="#" className="text-sm text-property237-primary hover:text-property237-dark font-medium">
+                <button
+                  onClick={() => router.push('/my-properties')}
+                  className="text-sm text-property237-primary hover:text-property237-dark font-medium"
+                >
                   View All
-                </a>
+                </button>
               </div>
               <div className="text-center py-12">
                 <HomeIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
@@ -159,7 +168,7 @@ export default function AgentDashboardPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-500 mb-4">
                   Start by adding your first property listing
                 </p>
-                <Button>
+                <Button onClick={() => router.push('/add-property')}>
                   <PlusCircleIcon className="h-5 w-5 mr-2" />
                   Add Your First Property
                 </Button>
@@ -246,7 +255,11 @@ export default function AgentDashboardPage() {
               </div>
               <p className="text-4xl font-bold mb-2">{balance?.balance || '0'}</p>
               <p className="text-sm opacity-75 mb-4">credits available</p>
-              <Button variant="outline" className="w-full bg-white text-property237-primary hover:bg-gray-100">
+              <Button
+                variant="outline"
+                className="w-full bg-white text-property237-primary hover:bg-gray-100"
+                onClick={() => router.push('/credits')}
+              >
                 Buy More Credits
               </Button>
               <div className="mt-4 pt-4 border-t border-white/20">
@@ -267,7 +280,12 @@ export default function AgentDashboardPage() {
               <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
                 Properties with high-quality photos get 3x more views. Add professional photos to your listings!
               </p>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => router.push('/help')}
+              >
                 Learn More
               </Button>
             </div>
@@ -278,10 +296,20 @@ export default function AgentDashboardPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Our team is here to support you
               </p>
-              <Button variant="outline" size="sm" className="w-full mb-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full mb-2"
+                onClick={() => router.push('/contact')}
+              >
                 Contact Support
               </Button>
-              <Button variant="ghost" size="sm" className="w-full">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                onClick={() => router.push('/help')}
+              >
                 View Documentation
               </Button>
             </div>

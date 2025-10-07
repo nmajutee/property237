@@ -37,18 +37,44 @@ export default function Navbar() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check if user is logged in and fetch fresh data
     const token = localStorage.getItem('property237_access_token')
     const userData = localStorage.getItem('property237_user')
 
     if (token && userData) {
       try {
         setUser(JSON.parse(userData))
+        // Fetch fresh user data from backend
+        fetchUserProfile(token)
       } catch (error) {
         console.error('Error parsing user data:', error)
       }
     }
   }, [pathname]) // Re-check when pathname changes
+
+  const fetchUserProfile = async (token: string) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/profile/', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        // Update user state with fresh data
+        setUser(data)
+        // Update localStorage
+        localStorage.setItem('property237_user', JSON.stringify(data))
+      } else if (response.status === 401) {
+        // Token expired or invalid
+        handleLogout()
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('property237_access_token')

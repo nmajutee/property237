@@ -8,6 +8,7 @@ import { HeartIcon as HeartSolid, MapPinIcon, HomeIcon } from '@heroicons/react/
 
 interface Property {
   id: number
+  slug: string
   title: string
   property_type: string
   location: string
@@ -59,13 +60,13 @@ export default function MyFavoritesPage() {
     }
   }
 
-  const removeFavorite = async (propertyId: number) => {
+  const removeFavorite = async (propertySlug: string) => {
     const token = localStorage.getItem('property237_access_token')
     if (!token) return
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/properties/${propertyId}/favorite/`,
+        `http://localhost:8000/api/properties/${propertySlug}/favorite/`,
         {
           method: 'DELETE',
           headers: {
@@ -76,7 +77,8 @@ export default function MyFavoritesPage() {
       )
 
       if (response.ok) {
-        setFavorites(favorites.filter(prop => prop.id !== propertyId))
+        // Re-fetch favorites to update list
+        fetchFavorites(token)
       }
     } catch (error) {
       console.error('Error removing favorite:', error)
@@ -158,7 +160,7 @@ export default function MyFavoritesPage() {
                     </span>
                   )}
                   <button
-                    onClick={() => removeFavorite(property.id)}
+                    onClick={() => removeFavorite(property.slug || property.id.toString())}
                     className="absolute top-4 right-4 bg-white dark:bg-gray-800 p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
                   >
                     <HeartSolid className="w-5 h-5 text-red-500" />

@@ -4,7 +4,6 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { SignUpCard, UserRole } from '../../components/auth/SignUpCard'
 import { SimpleSignup } from '../../components/auth/SimpleSignup'
-import { NavigationBar } from '../../components/composite/NavigationBar'
 import { authAPI } from '../../services/api'
 
 interface SignupFormData {
@@ -85,11 +84,6 @@ export default function SignUpPage() {
   if (step === 'role') {
     return (
       <div className={isDarkMode ? 'dark' : ''}>
-        <NavigationBar
-          showThemeToggle={true}
-          isDarkMode={isDarkMode}
-          onThemeToggle={() => setIsDarkMode(!isDarkMode)}
-        />
         <SignUpCard
           onSelectRole={handleRoleSelect}
           loading={loading}
@@ -102,11 +96,6 @@ export default function SignUpPage() {
   // Show details form step
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <NavigationBar
-        showThemeToggle={true}
-        isDarkMode={isDarkMode}
-        onThemeToggle={() => setIsDarkMode(!isDarkMode)}
-      />
       <div className="relative">
         {/* Back button */}
         <button

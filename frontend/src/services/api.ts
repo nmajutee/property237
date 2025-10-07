@@ -3,14 +3,30 @@
  * Connects frontend to Django backend with authentication and credit management
  */
 
-// API Base URL - uses relative path which is proxied by Vercel to backend
-// In production: /api -> https://property237.onrender.com/api (via vercel.json rewrite)
-// In development: uses localhost backend
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
-  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
-    ? '/api'  // Production: use relative path (proxied by Vercel)
-    : 'http://localhost:8000/api'  // Development: direct connection
-  );
+// Dynamic API URL getter - evaluates at runtime, not build time
+// This ensures the correct URL is used in production vs development
+const getApiBaseUrl = (): string => {
+  // Priority 1: Environment variable (if set)
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Priority 2: Check if we're in browser and not localhost
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    // Production deployment (Vercel or custom domain)
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return '/api'; // Use relative path - proxied by vercel.json
+    }
+  }
+  
+  // Priority 3: Development fallback
+  return 'http://localhost:8000/api';
+};
+
+// Export for debugging/testing purposes
+export { getApiBaseUrl };
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'property237_access_token';
@@ -73,7 +89,9 @@ class APIClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
+    // Get API base URL dynamically at runtime
+    const baseUrl = getApiBaseUrl();
+    const url = `${baseUrl}${endpoint}`;
     const accessToken = tokenService.getAccessToken();
 
     const headers: Record<string, string> = {
@@ -155,7 +173,8 @@ class APIClient {
       throw new Error('No refresh token available');
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/auth/token/refresh/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -449,4 +449,12 @@ LOGGING = {
 import pathlib
 (BASE_DIR / 'logs').mkdir(exist_ok=True)
 
+# CSRF Trusted Origins - Add your domains here
 CSRF_TRUSTED_ORIGINS = [o for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o]
+if not CSRF_TRUSTED_ORIGINS:
+    # Default trusted origins for production
+    CSRF_TRUSTED_ORIGINS = [
+        'https://property237.onrender.com',
+        'http://localhost:3000',
+        'http://localhost:8000',
+    ]

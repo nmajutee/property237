@@ -221,21 +221,21 @@ export default function HomePage() {
               <h4 className="font-semibold mb-4">For Tenants</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link href="/properties" className="hover:text-property237-primary">Browse Properties</Link></li>
-                <li><Link href="/saved" className="hover:text-property237-primary">Saved Properties</Link></li>
+                {/* <li><Link href="/saved" className="hover:text-property237-primary">Saved Properties</Link></li> */}
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">For Agents</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="/list-property" className="hover:text-property237-primary">List Property</a></li>
-                <li><a href="/pricing" className="hover:text-property237-primary">Pricing</a></li>
+                <li><Link href="/add-property" className="hover:text-property237-primary">List Property</Link></li>
+                <li><Link href="/my-properties" className="hover:text-property237-primary">My Properties</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="/about" className="hover:text-property237-primary">About Us</a></li>
-                <li><a href="/contact" className="hover:text-property237-primary">Contact</a></li>
+                <li><Link href="/login" className="hover:text-property237-primary">Login</Link></li>
+                <li><Link href="/register" className="hover:text-property237-primary">Register</Link></li>
               </ul>
             </div>
           </div>

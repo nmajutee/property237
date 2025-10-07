@@ -96,26 +96,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-# Prefer Postgres; allow SQLite fallback for local dev/tests
-if os.getenv('DB_ENGINE') == 'sqlite' or os.getenv('USE_SQLITE', 'False').lower() in ['true', '1', 'yes']:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# ===================================
+# DATABASE CONFIGURATION (Auto Switch)
+# ===================================
+
+import dj_database_url
+
+# Default: SQLite for local development
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'property237_db'),
-            'USER': os.getenv('POSTGRES_USER', 'postgres'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-            'HOST': os.getenv('DB_HOST', '127.0.0.1'),  # local default
-            'PORT': os.getenv('DB_PORT', '5432'),       # local default
-        }
-    }
+}
+
+# Production: Use PostgreSQL when INTERNAL_URL is set (Render provides this)
+DATABASE_URL = os.getenv('INTERNAL_URL') or os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    # On Render: automatically use PostgreSQL via INTERNAL_URL
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

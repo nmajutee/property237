@@ -28,5 +28,8 @@ COPY . /app/
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run migrations and collect static files
+RUN python manage.py collectstatic --noinput --clear || true
+
+# Run the application with Gunicorn
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120"]

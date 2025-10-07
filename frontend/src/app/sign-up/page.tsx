@@ -23,6 +23,7 @@ export default function SignUpPage() {
   const [selectedRole, setSelectedRole] = React.useState<UserRole | null>(null)
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState('')
+  const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({})
   const [isDarkMode, setIsDarkMode] = React.useState(false)
 
   const handleRoleSelect = (role: UserRole) => {
@@ -33,6 +34,7 @@ export default function SignUpPage() {
   const handleSignup = async (data: SignupFormData) => {
     setLoading(true)
     setError('')
+    setFieldErrors({})
 
     try {
       const response = await authAPI.signup({
@@ -54,26 +56,52 @@ export default function SignUpPage() {
       // Handle validation errors from backend
       if (err.response?.data?.errors) {
         const errors = err.response.data.errors
-        const errorMessages = Object.entries(errors)
-          .map(([field, messages]: [string, any]) => {
-            // Format field name nicely
-            const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-            const message = Array.isArray(messages) ? messages.join(', ') : messages
-            
-            // Add helpful hints for common errors
-            if (message.includes('already registered') || message.includes('already taken')) {
-              return `${fieldName}: ${message}. Already have an account? Try logging in.`
-            }
-            return `${fieldName}: ${message}`
-          })
-          .join('. ')
-        setError(errorMessages)
+        const newFieldErrors: Record<string, string> = {}
+        const errorMessages: string[] = []
+        
+        Object.entries(errors).forEach(([field, messages]: [string, any]) => {
+          // Format field name nicely
+          const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+          const message = Array.isArray(messages) ? messages.join(', ') : messages
+          
+          // Store field-specific error for form display
+          newFieldErrors[field] = message
+          
+          // Build user-friendly error message
+          let displayMessage = `${fieldName}: ${message}`
+          
+          // Add helpful hints for common errors
+          if (message.includes('already registered') || message.includes('already taken')) {
+            displayMessage += '. Already have an account? Try logging in.'
+          } else if (message.includes('This field may not be blank')) {
+            displayMessage = `${fieldName} is required`
+          } else if (message.includes('Invalid phone number')) {
+            displayMessage = `${fieldName}: Must be in format +237XXXXXXXXX (9 digits after +237)`
+          } else if (field === 'password' && message.includes('too short')) {
+            displayMessage = `${fieldName}: Must be at least 8 characters long`
+          } else if (field === 'password' && message.includes('too common')) {
+            displayMessage = `${fieldName}: This password is too common. Please choose a stronger password`
+          } else if (field === 'username' && message.includes('Username can only contain')) {
+            displayMessage = `${fieldName}: Can only contain letters, numbers, and underscores`
+          }
+          
+          errorMessages.push(displayMessage)
+        })
+        
+        setFieldErrors(newFieldErrors)
+        setError(errorMessages.join('. '))
       } else if (err.response?.data?.message) {
         setError(err.response.data.message)
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later or contact support.')
+      } else if (err.response?.status === 429) {
+        setError('Too many requests. Please wait a moment and try again.')
       } else if (!err.response) {
-        setError('Network error. Please check your connection and try again.')
+        setError('Network error. Please check your internet connection and try again.')
+      } else if (err.code === 'ECONNABORTED') {
+        setError('Request timeout. Please check your connection and try again.')
       } else {
-        setError('Registration failed. Please try again.')
+        setError('Registration failed. Please check your information and try again.')
       }
 
       setLoading(false)
@@ -122,6 +150,7 @@ export default function SignUpPage() {
           onLoginClick={handleLoginClick}
           loading={loading}
           error={error}
+          fieldErrors={fieldErrors}
         />
       </div>
     </div>

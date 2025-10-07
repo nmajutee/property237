@@ -63,42 +63,54 @@ def signup(request):
         "terms_accepted": true
     }
     """
-    serializer = SignupSerializer(data=request.data)
+    try:
+        serializer = SignupSerializer(data=request.data)
 
-    if not serializer.is_valid():
-        return Response(
-            {'errors': serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        if not serializer.is_valid():
+            return Response(
+                {'errors': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-    # Create user
-    success, user, message = AuthService.signup_user(serializer.validated_data)
+        # Create user
+        success, user, message = AuthService.signup_user(serializer.validated_data)
 
-    if success:
-        # Request OTP for phone verification
-        ip_address, user_agent = get_client_info(request)
-        otp_success, otp, otp_message = OTPService.request_otp(
-            recipient=user.phone_number,
-            otp_type='phone',
-            purpose='signup',
-            user=user,
-            ip_address=ip_address,
-            user_agent=user_agent
-        )
+        if success:
+            # Request OTP for phone verification
+            ip_address, user_agent = get_client_info(request)
+            otp_success, otp, otp_message = OTPService.request_otp(
+                recipient=user.phone_number,
+                otp_type='phone',
+                purpose='signup',
+                user=user,
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
 
-        return Response({
-            'success': True,
-            'message': message,
-            'user': UserSerializer(user).data,
-            'otp_sent': otp_success,
-            'otp_message': otp_message,
-            'next_step': 'verify_phone'
-        }, status=status.HTTP_201_CREATED)
-    else:
+            return Response({
+                'success': True,
+                'message': message,
+                'user': UserSerializer(user).data,
+                'otp_sent': otp_success,
+                'otp_message': otp_message,
+                'next_step': 'verify_phone'
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'success': False,
+                'message': message
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Signup error: {str(e)}", exc_info=True)
+        
         return Response({
             'success': False,
-            'message': message
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'message': 'An unexpected error occurred during registration. Please try again or contact support.'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])

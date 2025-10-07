@@ -23,13 +23,15 @@ interface SimpleSignupProps {
   onLoginClick: () => void
   loading?: boolean
   error?: string
+  fieldErrors?: Record<string, string>
 }
 
 export const SimpleSignup: React.FC<SimpleSignupProps> = ({
   onSignup,
   onLoginClick,
   loading = false,
-  error
+  error,
+  fieldErrors = {}
 }) => {
   const [formData, setFormData] = useState<SignupFormData>({
     full_name: '',
@@ -85,10 +87,18 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Clear any previous errors
+    setErrors({})
+    
+    // Validate form
     if (validateForm()) {
       await onSignup(formData)
     }
   }
+
+  // Merge backend field errors with frontend validation errors
+  const displayErrors = { ...errors, ...fieldErrors }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -124,7 +134,7 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                 placeholder="Enter your full name"
                 required
-                error={errors.full_name}
+                error={displayErrors.full_name}
                 leftIcon={<UserIcon className="h-5 w-5" />}
               />
             </div>
@@ -138,7 +148,7 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 placeholder="Choose a unique username"
                 required
-                error={errors.username}
+                error={displayErrors.username}
                 leftIcon={<UserIcon className="h-5 w-5" />}
               />
             </div>
@@ -152,7 +162,7 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="your@email.com"
                 required
-                error={errors.email}
+                error={displayErrors.email}
                 leftIcon={<EnvelopeIcon className="h-5 w-5" />}
               />
 
@@ -177,7 +187,7 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
                     onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                     placeholder="698765432"
                     required
-                    error={errors.phone_number}
+                    error={displayErrors.phone_number}
                     className="flex-1"
                   />
                 </div>
@@ -196,7 +206,7 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="At least 8 characters"
                 required
-                error={errors.password}
+                error={displayErrors.password}
                 leftIcon={<LockClosedIcon className="h-5 w-5" />}
               />
 
@@ -207,7 +217,7 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
                 onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
                 placeholder="Re-enter password"
                 required
-                error={errors.confirm_password}
+                error={displayErrors.confirm_password || displayErrors.password_confirm}
                 leftIcon={<LockClosedIcon className="h-5 w-5" />}
               />
             </div>

@@ -3,7 +3,27 @@
  * Connects frontend to Django backend with authentication and credit management
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// Use production URL if environment variable is not set and we're not in development
+const getApiBaseUrl = () => {
+  // Check if environment variable is set
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // If in browser, check the hostname
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // If deployed on Vercel
+    if (hostname.includes('vercel.app') || hostname === 'property237.com') {
+      return 'https://property237.onrender.com/api';
+    }
+  }
+  
+  // Default to localhost for development
+  return 'http://localhost:8000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'property237_access_token';

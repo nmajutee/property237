@@ -56,13 +56,22 @@ export default function SignUpPage() {
         const errors = err.response.data.errors
         const errorMessages = Object.entries(errors)
           .map(([field, messages]: [string, any]) => {
-            const fieldName = field.replace('_', ' ')
-            return `${fieldName}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
+            // Format field name nicely
+            const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+            const message = Array.isArray(messages) ? messages.join(', ') : messages
+            
+            // Add helpful hints for common errors
+            if (message.includes('already registered') || message.includes('already taken')) {
+              return `${fieldName}: ${message}. Already have an account? Try logging in.`
+            }
+            return `${fieldName}: ${message}`
           })
           .join('. ')
         setError(errorMessages)
       } else if (err.response?.data?.message) {
         setError(err.response.data.message)
+      } else if (!err.response) {
+        setError('Network error. Please check your connection and try again.')
       } else {
         setError('Registration failed. Please try again.')
       }

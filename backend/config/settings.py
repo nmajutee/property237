@@ -170,12 +170,17 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS settings for frontend integration
-# CORS settings for frontend integration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",  # Vite default
     "http://127.0.0.1:5173",
+    "https://property237.vercel.app",  # Vercel production
+]
+
+# Allow Vercel preview deployments
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",  # All Vercel preview URLs
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -455,6 +460,7 @@ if not CSRF_TRUSTED_ORIGINS:
     # Default trusted origins for production
     CSRF_TRUSTED_ORIGINS = [
         'https://property237.onrender.com',
+        'https://property237.vercel.app',
         'http://localhost:3000',
         'http://localhost:8000',
     ]

@@ -74,3 +74,39 @@ def database_status(request):
             'areas': Area.objects.count(),
         }
     })
+
+
+@api_view(['GET'])
+def user_status(request):
+    """
+    Check current user's status and permissions.
+    Requires authentication.
+    """
+    if not request.user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=401)
+
+    from agents.models import AgentProfile
+
+    has_agent_profile = False
+    agent_profile_id = None
+    try:
+        agent_profile = request.user.agents_profile
+        has_agent_profile = True
+        agent_profile_id = agent_profile.id
+    except AgentProfile.DoesNotExist:
+        pass
+
+    return Response({
+        'user': {
+            'id': request.user.id,
+            'email': request.user.email,
+            'phone_number': str(request.user.phone_number),
+            'user_type': request.user.user_type,
+            'is_phone_verified': request.user.is_phone_verified,
+            'can_list_property': request.user.can_list_property(),
+        },
+        'agent_profile': {
+            'exists': has_agent_profile,
+            'id': agent_profile_id,
+        }
+    })

@@ -13,6 +13,7 @@ urlpatterns = [
     # Admin utilities
     path('admin/seed/', views_admin.seed_database, name='admin-seed'),
     path('admin/status/', views_admin.database_status, name='admin-status'),
+    path('admin/user-status/', views_admin.user_status, name='user-status'),
 
     # Property metadata and search BEFORE slug route
     path('search/', views.property_search, name='property-search'),

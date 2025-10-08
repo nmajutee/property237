@@ -41,9 +41,9 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
         # Ensure only agents can create properties
         import logging
         logger = logging.getLogger(__name__)
-        
+
         logger.info(f"User creating property: {self.request.user.email}, type: {self.request.user.user_type}")
-        
+
         if self.request.user.user_type == 'agent':
             # Try to get agent profile, create if doesn't exist
             try:
@@ -59,7 +59,7 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
                     data_consent_accepted=True
                 )
                 logger.info(f"Created agent profile: {agent_profile.id}")
-            
+
             try:
                 serializer.save(agent=agent_profile)
                 logger.info("Property saved successfully")

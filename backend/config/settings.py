@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'rest_framework',
     'rest_framework_simplejwt',  # JWT Authentication
     'rest_framework_simplejwt.token_blacklist',  # JWT token blacklist
@@ -391,21 +393,38 @@ else:
     }
 
 # ==============================
-# File Storage & Media (S3-ready)
+# File Storage & Media
 # ==============================
-if os.getenv('AWS_STORAGE_BUCKET_NAME'):
-    # Production S3 storage
+
+# Cloudinary Configuration (Free tier with persistent storage)
+if os.getenv('CLOUDINARY_CLOUD_NAME'):
+    # Production - Use Cloudinary
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+
+    cloudinary.config(
+        cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+        api_key=os.getenv('CLOUDINARY_API_KEY'),
+        api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+        secure=True
+    )
+
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'  # Cloudinary handles the actual URL
+
+elif os.getenv('AWS_STORAGE_BUCKET_NAME'):
+    # Alternative: S3 storage
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.StaticS3Boto3Storage'
 
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ca-central-1')  # Canada region
-    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN')  # CDN domain
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ca-central-1')
+    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN')
     AWS_DEFAULT_ACL = 'private'
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_ENCRYPTION = True
 
-    # Media files configuration
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"}/media/'
 else:
     # Local development

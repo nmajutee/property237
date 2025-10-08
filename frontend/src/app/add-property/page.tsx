@@ -155,17 +155,11 @@ export default function AddPropertyPage() {
       // Get the correct API base URL (works in both dev and production)
       const apiBaseUrl = getApiBaseUrl()
 
-      // Fetch all metadata in parallel
+      // Fetch all metadata in parallel (these endpoints are public - no auth needed)
       const [typesRes, statusesRes, regionsRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/properties/types/`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${apiBaseUrl}/properties/statuses/`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${apiBaseUrl}/locations/regions/`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        fetch(`${apiBaseUrl}/properties/types/`),
+        fetch(`${apiBaseUrl}/properties/statuses/`),
+        fetch(`${apiBaseUrl}/locations/regions/`)
       ])
 
       // Check if all responses are OK
@@ -231,12 +225,9 @@ export default function AddPropertyPage() {
     setAreas([])
 
     if (regionId) {
-      const token = localStorage.getItem('property237_access_token')
       const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        const response = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`)
         if (response.ok) {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
@@ -261,12 +252,9 @@ export default function AddPropertyPage() {
     setAreas([])
 
     if (cityId) {
-      const token = localStorage.getItem('property237_access_token')
       const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        const response = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`)
         if (response.ok) {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {

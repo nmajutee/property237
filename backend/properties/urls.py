@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, views_admin
 
 app_name = 'properties'
 
@@ -9,6 +9,10 @@ urlpatterns = [
 
     # Agent's properties
     path('my-properties/', views.my_properties_list, name='my-properties'),
+
+    # Admin utilities
+    path('admin/seed/', views_admin.seed_database, name='admin-seed'),
+    path('admin/status/', views_admin.database_status, name='admin-status'),
 
     # Property metadata and search BEFORE slug route
     path('search/', views.property_search, name='property-search'),

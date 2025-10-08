@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn
 
 COPY . .
 
-RUN python manage.py collectstatic --noinput || true
+# Make start script executable
+RUN chmod +x start.sh
 
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+# Use start.sh which includes migrations and data seeding
+CMD ["./start.sh"]

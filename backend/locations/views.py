@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from .models import Country, Region, City, Area, PopularLocation
 from .serializers import (
     CountrySerializer, RegionSerializer, CitySerializer, AreaSerializer,
@@ -10,12 +11,14 @@ from .serializers import (
 
 class CountryListAPIView(generics.ListAPIView):
     """List all countries"""
+    permission_classes = [AllowAny]
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
 
 class RegionListAPIView(generics.ListAPIView):
     """List regions, optionally filtered by country"""
+    permission_classes = [AllowAny]
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
 
@@ -29,6 +32,7 @@ class RegionListAPIView(generics.ListAPIView):
 
 class CityListAPIView(generics.ListAPIView):
     """List cities, optionally filtered by region"""
+    permission_classes = [AllowAny]
     queryset = City.objects.all()
     serializer_class = CitySerializer
 
@@ -42,6 +46,7 @@ class CityListAPIView(generics.ListAPIView):
 
 class AreaListAPIView(generics.ListAPIView):
     """List areas, optionally filtered by city"""
+    permission_classes = [AllowAny]
     queryset = Area.objects.all()
     serializer_class = AreaSerializer
 

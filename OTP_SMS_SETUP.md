@@ -2,8 +2,8 @@
 
 ## Current Status
 
-✅ **Sign-up working** - Network error fixed!  
-🔄 **OTP implementation** - SMS integration added  
+✅ **Sign-up working** - Network error fixed!
+🔄 **OTP implementation** - SMS integration added
 📝 **Status:** SMS disabled by default (development mode)
 
 ## How It Works Now
@@ -34,10 +34,10 @@
 ### Option 2: Check Database Directly
 ```sql
 -- The OTP code is stored in the database
-SELECT otp_code, recipient, created_at 
-FROM authentication_otpverification 
-WHERE is_verified = FALSE 
-ORDER BY created_at DESC 
+SELECT otp_code, recipient, created_at
+FROM authentication_otpverification
+WHERE is_verified = FALSE
+ORDER BY created_at DESC
 LIMIT 1;
 ```
 
@@ -97,7 +97,7 @@ AFRICASTALKING_SENDER_ID=Property237
            # Print to console for development
            print(f"[SMS] OTP code: {otp_code}")
            return True
-       
+
        # Send real SMS via Africa's Talking
        africastalking.initialize(...)
        sms = africastalking.SMS
@@ -186,8 +186,8 @@ message = client.messages.create(
 
 ## Costs Estimate
 
-**Development:** FREE (no SMS sent)  
-**Production:** 
+**Development:** FREE (no SMS sent)
+**Production:**
 - Setup: $5 minimum top-up
 - Per user: $0.08 per OTP
 - Monthly estimate: $0.08 × expected signups
@@ -199,6 +199,6 @@ message = client.messages.create(
 
 ---
 
-**Status:** Committed and deployed (commit `af7cf7a`)  
-**Testing:** Check Render logs for OTP codes  
+**Status:** Committed and deployed (commit `af7cf7a`)
+**Testing:** Check Render logs for OTP codes
 **Production:** Configure Africa's Talking when ready

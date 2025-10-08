@@ -1,7 +1,7 @@
 from rest_framework import generics, filters, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
@@ -117,12 +117,14 @@ def property_search(request):
 
 class PropertyTypeListAPIView(generics.ListAPIView):
     """List all active property types"""
+    permission_classes = [AllowAny]
     queryset = PropertyType.objects.filter(is_active=True)
     serializer_class = PropertyTypeSerializer
 
 
 class PropertyStatusListAPIView(generics.ListAPIView):
     """List all active property statuses"""
+    permission_classes = [AllowAny]
     queryset = PropertyStatus.objects.filter(is_active=True)
     serializer_class = PropertyStatusSerializer
 

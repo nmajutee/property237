@@ -111,12 +111,17 @@ class APIClient {
     }
 
     try {
+      // Create abort controller for timeout (60 seconds for Render free tier wake-up)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
       const response = await fetch(url, {
         ...options,
         headers,
-        mode: 'cors',
-        credentials: 'include',
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       // Handle 401 Unauthorized - token expired
       if (response.status === 401 && accessToken) {
@@ -165,7 +170,7 @@ class APIClient {
       const errorData = await response.json().catch(() => ({
         message: response.statusText,
       }));
-      
+
       // Create an axios-like error object with response property
       const error: any = new Error(errorData.message || `HTTP ${response.status}`);
       error.response = {
@@ -173,14 +178,14 @@ class APIClient {
         statusText: response.statusText,
         data: errorData,
       };
-      
+
       console.error('[API Error]', {
         status: response.status,
         statusText: response.statusText,
         data: errorData,
         url: response.url,
       });
-      
+
       throw error;
     }
 

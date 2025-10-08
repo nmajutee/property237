@@ -104,9 +104,15 @@ export default function SignUpPage() {
           stack: err.stack,
           error: err
         })
-        setError(`Network error: ${err.message || 'Please check your internet connection and try again.'}`)
+        
+        // Check if it's an abort error (timeout)
+        if (err.name === 'AbortError') {
+          setError('Server is taking too long to respond. The server may be starting up (this can take up to 60 seconds on first request). Please try again.')
+        } else {
+          setError(`Network error: ${err.message || 'Please check your internet connection and try again.'}`)
+        }
       } else if (err.code === 'ECONNABORTED') {
-        setError('Request timeout. Please check your connection and try again.')
+        setError('Request timeout. The server may be starting up. Please try again in a moment.')
       } else {
         console.error('[Sign-up Error] Unknown error:', err)
         setError('Registration failed. Please check your information and try again.')

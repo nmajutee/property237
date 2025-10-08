@@ -169,21 +169,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CORS settings for frontend integration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",  # Vite default
-    "http://127.0.0.1:5173",
-    "https://property237.vercel.app",  # Vercel production
-]
-
-# Allow Vercel preview deployments
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*\.vercel\.app$",  # All Vercel preview URLs
-]
-
-CORS_ALLOW_CREDENTIALS = True
+# CORS settings are configured at the end of this file (after JWT settings)
+# See line ~290 for complete CORS configuration
 
 # REST Framework settings
 # Django REST Framework configuration

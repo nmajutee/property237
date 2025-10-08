@@ -100,13 +100,13 @@ def signup(request):
                 'success': False,
                 'message': message
             }, status=status.HTTP_400_BAD_REQUEST)
-    
+
     except Exception as e:
         # Log the error for debugging
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f"Signup error: {str(e)}", exc_info=True)
-        
+
         return Response({
             'success': False,
             'message': 'An unexpected error occurred during registration. Please try again or contact support.'

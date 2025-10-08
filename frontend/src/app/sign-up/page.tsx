@@ -58,18 +58,18 @@ export default function SignUpPage() {
         const errors = err.response.data.errors
         const newFieldErrors: Record<string, string> = {}
         const errorMessages: string[] = []
-        
+
         Object.entries(errors).forEach(([field, messages]: [string, any]) => {
           // Format field name nicely
           const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
           const message = Array.isArray(messages) ? messages.join(', ') : messages
-          
+
           // Store field-specific error for form display
           newFieldErrors[field] = message
-          
+
           // Build user-friendly error message
           let displayMessage = `${fieldName}: ${message}`
-          
+
           // Add helpful hints for common errors
           if (message.includes('already registered') || message.includes('already taken')) {
             displayMessage += '. Already have an account? Try logging in.'
@@ -84,10 +84,10 @@ export default function SignUpPage() {
           } else if (field === 'username' && message.includes('Username can only contain')) {
             displayMessage = `${fieldName}: Can only contain letters, numbers, and underscores`
           }
-          
+
           errorMessages.push(displayMessage)
         })
-        
+
         setFieldErrors(newFieldErrors)
         setError(errorMessages.join('. '))
       } else if (err.response?.data?.message) {

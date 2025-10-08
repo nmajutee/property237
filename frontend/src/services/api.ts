@@ -10,17 +10,17 @@ const getApiBaseUrl = (): string => {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  
+
   // Priority 2: Check if we're in browser and not localhost
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    
+
     // Production deployment (Vercel or custom domain)
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
       return '/api'; // Use relative path - proxied by vercel.json
     }
   }
-  
+
   // Priority 3: Development fallback
   return 'http://localhost:8000/api';
 };
@@ -92,6 +92,13 @@ class APIClient {
     // Get API base URL dynamically at runtime
     const baseUrl = getApiBaseUrl();
     const url = `${baseUrl}${endpoint}`;
+
+    // Debug logging
+    console.log('[API Debug] Base URL:', baseUrl);
+    console.log('[API Debug] Full URL:', url);
+    console.log('[API Debug] Endpoint:', endpoint);
+    console.log('[API Debug] Window location:', typeof window !== 'undefined' ? window.location.hostname : 'server-side');
+
     const accessToken = tokenService.getAccessToken();
 
     const headers: Record<string, string> = {

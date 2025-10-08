@@ -87,10 +87,10 @@ export const SimpleSignup: React.FC<SimpleSignupProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Clear any previous errors
     setErrors({})
-    
+
     // Validate form
     if (validateForm()) {
       await onSignup(formData)

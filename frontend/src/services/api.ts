@@ -6,22 +6,18 @@
 // Dynamic API URL getter - evaluates at runtime, not build time
 // This ensures the correct URL is used in production vs development
 const getApiBaseUrl = (): string => {
-  // Priority 1: Environment variable (if set)
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  // Priority 2: Check if we're in browser and not localhost
+  // In browser context
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
 
-    // Production deployment (Vercel or custom domain)
+    // Production deployment (Vercel or custom domain) - use relative path
+    // This will be proxied by vercel.json to the backend
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return '/api'; // Use relative path - proxied by vercel.json
+      return '/api'; // Proxied by vercel.json to https://property237.onrender.com/api
     }
   }
 
-  // Priority 3: Development fallback
+  // Development fallback (localhost)
   return 'http://localhost:8000/api';
 };
 

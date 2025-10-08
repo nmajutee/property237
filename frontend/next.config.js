@@ -10,17 +10,19 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
+  // Rewrites are handled by vercel.json in production
+  // This allows local development without conflicts
   async rewrites() {
-    // Only add rewrite if API URL is defined
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL
-    if (apiUrl) {
+    // Only use rewrites in development (local)
+    if (process.env.NODE_ENV === 'development') {
       return [
         {
           source: '/api/:path*',
-          destination: `${apiUrl}/:path*`,
+          destination: 'http://localhost:8000/api/:path*',
         },
       ]
     }
+    // In production, vercel.json handles the rewrites
     return []
   },
 

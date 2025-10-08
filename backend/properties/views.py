@@ -39,12 +39,18 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         # Ensure only agents can create properties
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"User creating property: {self.request.user.email}, type: {self.request.user.user_type}")
+        
         if self.request.user.user_type == 'agent':
             # Try to get agent profile, create if doesn't exist
             try:
                 agent_profile = self.request.user.agents_profile
+                logger.info(f"Found existing agent profile: {agent_profile.id}")
             except AgentProfile.DoesNotExist:
-                from agents.models import AgentProfile
+                logger.info("Creating new agent profile")
                 agent_profile = AgentProfile.objects.create(
                     user=self.request.user,
                     bio='Real estate agent',
@@ -52,8 +58,16 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
                     terms_accepted=True,
                     data_consent_accepted=True
                 )
-            serializer.save(agent=agent_profile)
+                logger.info(f"Created agent profile: {agent_profile.id}")
+            
+            try:
+                serializer.save(agent=agent_profile)
+                logger.info("Property saved successfully")
+            except Exception as e:
+                logger.error(f"Error saving property: {str(e)}", exc_info=True)
+                raise
         else:
+            logger.warning(f"Non-agent user {self.request.user.email} tried to create property")
             raise PermissionDenied("Only agents can create properties")
 
 

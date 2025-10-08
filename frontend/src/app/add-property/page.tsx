@@ -506,12 +506,24 @@ export default function AddPropertyPage() {
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-2 text-sm text-gray-600">
-            <span>Basic Info</span>
-            <span>Location & Details</span>
-            <span>Pricing & Terms</span>
-            <span>Features & Utilities</span>
-            <span>Images</span>
+          {/* Step Labels - aligned with circles */}
+          <div className="flex items-center mt-2">
+            {[
+              'Basic Info',
+              'Location & Details',
+              'Pricing & Terms',
+              'Features & Utilities',
+              'Images'
+            ].map((label, index) => (
+              <div key={index} className="flex-1 flex items-center">
+                <span className={`text-xs text-center w-10 ${
+                  index + 1 <= step ? 'text-green-600 font-medium' : 'text-gray-600'
+                }`}>
+                  {label}
+                </span>
+                {index < 4 && <div className="flex-1 mx-2" />}
+              </div>
+            ))}
           </div>
         </div>
 

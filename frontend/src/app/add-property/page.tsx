@@ -183,7 +183,7 @@ export default function AddPropertyPage() {
           return
         }
 
-        setError('Failed to load property metadata. Please refresh the page.')
+        setError('⚠️ Warning: Could not load all property metadata. Some dropdowns may be empty. Please ensure the database is seeded.')
         setLoading(false)
         return
       }
@@ -217,7 +217,7 @@ export default function AddPropertyPage() {
       setLoading(false)
     } catch (err) {
       console.error('Error fetching metadata:', err)
-      setError('Failed to load form data. Please refresh.')
+      setError('⚠️ Warning: Could not load property types and locations. The form will still work, but you may need to refresh if dropdowns are empty.')
       setLoading(false)
     }
   }
@@ -355,13 +355,16 @@ export default function AddPropertyPage() {
     return true
   }
 
-  const handleNext = () => {
+  const handleNext = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault() // Prevent any form submission
     if (validateStep()) {
       setStep(prev => prev + 1)
+      setError(null) // Clear any previous errors when moving to next step
     }
   }
 
-  const handleBack = () => {
+  const handleBack = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault() // Prevent any form submission
     setStep(prev => prev - 1)
     setError(null)
   }
@@ -536,8 +539,15 @@ export default function AddPropertyPage() {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {error}
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              className="ml-4 text-red-700 hover:text-red-900"
+            >
+              ✕
+            </button>
           </div>
         )}
 

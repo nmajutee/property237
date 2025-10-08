@@ -204,7 +204,7 @@ class APIClient {
     }
 
     const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}/auth/token/refresh`, {
+    const response = await fetch(`${baseUrl}/auth/token/refresh/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -266,7 +266,7 @@ export const authAPI = {
     password_confirm: string;
     user_type: 'tenant' | 'agent';
     terms_accepted: boolean;
-  }) => apiClient.post('/auth/signup', data),
+  }) => apiClient.post('/auth/signup/', data),
 
   login: (data: { identifier: string; password: string; remember_me?: boolean }) =>
     apiClient.post<{
@@ -274,7 +274,7 @@ export const authAPI = {
       message: string;
       user: any;
       tokens: { access: string; refresh: string };
-    }>('/auth/login', data).then((response) => {
+    }>('/auth/login/', data).then((response) => {
       if (response.success && response.tokens) {
         tokenService.setTokens(response.tokens.access, response.tokens.refresh);
         tokenService.setUser(response.user);
@@ -286,7 +286,7 @@ export const authAPI = {
     const refreshToken = tokenService.getRefreshToken();
     tokenService.clearTokens();
     if (refreshToken) {
-      return apiClient.post('/auth/logout', { refresh_token: refreshToken });
+      return apiClient.post('/auth/logout/', { refresh_token: refreshToken });
     }
     return Promise.resolve();
   },
@@ -295,7 +295,7 @@ export const authAPI = {
     recipient: string;
     otp_type: 'phone' | 'email';
     purpose: 'signup' | 'login' | 'password_reset' | 'phone_change';
-  }) => apiClient.post('/auth/otp/request', data),
+  }) => apiClient.post('/auth/otp/request/', data),
 
   verifyOTP: (data: { recipient: string; otp_code: string; purpose: string }) =>
     apiClient.post<{
@@ -303,7 +303,7 @@ export const authAPI = {
       message: string;
       user?: any;
       tokens?: { access: string; refresh: string };
-    }>('/auth/otp/verify', data).then((response) => {
+    }>('/auth/otp/verify/', data).then((response) => {
       if (response.success && response.tokens) {
         tokenService.setTokens(response.tokens.access, response.tokens.refresh);
         if (response.user) {
@@ -314,17 +314,17 @@ export const authAPI = {
     }),
 
   requestPasswordReset: (data: { identifier: string }) =>
-    apiClient.post('/auth/password/reset/request', data),
+    apiClient.post('/auth/password/reset/request/', data),
 
   confirmPasswordReset: (data: {
     token: string;
     new_password: string;
     new_password_confirm: string;
-  }) => apiClient.post('/auth/password/reset/confirm', data),
+  }) => apiClient.post('/auth/password/reset/confirm/', data),
 
-  getProfile: () => apiClient.get('/auth/profile'),
+  getProfile: () => apiClient.get('/auth/profile/'),
 
-  updateProfile: (data: any) => apiClient.patch('/auth/profile/update', data),
+  updateProfile: (data: any) => apiClient.patch('/auth/profile/update/', data),
 };
 
 /**
@@ -340,7 +340,7 @@ export const creditsAPI = {
       user_email: string;
       user_type: string;
       has_low_balance: boolean;
-    }>('/credits/balance'),
+    }>('/credits/balance/'),
 
   getStatistics: () =>
     apiClient.get<{
@@ -352,7 +352,7 @@ export const creditsAPI = {
       usage_count: number;
       properties_viewed: number;
       last_purchase: string | null;
-    }>('/credits/statistics'),
+    }>('/credits/statistics/'),
 
   getPackages: () =>
     apiClient.get<
@@ -367,7 +367,7 @@ export const creditsAPI = {
         price_per_credit: string;
         is_popular: boolean;
       }>
-    >('/credits/packages'),
+    >('/credits/packages/'),
 
   getPricing: () =>
     apiClient.get<
@@ -378,7 +378,7 @@ export const creditsAPI = {
         description: string;
         is_active: boolean;
       }>
-    >('/credits/pricing'),
+    >('/credits/pricing/'),
 
   purchaseCredits: (data: {
     package_id: string;
@@ -390,7 +390,7 @@ export const creditsAPI = {
       message: string;
       transaction: any;
       balance: any;
-    }>('/credits/purchase', data),
+    }>('/credits/purchase/', data),
 
   useCredits: (data: {
     action: 'view_property' | 'list_property' | 'featured_listing' | 'contact_reveal';
@@ -401,7 +401,7 @@ export const creditsAPI = {
       message: string;
       transaction: any;
       balance: any;
-    }>('/credits/use', data),
+    }>('/credits/use/', data),
 
   checkPropertyAccess: (propertyId: number) =>
     apiClient.get<{
@@ -409,14 +409,14 @@ export const creditsAPI = {
       reason: string;
       credits_required: number;
       current_balance: number;
-    }>(`/credits/check-access/${propertyId}`),
+    }>(`/credits/check-access/${propertyId}/`),
 
   getTransactions: (params?: { type?: string; status?: string }) => {
     const query = new URLSearchParams(params as any).toString();
-    return apiClient.get(`/credits/transactions${query ? `?${query}` : ''}`);
+    return apiClient.get(`/credits/transactions/${query ? `?${query}` : ''}`);
   },
 
-  getPropertyViews: () => apiClient.get('/credits/property-views'),
+  getPropertyViews: () => apiClient.get('/credits/property-views/'),
 
   initiateMomoPayment: (data: { package_id: string; phone_number: string }) =>
     apiClient.post<{
@@ -426,7 +426,7 @@ export const creditsAPI = {
       amount: number;
       currency: string;
       package: any;
-    }>('/credits/payment/momo/initiate', data),
+    }>('/credits/payment/momo/initiate/', data),
 
   verifyMomoPayment: (data: { payment_reference: string; package_id: string }) =>
     apiClient.post<{
@@ -434,7 +434,7 @@ export const creditsAPI = {
       message: string;
       transaction: any;
       balance: any;
-    }>('/credits/payment/momo/verify', data),
+    }>('/credits/payment/momo/verify/', data),
 };
 
 /**

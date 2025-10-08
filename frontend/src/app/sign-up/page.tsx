@@ -104,7 +104,7 @@ export default function SignUpPage() {
           stack: err.stack,
           error: err
         })
-        
+
         // Check if it's an abort error (timeout)
         if (err.name === 'AbortError') {
           setError('Server is taking too long to respond. The server may be starting up (this can take up to 60 seconds on first request). Please try again.')

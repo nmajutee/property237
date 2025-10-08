@@ -401,7 +401,8 @@ export default function AddPropertyPage() {
 
       console.log('Submitting property...')
 
-      const response = await fetch('http://localhost:8000/api/properties/', {
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

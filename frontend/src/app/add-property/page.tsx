@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { getApiBaseUrl } from '@/services/api'
 
 // Interfaces matching backend models
 interface PropertyType {
@@ -151,15 +152,18 @@ export default function AddPropertyPage() {
         return
       }
 
+      // Get the correct API base URL (works in both dev and production)
+      const apiBaseUrl = getApiBaseUrl()
+
       // Fetch all metadata in parallel
       const [typesRes, statusesRes, regionsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/properties/types/', {
+        fetch(`${apiBaseUrl}/properties/types/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:8000/api/properties/statuses/', {
+        fetch(`${apiBaseUrl}/properties/statuses/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:8000/api/locations/regions/', {
+        fetch(`${apiBaseUrl}/locations/regions/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ])
@@ -228,8 +232,9 @@ export default function AddPropertyPage() {
 
     if (regionId) {
       const token = localStorage.getItem('property237_access_token')
+      const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`http://localhost:8000/api/locations/cities/?region=${regionId}`, {
+        const response = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.ok) {
@@ -257,8 +262,9 @@ export default function AddPropertyPage() {
 
     if (cityId) {
       const token = localStorage.getItem('property237_access_token')
+      const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`http://localhost:8000/api/locations/areas/?city=${cityId}`, {
+        const response = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.ok) {

@@ -9,5 +9,6 @@
       "source": "/api/:path*",
       "destination": "https://property237.onrender.com/api/:path*"
     }
-  ]
+  ],
+  "trailingSlash": false
 }

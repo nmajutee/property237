@@ -114,6 +114,8 @@ class APIClient {
       const response = await fetch(url, {
         ...options,
         headers,
+        mode: 'cors',
+        credentials: 'include',
       });
 
       // Handle 401 Unauthorized - token expired
@@ -160,10 +162,26 @@ class APIClient {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
-      const error = await response.json().catch(() => ({
+      const errorData = await response.json().catch(() => ({
         message: response.statusText,
       }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      
+      // Create an axios-like error object with response property
+      const error: any = new Error(errorData.message || `HTTP ${response.status}`);
+      error.response = {
+        status: response.status,
+        statusText: response.statusText,
+        data: errorData,
+      };
+      
+      console.error('[API Error]', {
+        status: response.status,
+        statusText: response.statusText,
+        data: errorData,
+        url: response.url,
+      });
+      
+      throw error;
     }
 
     const contentType = response.headers.get('content-type');

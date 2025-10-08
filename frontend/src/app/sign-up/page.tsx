@@ -97,10 +97,18 @@ export default function SignUpPage() {
       } else if (err.response?.status === 429) {
         setError('Too many requests. Please wait a moment and try again.')
       } else if (!err.response) {
-        setError('Network error. Please check your internet connection and try again.')
+        // Log detailed error information for debugging
+        console.error('[Sign-up Error] Network error details:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack,
+          error: err
+        })
+        setError(`Network error: ${err.message || 'Please check your internet connection and try again.'}`)
       } else if (err.code === 'ECONNABORTED') {
         setError('Request timeout. Please check your connection and try again.')
       } else {
+        console.error('[Sign-up Error] Unknown error:', err)
         setError('Registration failed. Please check your information and try again.')
       }
 

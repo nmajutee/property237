@@ -42,6 +42,7 @@ export default function AddPropertyPage() {
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Metadata from backend
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([])
@@ -458,12 +459,14 @@ export default function AddPropertyPage() {
         console.log('Property Slug:', data.slug)
         console.log('Images uploaded:', images.length)
 
-        // Show detailed success message
+        // Show success message
         const imageText = images.length > 0 ? ` with ${images.length} image${images.length > 1 ? 's' : ''}` : ''
-        alert(`✅ Property "${data.title}" has been successfully published${imageText}!\n\nIt is now visible to all users and can be found in your listings.`)
-
-        // Redirect to my properties page
-        router.push('/my-properties')
+        setSuccessMessage(`Property "${data.title}" has been successfully published${imageText}!`)
+        
+        // Redirect to my properties page after 2 seconds
+        setTimeout(() => {
+          router.push('/my-properties')
+        }, 2500)
       } else {
         // Check if response is JSON before parsing
         const contentType = response.headers.get('content-type')
@@ -571,6 +574,16 @@ export default function AddPropertyPage() {
             ))}
           </div>
         </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border-2 border-green-500 text-green-800 px-6 py-4 rounded-lg flex items-center shadow-lg">
+            <svg className="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="font-semibold">{successMessage}</span>
+          </div>
+        )}
 
         {/* Error Alert */}
         {error && (

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Navbar from '../../../components/navigation/Navbar'
+import { getApiBaseUrl } from '@/services/api'
 import {
   HeartIcon as HeartOutline,
   MapPinIcon,
@@ -64,7 +65,8 @@ export default function PropertyDetailPage() {
 
   const fetchProperty = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/properties/${id}/`)
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/${id}/`)
       if (response.ok) {
         const data = await response.json()
         setProperty(data)
@@ -84,8 +86,9 @@ export default function PropertyDetailPage() {
     if (!token) return
 
     try {
+      const apiBaseUrl = getApiBaseUrl()
       const response = await fetch(
-        `http://localhost:8000/api/properties/${id}/is_favorite/`,
+        `${apiBaseUrl}/properties/${id}/is_favorite/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,

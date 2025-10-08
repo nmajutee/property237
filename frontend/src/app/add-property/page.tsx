@@ -405,7 +405,7 @@ export default function AddPropertyPage() {
       if (response.status === 401) {
         console.log('Token expired, attempting refresh...')
         const refreshToken = localStorage.getItem('property237_refresh_token')
-        
+
         if (refreshToken) {
           try {
             const refreshResponse = await fetch(`${apiBaseUrl}/auth/token/refresh/`, {
@@ -418,9 +418,9 @@ export default function AddPropertyPage() {
               const refreshData = await refreshResponse.json()
               localStorage.setItem('property237_access_token', refreshData.access)
               token = refreshData.access
-              
+
               console.log('Token refreshed, retrying submission...')
-              
+
               // Retry with new token
               response = await fetch(`${apiBaseUrl}/properties/`, {
                 method: 'POST',

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
+import { getApiBaseUrl } from '@/services/api'
 import {
   PencilIcon,
   TrashIcon,
@@ -91,7 +92,8 @@ export default function MyPropertiesPage() {
 
   const fetchProperties = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/properties/my-properties/', {
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/my-properties/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -118,7 +120,8 @@ export default function MyPropertiesPage() {
     if (!token) return
 
     try {
-      const response = await fetch(`http://localhost:8000/api/properties/${propertySlug}/`, {
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/${propertySlug}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -143,9 +146,10 @@ export default function MyPropertiesPage() {
     if (!token) return
 
     try {
+      const apiBaseUrl = getApiBaseUrl()
       // Update is_active status via PATCH
       const response = await fetch(
-        `http://localhost:8000/api/properties/${propertySlug}/`,
+        `${apiBaseUrl}/properties/${propertySlug}/`,
         {
           method: 'PATCH',
           headers: {

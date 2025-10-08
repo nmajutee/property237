@@ -360,7 +360,7 @@ export default function AddPropertyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const token = localStorage.getItem('property237_access_token')
+    let token = localStorage.getItem('property237_access_token')
     if (!token) {
       router.push('/sign-in')
       return
@@ -393,13 +393,60 @@ export default function AddPropertyPage() {
       console.log('Submitting property...')
 
       const apiBaseUrl = getApiBaseUrl()
-      const response = await fetch(`${apiBaseUrl}/properties/`, {
+      let response = await fetch(`${apiBaseUrl}/properties/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
         body: formDataToSend,
       })
+
+      // Handle token expiration - try to refresh
+      if (response.status === 401) {
+        console.log('Token expired, attempting refresh...')
+        const refreshToken = localStorage.getItem('property237_refresh_token')
+        
+        if (refreshToken) {
+          try {
+            const refreshResponse = await fetch(`${apiBaseUrl}/auth/token/refresh/`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refresh: refreshToken })
+            })
+
+            if (refreshResponse.ok) {
+              const refreshData = await refreshResponse.json()
+              localStorage.setItem('property237_access_token', refreshData.access)
+              token = refreshData.access
+              
+              console.log('Token refreshed, retrying submission...')
+              
+              // Retry with new token
+              response = await fetch(`${apiBaseUrl}/properties/`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+                body: formDataToSend,
+              })
+            } else {
+              // Refresh failed, redirect to login
+              setError('Your session has expired. Please sign in again.')
+              setTimeout(() => router.push('/sign-in'), 2000)
+              return
+            }
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError)
+            setError('Your session has expired. Please sign in again.')
+            setTimeout(() => router.push('/sign-in'), 2000)
+            return
+          }
+        } else {
+          setError('Your session has expired. Please sign in again.')
+          setTimeout(() => router.push('/sign-in'), 2000)
+          return
+        }
+      }
 
       console.log('Response status:', response.status)
       console.log('Response ok:', response.ok)

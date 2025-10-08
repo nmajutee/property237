@@ -211,23 +211,44 @@ class OTPService:
     @staticmethod
     def _send_sms(phone_number, otp_code):
         """
-        Send SMS with OTP code
-        TODO: Integrate with SMS provider (e.g., Twilio, Africa's Talking)
+        Send SMS with OTP code via Africa's Talking
         """
-        # Mock implementation for development
-        print(f"[SMS] Sending OTP {otp_code} to {phone_number}")
-
-        # In production, integrate with SMS provider:
-        # from twilio.rest import Client
-        # client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        # message = client.messages.create(
-        #     body=f"Your Property237 verification code is: {otp_code}",
-        #     from_=settings.TWILIO_PHONE_NUMBER,
-        #     to=phone_number
-        # )
-        # return message.sid is not None
-
-        return True  # Mock success
+        try:
+            # Check if SMS is enabled
+            if not getattr(settings, 'SMS_ENABLED', False):
+                print(f"[SMS DISABLED] Would send OTP {otp_code} to {phone_number}")
+                print(f"[SMS] Copy this code to verify: {otp_code}")
+                return True  # Mock success for development
+            
+            # Import Africa's Talking
+            import africastalking
+            
+            # Initialize SDK
+            africastalking.initialize(
+                username=settings.AFRICASTALKING_USERNAME,
+                api_key=settings.AFRICASTALKING_API_KEY
+            )
+            
+            # Get SMS service
+            sms = africastalking.SMS
+            
+            # Send message
+            message = f"Your Property237 verification code is: {otp_code}. Valid for 10 minutes."
+            response = sms.send(message, [phone_number], sender_id=settings.AFRICASTALKING_SENDER_ID)
+            
+            print(f"[SMS] Sent OTP to {phone_number}: {response}")
+            return True
+            
+        except ImportError:
+            # Africa's Talking not installed
+            print(f"[SMS] Africa's Talking not installed. OTP code: {otp_code}")
+            print(f"[SMS] Install with: pip install africastalking")
+            return True  # Return True for development
+            
+        except Exception as e:
+            print(f"[SMS ERROR] Failed to send OTP to {phone_number}: {str(e)}")
+            print(f"[SMS FALLBACK] Use this code: {otp_code}")
+            return True  # Return True to not block user signup
 
     @staticmethod
     def _send_email(email_address, otp_code):

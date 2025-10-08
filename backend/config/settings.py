@@ -466,6 +466,14 @@ LOGGING = {
 import pathlib
 (BASE_DIR / 'logs').mkdir(exist_ok=True)
 
+# ==============================
+# SMS Configuration (Africa's Talking)
+# ==============================
+SMS_ENABLED = os.getenv('SMS_ENABLED', 'False') == 'True'
+AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME', 'sandbox')
+AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY', '')
+AFRICASTALKING_SENDER_ID = os.getenv('AFRICASTALKING_SENDER_ID', 'Property237')
+
 # CSRF Trusted Origins - Add your domains here
 CSRF_TRUSTED_ORIGINS = [o for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o]
 if not CSRF_TRUSTED_ORIGINS:

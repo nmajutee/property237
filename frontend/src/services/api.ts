@@ -3,21 +3,20 @@
  * Connects frontend to Django backend with authentication and credit management
  */
 
-// Dynamic API URL getter - evaluates at runtime, not build time
-// This ensures the correct URL is used in production vs development
+// DIRECT BACKEND APPROACH - No proxy, no redirects, no issues
+// Call the backend directly with proper CORS
 const getApiBaseUrl = (): string => {
   // In browser context
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
 
-    // Production deployment (Vercel or custom domain) - use relative path
-    // This will be proxied by vercel.json to the backend
+    // Production: Call backend directly
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return '/api'; // Proxied by vercel.json to https://property237.onrender.com/api
+      return 'https://property237.onrender.com/api';
     }
   }
 
-  // Development fallback (localhost)
+  // Development: localhost
   return 'http://localhost:8000/api';
 };
 

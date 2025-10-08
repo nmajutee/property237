@@ -292,15 +292,40 @@ CORS_ALLOWED_ORIGINS = [
     'https://property237.com',
     'https://www.property237.com',
     'https://admin.property237.com',
-] + os.getenv('ADDITIONAL_CORS_ORIGINS', '').split(',') if os.getenv('ADDITIONAL_CORS_ORIGINS') else []
+    'https://property237.vercel.app',  # Vercel deployment - CRITICAL!
+] + (os.getenv('ADDITIONAL_CORS_ORIGINS', '').split(',') if os.getenv('ADDITIONAL_CORS_ORIGINS') else [])
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.property237\.com$",  # All subdomains
+    r"^https://.*\.vercel\.app$",  # All Vercel preview deployments
     r"^http://localhost:\d+$",  # Local development
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
+
+# Allow all methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Allow all headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Headers exposed to frontend
 CORS_EXPOSE_HEADERS = [

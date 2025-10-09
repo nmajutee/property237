@@ -153,6 +153,11 @@ export default function MyPropertiesPage() {
       })
 
       console.log(`Delete response status: ${response.status}`)
+      console.log(`Delete response ok: ${response.ok}`)
+      
+      // Get response text for debugging
+      const responseText = await response.text()
+      console.log(`Delete response body: ${responseText}`)
 
       if (response.ok || response.status === 204) {
         // Remove property from state immediately for instant UI update
@@ -167,9 +172,35 @@ export default function MyPropertiesPage() {
         // Re-fetch to ensure sync with backend
         await fetchProperties(token)
       } else {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('Delete failed:', errorData)
-        showNotification('error', `Failed to delete property: ${errorData.error || errorData.detail || 'Unknown error'}`)
+        // Try to parse error response
+        let errorData: any = {}
+        try {
+          errorData = responseText ? JSON.parse(responseText) : {}
+        } catch (e) {
+          errorData = { detail: responseText || 'Unknown error' }
+        }
+        
+        console.error('Delete failed - Status:', response.status)
+        console.error('Delete failed - Error data:', errorData)
+        console.error('Delete failed - Headers:', Object.fromEntries(response.headers.entries()))
+        
+        // Get better error message
+        let errorMessage = 'Unknown error'
+        if (errorData.detail) {
+          errorMessage = errorData.detail
+        } else if (errorData.error) {
+          errorMessage = errorData.error
+        } else if (response.status === 403) {
+          errorMessage = 'You do not have permission to delete this property'
+        } else if (response.status === 404) {
+          errorMessage = 'Property not found'
+        } else if (response.status === 401) {
+          errorMessage = 'Please log in again'
+        } else {
+          errorMessage = `Server error (${response.status})`
+        }
+        
+        showNotification('error', `Failed to delete property: ${errorMessage}`)
         setDeleteModal({ show: false, propertySlug: '', propertyTitle: '' })
       }
     } catch (error: any) {

@@ -40,6 +40,8 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
             # If using Cloudinary, add transformations for consistent sizing
             if 'cloudinary' in url or 'res.cloudinary.com' in url:
+                # Fix malformed Cloudinary URLs (missing /image/upload/)
+                url = self._fix_cloudinary_url(url)
                 # Transform to standard size: 1200x800, crop to fill, auto quality
                 url = self._apply_cloudinary_transform(url, 'w_1200,h_800,c_fill,q_auto,f_auto')
                 return url
@@ -65,6 +67,8 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
             # If using Cloudinary, create optimized thumbnail
             if 'cloudinary' in url or 'res.cloudinary.com' in url:
+                # Fix malformed Cloudinary URLs (missing /image/upload/)
+                url = self._fix_cloudinary_url(url)
                 # Smaller thumbnail: 400x300, crop to fill, auto quality
                 url = self._apply_cloudinary_transform(url, 'w_400,h_300,c_fill,q_auto,f_auto')
                 return url
@@ -81,6 +85,19 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
             return url
         return 'https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=No+Image'
+
+    def _fix_cloudinary_url(self, url):
+        """Fix malformed Cloudinary URLs that are missing /image/upload/"""
+        if 'res.cloudinary.com' in url and '/upload/' not in url:
+            # URL format: https://res.cloudinary.com/CLOUD_NAME/path/to/image.jpg
+            # Should be: https://res.cloudinary.com/CLOUD_NAME/image/upload/path/to/image.jpg
+            import re
+            match = re.match(r'(https://res\.cloudinary\.com/[^/]+)/(.*)', url)
+            if match:
+                base_url = match.group(1)
+                image_path = match.group(2)
+                return f"{base_url}/image/upload/{image_path}"
+        return url
 
     def _apply_cloudinary_transform(self, url, transforms):
         """Apply Cloudinary transformations to image URL"""
@@ -119,6 +136,8 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
             # Apply Cloudinary transformations for consistent sizing
             if 'cloudinary' in url or 'res.cloudinary.com' in url:
+                # Fix malformed Cloudinary URLs (missing /image/upload/)
+                url = self._fix_cloudinary_url(url)
                 url = self._apply_cloudinary_transform(url, 'w_800,h_600,c_fill,q_auto,f_auto')
 
             # Make URL absolute if not already
@@ -129,6 +148,19 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
             return url
         return None
+
+    def _fix_cloudinary_url(self, url):
+        """Fix malformed Cloudinary URLs that are missing /image/upload/"""
+        if 'res.cloudinary.com' in url and '/upload/' not in url:
+            # URL format: https://res.cloudinary.com/CLOUD_NAME/path/to/image.jpg
+            # Should be: https://res.cloudinary.com/CLOUD_NAME/image/upload/path/to/image.jpg
+            import re
+            match = re.match(r'(https://res\.cloudinary\.com/[^/]+)/(.*)', url)
+            if match:
+                base_url = match.group(1)
+                image_path = match.group(2)
+                return f"{base_url}/image/upload/{image_path}"
+        return url
 
     def _apply_cloudinary_transform(self, url, transforms):
         """Apply Cloudinary transformations to image URL"""

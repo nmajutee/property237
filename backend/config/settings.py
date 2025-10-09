@@ -410,8 +410,23 @@ if os.getenv('CLOUDINARY_CLOUD_NAME'):
         secure=True
     )
 
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'  # Cloudinary handles the actual URL
+    # Use custom storage backend with image optimization
+    DEFAULT_FILE_STORAGE = 'utils.cloudinary_storage.OptimizedCloudinaryStorage'
+    
+    # Cloudinary URL prefix
+    MEDIA_URL = f'https://res.cloudinary.com/{os.getenv("CLOUDINARY_CLOUD_NAME")}/'
+    
+    # Cloudinary settings for django-cloudinary-storage
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+        'SECURE': True,
+        'MEDIA_TAG': 'media',
+        'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+        'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
+        'STATIC_TAG': 'static',
+    }
 
 elif os.getenv('AWS_STORAGE_BUCKET_NAME'):
     # Alternative: S3 storage

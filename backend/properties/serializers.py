@@ -26,19 +26,58 @@ class PropertyFeatureSerializer(serializers.ModelSerializer):
 class PropertyImageSerializer(serializers.ModelSerializer):
     """Serializer for property images"""
     image_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = PropertyImage
-        fields = ['id', 'image', 'image_url', 'image_type', 'title', 'is_primary', 'order', 'created_at']
+        fields = ['id', 'image', 'image_url', 'thumbnail_url', 'image_type', 'title', 'is_primary', 'order', 'created_at']
         read_only_fields = ['id', 'created_at']
 
     def get_image_url(self, obj):
+        """Get full-size image URL with Cloudinary transformations"""
         if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
+            url = obj.image.url
+            
+            # If using Cloudinary, add transformations for consistent sizing
+            if 'cloudinary' in url or 'res.cloudinary.com' in url:
+                # Transform to standard size: 1200x800, crop to fill, auto quality
+                url = self._apply_cloudinary_transform(url, 'w_1200,h_800,c_fill,q_auto,f_auto')
+            
+            # Make URL absolute if not already
+            if url and not url.startswith('http'):
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(url)
+            
+            return url
         return None
+
+    def get_thumbnail_url(self, obj):
+        """Get thumbnail URL for lists/cards"""
+        if obj.image:
+            url = obj.image.url
+            
+            # If using Cloudinary, create optimized thumbnail
+            if 'cloudinary' in url or 'res.cloudinary.com' in url:
+                # Smaller thumbnail: 400x300, crop to fill, auto quality
+                url = self._apply_cloudinary_transform(url, 'w_400,h_300,c_fill,q_auto,f_auto')
+            
+            # Make URL absolute if not already
+            if url and not url.startswith('http'):
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(url)
+            
+            return url
+        return None
+
+    def _apply_cloudinary_transform(self, url, transforms):
+        """Apply Cloudinary transformations to image URL"""
+        if '/upload/' in url:
+            # Insert transformations after '/upload/'
+            parts = url.split('/upload/')
+            return f"{parts[0]}/upload/{transforms}/{parts[1]}"
+        return url
 
 
 class PropertyListSerializer(serializers.ModelSerializer):
@@ -60,19 +99,32 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
     def get_primary_image(self, obj):
         primary_image = obj.images.filter(is_primary=True).first()
+        if not primary_image:
+            # Fallback to first image if no primary
+            primary_image = obj.images.first()
+        
         if primary_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(primary_image.image.url)
-            return primary_image.image.url
-        # Fallback to first image if no primary
-        first_image = obj.images.first()
-        if first_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(first_image.image.url)
-            return first_image.image.url
+            url = primary_image.image.url
+            
+            # Apply Cloudinary transformations for consistent sizing
+            if 'cloudinary' in url or 'res.cloudinary.com' in url:
+                url = self._apply_cloudinary_transform(url, 'w_800,h_600,c_fill,q_auto,f_auto')
+            
+            # Make URL absolute if not already
+            if url and not url.startswith('http'):
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(url)
+            
+            return url
         return None
+
+    def _apply_cloudinary_transform(self, url, transforms):
+        """Apply Cloudinary transformations to image URL"""
+        if '/upload/' in url:
+            parts = url.split('/upload/')
+            return f"{parts[0]}/upload/{transforms}/{parts[1]}"
+        return url
 
 
 class PropertyDetailSerializer(serializers.ModelSerializer):

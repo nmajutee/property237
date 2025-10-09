@@ -37,17 +37,17 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         """Get full-size image URL"""
         if obj.image:
             url = obj.image.url
-            
+
             # AWS S3 URLs are already absolute
             if url and url.startswith('http'):
                 return url
-            
+
             # For local paths, make absolute
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-                    
+
             return url
         return None
 
@@ -81,17 +81,17 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
         if primary_image and primary_image.image:
             url = primary_image.image.url
-            
+
             # AWS S3 URLs are already absolute
             if url and url.startswith('http'):
                 return url
-                
+
             # For local paths, make absolute
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-                    
+
             return url
         return None
 

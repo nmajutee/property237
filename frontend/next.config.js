@@ -4,7 +4,14 @@ const nextConfig = {
   typedRoutes: true,
 
   images: {
-    domains: ['localhost', 'property237.com'],
+    domains: [
+      'localhost',
+      'property237.com',
+      'property237-media.s3.eu-west-1.amazonaws.com',
+      'property237-media.s3.amazonaws.com',
+      's3.eu-west-1.amazonaws.com',
+      's3.amazonaws.com'
+    ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

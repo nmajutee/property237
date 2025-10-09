@@ -66,7 +66,7 @@
 
 ### 1. Images Still Not Showing
 **Why**: Old properties uploaded before Cloudinary
-**Fix**: 
+**Fix**:
 - Delete old test properties
 - Create NEW property after Cloudinary is configured
 - New images will be permanent

@@ -59,12 +59,12 @@
    - [ ] Property description shows
    - [ ] Location shows
    - [ ] Agent info shows
-   
+
 3. **Check browser console**:
    - Open DevTools (F12) → Console tab
    - Look for: `Navigating to property detail: [slug]`
    - Should have NO red errors
-   
+
 4. **If page is blank**:
    - Check console for errors
    - Check Network tab for failed API calls
@@ -78,11 +78,11 @@
 2. **Should happen**:
    - [ ] Navigates to `/edit-property/[slug]`
    - [ ] Either: Edit page loads, OR shows "Page not found"
-   
+
 3. **If "Page not found"**:
    - ✅ This is expected - edit page doesn't exist yet
    - We'll create it next if needed
-   
+
 4. **Check console**:
    - Should see: `Navigating to edit property: [slug]`
 
@@ -94,17 +94,17 @@
 2. **Should happen**:
    - [ ] Confirmation dialog appears
    - [ ] Message: "Are you sure you want to delete this property?"
-   
+
 3. **Click "OK" to confirm**:
    - [ ] Property disappears from list
    - [ ] Success message: "Property deleted successfully"
    - [ ] Total count decreases
-   
+
 4. **Check console**:
    - Should see: `Delete button clicked for: [slug]`
    - Should see: `Deleting property: [slug]`
    - Should see: `Delete response status: 204` or `200`
-   
+
 5. **If delete fails**:
    - Check console for error message
    - Check Network tab for API response
@@ -121,11 +121,11 @@
    - [ ] Text changes from "Available" to "Unavailable"
    - [ ] Button text changes to "Mark as Available"
    - [ ] Alert: "Property marked as unavailable"
-   
+
 4. **Click "Mark as Available"** to toggle back:
    - [ ] Badge changes back to green
    - [ ] Alert: "Property marked as available"
-   
+
 5. **Check console**:
    - Should see: `Toggling availability for: [slug] from true to false`
    - Should see: `Toggle response status: 200`
@@ -144,7 +144,7 @@
    - [ ] Message: "Property published successfully!"
    - [ ] Automatically redirects to My Properties after 2.5 seconds
    - [ ] New property appears in list
-   
+
 6. **Check the new property**:
    - [ ] Has green "Available" badge
    - [ ] Images display correctly
@@ -171,7 +171,7 @@
 **Solution**: Check localStorage for token, re-login if needed
 
 ### Issue: Images not showing
-**Solution**: 
+**Solution**:
 1. Check if Cloudinary is configured on Render
 2. Old properties won't have images (expected)
 3. Create NEW property to test

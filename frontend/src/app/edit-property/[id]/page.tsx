@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import { getApiBaseUrl } from '@/services/api';
 
 interface PropertyData {
   id: number;
@@ -86,7 +87,8 @@ export default function EditPropertyPage() {
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/properties/${propertyId}/`, {
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/${propertyId}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -255,8 +257,9 @@ export default function EditPropertyPage() {
         formDataToSend.append('images', file);
       });
 
-      const response = await fetch(`http://localhost:8000/api/properties/${propertyId}/`, {
-        method: 'PUT',
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/${propertyId}/`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
         },

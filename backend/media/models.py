@@ -90,13 +90,23 @@ class PropertyImage(models.Model):
         return f"{self.property.title} - {self.get_image_type_display()}"
 
     def save(self, *args, **kwargs):
+        import logging
+        logger = logging.getLogger(__name__)
+        
         # Ensure only one primary image per property
         if self.is_primary:
             PropertyImage.objects.filter(
                 property=self.property,
                 is_primary=True
             ).exclude(pk=self.pk).update(is_primary=False)
+        
         super().save(*args, **kwargs)
+        
+        # Log the saved image URL
+        if self.image:
+            logger.info(f"PropertyImage saved - ID: {self.pk}, URL: {self.image.url}")
+            logger.info(f"  Image name: {self.image.name}")
+            logger.info(f"  Image path: {getattr(self.image, 'path', 'N/A')}")
 
 
 class PropertyVideo(models.Model):

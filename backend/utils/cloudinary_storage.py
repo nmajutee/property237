@@ -23,12 +23,25 @@ class OptimizedCloudinaryStorage(MediaCloudinaryStorage):
 
     def _save(self, name, content):
         """Override save to optimize images before upload"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"Attempting to save file: {name}")
+        
         # Check if this is an image file
         if self._is_image(name):
+            logger.info(f"Optimizing image: {name}")
             content = self._optimize_image(content, name)
+            logger.info(f"Image optimized successfully")
 
         # Call parent save method to upload to Cloudinary
-        return super()._save(name, content)
+        try:
+            result = super()._save(name, content)
+            logger.info(f"File saved to Cloudinary successfully: {result}")
+            return result
+        except Exception as e:
+            logger.error(f"Failed to save to Cloudinary: {e}", exc_info=True)
+            raise
 
     def _is_image(self, name):
         """Check if file is an image based on extension"""

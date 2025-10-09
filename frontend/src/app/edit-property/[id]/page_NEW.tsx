@@ -49,7 +49,7 @@ export default function EditPropertyPage() {
   const router = useRouter()
   const params = useParams()
   const propertySlug = params.id as string
-  
+
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -244,7 +244,7 @@ export default function EditPropertyPage() {
         setSelectedRegion(data.area.city.region.id.toString())
         await fetchCitiesByRegion(data.area.city.region.id.toString())
       }
-      
+
       if (data.area?.city?.id) {
         setSelectedCity(data.area.city.id.toString())
         await fetchAreasByCity(data.area.city.id.toString())
@@ -318,7 +318,7 @@ export default function EditPropertyPage() {
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
-    
+
     if (type === 'checkbox') {
       const target = e.target as HTMLInputElement
       setFormData({ ...formData, [name]: target.checked })
@@ -448,7 +448,7 @@ export default function EditPropertyPage() {
   // Submit updated property
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateStep4()) return
 
     try {
@@ -537,7 +537,7 @@ export default function EditPropertyPage() {
 
       // Show success message
       setSuccessMessage('Property updated successfully!')
-      
+
       // Redirect after 2.5 seconds
       setTimeout(() => {
         router.push('/my-properties')
@@ -651,7 +651,7 @@ export default function EditPropertyPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
             {/* COPY ALL STEP CONTENT FROM add-property/page.tsx */}
             {/* This is placeholder - we'll use the exact same JSX */}
-            
+
             <div className="text-center py-12">
               <p className="text-gray-600 dark:text-gray-400">
                 Form steps will be identical to add-property form...

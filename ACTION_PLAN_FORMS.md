@@ -164,14 +164,14 @@ export function LocationSelector({ onAreaSelect }) {
   const [areas, setAreas] = useState([])
   const [selectedRegion, setSelectedRegion] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
-  
+
   // Load regions on mount
   useEffect(() => {
     fetch(`${getApiBaseUrl()}/locations/regions/`)
       .then(res => res.json())
       .then(data => setRegions(data.results || data))
   }, [])
-  
+
   // Load cities when region selected
   useEffect(() => {
     if (selectedRegion) {
@@ -180,7 +180,7 @@ export function LocationSelector({ onAreaSelect }) {
         .then(data => setCities(data.results || data))
     }
   }, [selectedRegion])
-  
+
   // Load areas when city selected
   useEffect(() => {
     if (selectedCity) {
@@ -189,19 +189,19 @@ export function LocationSelector({ onAreaSelect }) {
         .then(data => setAreas(data.results || data))
     }
   }, [selectedCity])
-  
+
   return (
     <div>
       <select onChange={(e) => setSelectedRegion(e.target.value)}>
         <option>Select Region</option>
         {regions.map(r => <option value={r.id}>{r.name}</option>)}
       </select>
-      
+
       <select onChange={(e) => setSelectedCity(e.target.value)}>
         <option>Select City</option>
         {cities.map(c => <option value={c.id}>{c.name}</option>)}
       </select>
-      
+
       <select onChange={(e) => onAreaSelect(e.target.value)}>
         <option>Select Area/Neighborhood</option>
         {areas.map(a => <option value={a.id}>{a.name}</option>)}

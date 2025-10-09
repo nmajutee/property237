@@ -42,7 +42,7 @@ export default function EditPropertyPage() {
   const router = useRouter()
   const params = useParams()
   const propertySlug = params.id as string
-  
+
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -101,7 +101,7 @@ export default function EditPropertyPage() {
     has_pool: false,
     has_gym: false,
     has_elevator: false,
-    
+
     // Furnishing
     furnished: '',
     has_tv: false,
@@ -121,7 +121,7 @@ export default function EditPropertyPage() {
     pets_allowed: false,
     smoking_allowed: false,
     featured: false,
-    
+
     // Additional amenities
     has_security_alarm: false,
     has_wifi: false,
@@ -335,7 +335,7 @@ export default function EditPropertyPage() {
         has_loading_dock: data.has_loading_dock || false,
         has_inventory_manager: data.has_inventory_manager || false,
         requires_goods_documentation: data.requires_goods_documentation || false,
-        
+
         // For Rent specific
         initial_months_payable: data.initial_months_payable || '',
         caution_months: data.caution_months || '',
@@ -363,7 +363,7 @@ export default function EditPropertyPage() {
       if (data.area?.city?.region?.id) {
         const regionId = data.area.city.region.id.toString()
         setSelectedRegion(regionId)
-        
+
         // Fetch cities for this region
         const citiesResponse = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`)
         if (citiesResponse.ok) {
@@ -371,11 +371,11 @@ export default function EditPropertyPage() {
           setCities(citiesData.results || citiesData)
         }
       }
-      
+
       if (data.area?.city?.id) {
         const cityId = data.area.city.id.toString()
         setSelectedCity(cityId)
-        
+
         // Fetch areas for this city
         const areasResponse = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`)
         if (areasResponse.ok) {

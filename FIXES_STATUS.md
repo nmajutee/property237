@@ -11,7 +11,7 @@
 
 ### 1. Delete Property Not Working
 **Status**: Investigating
-**What to do**: 
+**What to do**:
 1. Open browser console (F12)
 2. Try to delete a property
 3. Look for red error messages
@@ -131,7 +131,7 @@ We'll decide on edit form solution:
 
 ---
 
-**Waiting for**: 
+**Waiting for**:
 1. Vercel deployment to complete
 2. Your console output from delete attempt
 3. Your preference on edit form (quick vs proper fix)

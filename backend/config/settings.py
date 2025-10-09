@@ -397,25 +397,43 @@ else:
 # ==============================
 
 # Cloudinary Configuration (Free tier with persistent storage)
-# Parse CLOUDINARY_URL if available (format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME)
-cloudinary_url = os.getenv('CLOUDINARY_URL')
-if cloudinary_url:
-    # Extract components from CLOUDINARY_URL
-    import re
-    match = re.match(r'cloudinary://([^:]+):([^@]+)@(.+)', cloudinary_url)
-    if match:
-        cloudinary_api_key = match.group(1)
-        cloudinary_api_secret = match.group(2)
-        cloudinary_cloud_name = match.group(3)
+print("="*60)
+print("CLOUDINARY CONFIGURATION DEBUG")
+print("="*60)
+
+# Try individual environment variables first (more reliable)
+cloudinary_cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+cloudinary_api_key = os.getenv('CLOUDINARY_API_KEY')
+cloudinary_api_secret = os.getenv('CLOUDINARY_API_SECRET')
+
+print(f"Individual vars - CLOUDINARY_CLOUD_NAME: {bool(cloudinary_cloud_name)}")
+print(f"Individual vars - CLOUDINARY_API_KEY: {bool(cloudinary_api_key)}")
+print(f"Individual vars - CLOUDINARY_API_SECRET: {bool(cloudinary_api_secret)}")
+
+# If individual vars not set, try parsing CLOUDINARY_URL
+if not (cloudinary_cloud_name and cloudinary_api_key and cloudinary_api_secret):
+    cloudinary_url = os.getenv('CLOUDINARY_URL')
+    print(f"CLOUDINARY_URL present: {bool(cloudinary_url)}")
+    
+    if cloudinary_url:
+        print(f"CLOUDINARY_URL value: {cloudinary_url[:30]}...")  # Show first 30 chars only
+        # Extract components from CLOUDINARY_URL
+        import re
+        match = re.match(r'cloudinary://([^:]+):([^@]+)@(.+)', cloudinary_url)
+        if match:
+            cloudinary_api_key = match.group(1)
+            cloudinary_api_secret = match.group(2)
+            cloudinary_cloud_name = match.group(3)
+            print(f"✓ Successfully parsed CLOUDINARY_URL")
+            print(f"  Cloud Name: {cloudinary_cloud_name}")
+            print(f"  API Key: {cloudinary_api_key[:6]}...")
+        else:
+            print(f"✗ ERROR: Failed to parse CLOUDINARY_URL format")
     else:
-        cloudinary_api_key = None
-        cloudinary_api_secret = None
-        cloudinary_cloud_name = None
-else:
-    # Fallback to individual environment variables
-    cloudinary_cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
-    cloudinary_api_key = os.getenv('CLOUDINARY_API_KEY')
-    cloudinary_api_secret = os.getenv('CLOUDINARY_API_SECRET')
+        print(f"✗ ERROR: No CLOUDINARY_URL or individual variables found")
+
+print(f"Final values: cloud_name={bool(cloudinary_cloud_name)}, api_key={bool(cloudinary_api_key)}, api_secret={bool(cloudinary_api_secret)}")
+print("="*60)
 
 if cloudinary_cloud_name and cloudinary_api_key and cloudinary_api_secret:
     # Production - Use Cloudinary

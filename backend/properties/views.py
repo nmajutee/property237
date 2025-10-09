@@ -108,17 +108,6 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             instance.delete()
         else:
             raise PermissionDenied("You don't have permission to delete this property")
-        else:
-            raise PermissionDenied("You can only update your own properties")
-
-    def perform_destroy(self, instance):
-        # Soft delete - mark as inactive
-        if (self.request.user == instance.agent.user or
-            self.request.user.is_staff):
-            instance.is_active = False
-            instance.save()
-        else:
-            raise PermissionDenied("You can only delete your own properties")
 
 
 @api_view(['GET'])

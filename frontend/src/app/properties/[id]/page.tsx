@@ -16,31 +16,76 @@ import {
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid'
 
+interface PropertyImage {
+  id: number
+  image: string
+  image_url: string
+  image_type: string
+  title: string | null
+  is_primary: boolean
+  order: number
+  created_at: string
+}
+
+interface PropertyArea {
+  id: number
+  name: string
+  city: {
+    id: number
+    name: string
+    region: {
+      id: number
+      name: string
+      code: string
+    }
+  }
+}
+
+interface PropertyType {
+  id: number
+  name: string
+  category: string
+}
+
+interface PropertyStatus {
+  id: number
+  name: string
+}
+
+interface AgentProfile {
+  id: number
+  user: {
+    id: number
+    email: string
+    first_name: string
+    last_name: string
+    phone_number: string
+  }
+  bio: string
+  is_verified: boolean
+}
+
 interface Property {
   id: number
   title: string
   description: string
-  property_type: string
-  location: string
+  property_type: PropertyType
+  status: PropertyStatus
+  listing_type: string
+  area: PropertyArea
   address: string
-  price: number
-  bedrooms: number
-  bathrooms: number
-  area: number
-  year_built: number
-  images: string[]
-  videos: string[]
-  amenities: string[]
-  is_featured: boolean
-  is_available: boolean
-  agent: {
-    id: number
-    full_name: string
-    email: string
-    phone_number: string
-    profile_picture: string
-    is_verified: boolean
-  }
+  price: string
+  currency: string
+  no_of_bedrooms: number
+  no_of_bathrooms: number
+  square_footage: number
+  year_built: number | null
+  images: PropertyImage[]
+  featured: boolean
+  is_active: boolean
+  agent: AgentProfile
+  additional_features: any[]
+  slug: string
   created_at: string
   updated_at: string
 }
@@ -200,11 +245,15 @@ export default function PropertyDetailPage() {
         <div className="mb-8">
           <div className="relative h-96 rounded-xl overflow-hidden mb-4">
             <img
-              src={property.images[selectedImage] || '/placeholder-property.jpg'}
+              src={property.images[selectedImage]?.image_url || property.images[0]?.image_url || '/placeholder-property.jpg'}
               alt={property.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('Image failed to load:', property.images[selectedImage]?.image_url)
+                e.currentTarget.src = '/placeholder-property.jpg'
+              }}
             />
-            {property.is_featured && (
+            {property.featured && (
               <span className="absolute top-4 left-4 bg-yellow-500 text-white px-4 py-2 rounded-full font-semibold">
                 Featured
               </span>
@@ -222,11 +271,11 @@ export default function PropertyDetailPage() {
           </div>
 
           {/* Thumbnail Gallery */}
-          {property.images.length > 1 && (
+          {property.images && property.images.length > 1 && (
             <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
               {property.images.map((image, index) => (
                 <button
-                  key={index}
+                  key={image.id || index}
                   onClick={() => setSelectedImage(index)}
                   className={`relative h-20 rounded-lg overflow-hidden ${
                     selectedImage === index
@@ -234,7 +283,15 @@ export default function PropertyDetailPage() {
                       : 'opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+                  <img
+                    src={image.image_url || '/placeholder-property.jpg'}
+                    alt={image.title || `View ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Thumbnail failed to load:', image.image_url)
+                      e.currentTarget.src = '/placeholder-property.jpg'
+                    }}
+                  />
                 </button>
               ))}
             </div>

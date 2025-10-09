@@ -33,10 +33,10 @@ Fixing all 3 issues:
    ```
    Key: CLOUDINARY_CLOUD_NAME
    Value: [paste your cloud name from step 1.1]
-   
+
    Key: CLOUDINARY_API_KEY
    Value: [paste your API key from step 1.1]
-   
+
    Key: CLOUDINARY_API_SECRET
    Value: [paste your API secret from step 1.1]
    ```
@@ -115,17 +115,17 @@ After completing all steps above, verify:
 
 - [ ] **Cloudinary Dashboard**: Go to https://cloudinary.com/console → Media Library
   - You should see images in `property_images` folder
-  
+
 - [ ] **My Properties Page**: https://property237.vercel.app/my-properties
   - Properties show green "Available" badges
   - Images display in property cards
   - Total count is correct
-  
+
 - [ ] **Property Detail Page**: Click "View" on any property
   - Page loads (not blank)
   - All information displays
   - Images can be navigated
-  
+
 - [ ] **Public Listings**: Properties appear for other users to see
 
 ---

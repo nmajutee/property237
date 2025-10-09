@@ -54,7 +54,8 @@ class PropertyListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'property_type', 'status', 'listing_type',
             'price', 'currency', 'area', 'no_of_bedrooms', 'no_of_bathrooms',
-            'created_at', 'slug', 'featured', 'images', 'primary_image'
+            'created_at', 'slug', 'featured', 'images', 'primary_image',
+            'is_active', 'views_count'
         ]
 
     def get_primary_image(self, obj):

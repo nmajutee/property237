@@ -35,7 +35,7 @@
 
 **Why:** The first 2 properties were created when the app was using local storage (which gets deleted on Render restart)
 
-**Solution:** 
+**Solution:**
 - The images are lost (Render has no persistent storage)
 - Delete these 2 test properties
 - Create a NEW property AFTER Cloudinary is fully working

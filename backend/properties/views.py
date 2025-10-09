@@ -99,6 +99,16 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             self.request.user.is_staff):
             serializer.save()
         else:
+            raise PermissionDenied("You don't have permission to update this property")
+
+    def perform_destroy(self, instance):
+        # Only property owner or admin can delete
+        if (self.request.user == instance.agent.user or
+            self.request.user.is_staff):
+            instance.delete()
+        else:
+            raise PermissionDenied("You don't have permission to delete this property")
+        else:
             raise PermissionDenied("You can only update your own properties")
 
     def perform_destroy(self, instance):
@@ -160,9 +170,15 @@ def my_properties_list(request):
     Get properties owned by the current user (agent)
     Returns all properties created by the authenticated agent
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
     try:
+        logger.info(f"Fetching properties for user: {request.user.email}")
+
         # Get agent profile for current user
         agent_profile = request.user.agents_profile
+        logger.info(f"Found agent profile: {agent_profile.id}")
 
         # Get all properties owned by this agent (both active and inactive)
         properties = Property.objects.filter(
@@ -170,6 +186,8 @@ def my_properties_list(request):
         ).select_related(
             'property_type', 'status', 'area__city__region'
         ).prefetch_related('images').order_by('-created_at')
+
+        logger.info(f"Found {properties.count()} properties")
 
         # Serialize and return
         serializer = PropertyListSerializer(
@@ -184,10 +202,12 @@ def my_properties_list(request):
         })
 
     except AgentProfile.DoesNotExist:
+        logger.error(f"Agent profile not found for user: {request.user.email}")
         return Response({
             'error': 'Agent profile not found. Please complete your agent registration.'
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        logger.error(f'Error fetching properties: {str(e)}', exc_info=True)
         return Response({
             'error': f'Error fetching properties: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

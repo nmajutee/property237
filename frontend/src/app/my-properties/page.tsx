@@ -117,10 +117,18 @@ export default function MyPropertiesPage() {
     }
 
     const token = localStorage.getItem('property237_access_token')
-    if (!token) return
+    if (!token) {
+      console.error('No token found')
+      alert('Please log in to delete properties')
+      router.push('/signin')
+      return
+    }
 
     try {
       const apiBaseUrl = getApiBaseUrl()
+      console.log(`Deleting property: ${propertySlug}`)
+      console.log(`API URL: ${apiBaseUrl}/properties/${propertySlug}/`)
+
       const response = await fetch(`${apiBaseUrl}/properties/${propertySlug}/`, {
         method: 'DELETE',
         headers: {
@@ -128,25 +136,36 @@ export default function MyPropertiesPage() {
         },
       })
 
+      console.log(`Delete response status: ${response.status}`)
+
       if (response.ok || response.status === 204) {
         // Re-fetch properties to update list
-        fetchProperties(token)
+        await fetchProperties(token)
         alert('Property deleted successfully')
       } else {
-        alert('Failed to delete property')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Delete failed:', errorData)
+        alert(`Failed to delete property: ${errorData.error || errorData.detail || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error deleting property:', error)
-      alert('An error occurred. Please try again.')
+      alert('An error occurred. Please check your connection and try again.')
     }
   }
 
   const toggleAvailability = async (propertySlug: string, currentStatus: boolean) => {
     const token = localStorage.getItem('property237_access_token')
-    if (!token) return
+    if (!token) {
+      console.error('No token found')
+      alert('Please log in to update properties')
+      router.push('/signin')
+      return
+    }
 
     try {
       const apiBaseUrl = getApiBaseUrl()
+      console.log(`Toggling availability for: ${propertySlug} from ${currentStatus} to ${!currentStatus}`)
+
       // Update is_active status via PATCH
       const response = await fetch(
         `${apiBaseUrl}/properties/${propertySlug}/`,
@@ -160,12 +179,20 @@ export default function MyPropertiesPage() {
         }
       )
 
+      console.log(`Toggle response status: ${response.status}`)
+
       if (response.ok) {
         // Re-fetch properties to get updated data
-        fetchProperties(token)
+        await fetchProperties(token)
+        alert(`Property marked as ${!currentStatus ? 'available' : 'unavailable'}`)
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Toggle failed:', errorData)
+        alert(`Failed to update property: ${errorData.error || errorData.detail || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error toggling availability:', error)
+      alert('An error occurred. Please check your connection and try again.')
     }
   }
 
@@ -353,21 +380,30 @@ export default function MyPropertiesPage() {
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => router.push(`/properties/${property.slug}`)}
+                        onClick={() => {
+                          console.log(`Navigating to property detail: ${property.slug}`)
+                          router.push(`/properties/${property.slug}`)
+                        }}
                         className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
                       >
                         <EyeIcon className="w-4 h-4 mr-1" />
                         View
                       </button>
                       <button
-                        onClick={() => router.push(`/edit-property/${property.slug}`)}
+                        onClick={() => {
+                          console.log(`Navigating to edit property: ${property.slug}`)
+                          router.push(`/edit-property/${property.slug}`)
+                        }}
                         className="flex-1 px-3 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors flex items-center justify-center"
                       >
                         <PencilIcon className="w-4 h-4 mr-1" />
                         Edit
                       </button>
                       <button
-                        onClick={() => deleteProperty(property.slug)}
+                        onClick={() => {
+                          console.log(`Delete button clicked for: ${property.slug}`)
+                          deleteProperty(property.slug)
+                        }}
                         className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                       >
                         <TrashIcon className="w-4 h-4" />

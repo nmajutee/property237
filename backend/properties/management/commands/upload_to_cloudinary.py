@@ -22,10 +22,29 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options['dry_run']
 
-        # Check if Cloudinary is configured
-        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+        # Check if Cloudinary is configured - parse from CLOUDINARY_URL if available
+        cloudinary_url = os.getenv('CLOUDINARY_URL')
+        if cloudinary_url:
+            import re
+            match = re.match(r'cloudinary://([^:]+):([^@]+)@(.+)', cloudinary_url)
+            if match:
+                api_key = match.group(1)
+                api_secret = match.group(2)
+                cloud_name = match.group(3)
+                # Configure cloudinary
+                cloudinary.config(
+                    cloud_name=cloud_name,
+                    api_key=api_key,
+                    api_secret=api_secret,
+                    secure=True
+                )
+            else:
+                cloud_name = None
+        else:
+            cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+        
         if not cloud_name:
-            self.stdout.write(self.style.ERROR('Cloudinary not configured! Set CLOUDINARY_CLOUD_NAME environment variable.'))
+            self.stdout.write(self.style.ERROR('Cloudinary not configured! Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME environment variable.'))
             return
 
         self.stdout.write(f"Cloudinary configured: {cloud_name}")

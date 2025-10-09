@@ -18,25 +18,25 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options['dry_run']
-        
+
         images = PropertyImage.objects.all()
         total = images.count()
-        
+
         self.stdout.write(f"Found {total} property images")
-        
+
         if dry_run:
             self.stdout.write(self.style.WARNING("DRY RUN MODE - No changes will be made"))
-        
+
         fixed_count = 0
         error_count = 0
-        
+
         for i, image in enumerate(images, 1):
             try:
                 if image.image:
                     url = image.image.url
-                    
+
                     self.stdout.write(f"[{i}/{total}] {image.property.title}: {url}")
-                    
+
                     # Check if URL is valid
                     if url and ('cloudinary' in url or url.startswith('http')):
                         fixed_count += 1
@@ -47,11 +47,11 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(self.style.ERROR(f"[{i}/{total}] {image.property.title}: No image file"))
                     error_count += 1
-                    
+
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"[{i}/{total}] Error: {str(e)}"))
                 error_count += 1
-        
+
         self.stdout.write(self.style.SUCCESS(f"\nSummary:"))
         self.stdout.write(f"  Total images: {total}")
         self.stdout.write(self.style.SUCCESS(f"  Valid URLs: {fixed_count}"))

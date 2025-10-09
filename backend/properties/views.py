@@ -105,15 +105,15 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         # Only property owner or admin can delete
         import logging
         logger = logging.getLogger(__name__)
-        
+
         logger.info(f"Delete attempt - User: {self.request.user}, Property: {instance.title}")
         logger.info(f"Property agent: {instance.agent}, Agent user: {instance.agent.user if instance.agent else 'No agent'}")
         logger.info(f"Is staff: {self.request.user.is_staff}")
         logger.info(f"Match: {self.request.user == instance.agent.user if instance.agent else False}")
-        
+
         if not instance.agent:
             raise PermissionDenied("Property has no agent assigned")
-        
+
         if (self.request.user == instance.agent.user or
             self.request.user.is_staff):
             logger.info(f"Deleting property {instance.title}")

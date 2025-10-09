@@ -37,18 +37,18 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         """Get full-size image URL with Cloudinary transformations"""
         if obj.image:
             url = obj.image.url
-            
+
             # If using Cloudinary, add transformations for consistent sizing
             if 'cloudinary' in url or 'res.cloudinary.com' in url:
                 # Transform to standard size: 1200x800, crop to fill, auto quality
                 url = self._apply_cloudinary_transform(url, 'w_1200,h_800,c_fill,q_auto,f_auto')
-            
+
             # Make URL absolute if not already
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-            
+
             return url
         return None
 
@@ -56,18 +56,18 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         """Get thumbnail URL for lists/cards"""
         if obj.image:
             url = obj.image.url
-            
+
             # If using Cloudinary, create optimized thumbnail
             if 'cloudinary' in url or 'res.cloudinary.com' in url:
                 # Smaller thumbnail: 400x300, crop to fill, auto quality
                 url = self._apply_cloudinary_transform(url, 'w_400,h_300,c_fill,q_auto,f_auto')
-            
+
             # Make URL absolute if not already
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-            
+
             return url
         return None
 
@@ -102,20 +102,20 @@ class PropertyListSerializer(serializers.ModelSerializer):
         if not primary_image:
             # Fallback to first image if no primary
             primary_image = obj.images.first()
-        
+
         if primary_image:
             url = primary_image.image.url
-            
+
             # Apply Cloudinary transformations for consistent sizing
             if 'cloudinary' in url or 'res.cloudinary.com' in url:
                 url = self._apply_cloudinary_transform(url, 'w_800,h_600,c_fill,q_auto,f_auto')
-            
+
             # Make URL absolute if not already
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-            
+
             return url
         return None
 

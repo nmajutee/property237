@@ -412,10 +412,10 @@ if os.getenv('CLOUDINARY_CLOUD_NAME'):
 
     # Use custom storage backend with image optimization
     DEFAULT_FILE_STORAGE = 'utils.cloudinary_storage.OptimizedCloudinaryStorage'
-    
+
     # Cloudinary URL prefix
     MEDIA_URL = f'https://res.cloudinary.com/{os.getenv("CLOUDINARY_CLOUD_NAME")}/'
-    
+
     # Cloudinary settings for django-cloudinary-storage
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),

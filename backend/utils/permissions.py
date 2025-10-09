@@ -24,11 +24,11 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         # Read permissions for any request
         if request.method in permissions.SAFE_METHODS:
             return True
-        
+
         # For write operations, user must be authenticated
         # Object-level permission will be checked in has_object_permission
         return request.user and request.user.is_authenticated
-    
+
     def has_object_permission(self, request, view, obj):
         # Read permissions for any request
         if request.method in permissions.SAFE_METHODS:
@@ -37,10 +37,10 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         # Write permissions only for the owner
         import logging
         logger = logging.getLogger(__name__)
-        
+
         logger.info(f"IsOwnerOrReadOnly check - User: {request.user}, Method: {request.method}")
         logger.info(f"Object type: {type(obj).__name__}")
-        
+
         if hasattr(obj, 'user'):
             result = obj.user == request.user
             logger.info(f"Has 'user' attr - obj.user: {obj.user}, match: {result}")

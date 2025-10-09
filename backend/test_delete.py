@@ -45,17 +45,17 @@ try:
     # Check related objects
     images = prop.images.all()
     print(f"   Related images: {images.count()}")
-    
+
     viewings = prop.viewings.all()
     print(f"   Related viewings: {viewings.count()}")
-    
+
     favorites = prop.favorited_by.all()
     print(f"   Favorited by: {favorites.count()}")
-    
+
     # Don't actually delete, just simulate
     print(f"\n✅ Property CAN be deleted (simulation only)")
     print(f"   All related objects will be cascade deleted")
-    
+
 except Exception as e:
     print(f"\n❌ Error: {str(e)}")
     import traceback

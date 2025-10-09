@@ -129,7 +129,7 @@ export default function MyPropertiesPage() {
 
   const deleteProperty = async () => {
     const { propertySlug, propertyTitle } = deleteModal
-    
+
     const token = localStorage.getItem('property237_access_token')
     if (!token) {
       console.error('No token found')
@@ -154,7 +154,7 @@ export default function MyPropertiesPage() {
 
       console.log(`Delete response status: ${response.status}`)
       console.log(`Delete response ok: ${response.ok}`)
-      
+
       // Get response text for debugging
       const responseText = await response.text()
       console.log(`Delete response body: ${responseText}`)
@@ -162,13 +162,13 @@ export default function MyPropertiesPage() {
       if (response.ok || response.status === 204) {
         // Remove property from state immediately for instant UI update
         setProperties(prev => prev.filter(p => p.slug !== propertySlug))
-        
+
         // Close modal
         setDeleteModal({ show: false, propertySlug: '', propertyTitle: '' })
-        
+
         // Show success notification
         showNotification('success', `"${propertyTitle}" has been deleted successfully`)
-        
+
         // Re-fetch to ensure sync with backend
         await fetchProperties(token)
       } else {
@@ -179,11 +179,11 @@ export default function MyPropertiesPage() {
         } catch (e) {
           errorData = { detail: responseText || 'Unknown error' }
         }
-        
+
         console.error('Delete failed - Status:', response.status)
         console.error('Delete failed - Error data:', errorData)
         console.error('Delete failed - Headers:', Object.fromEntries(response.headers.entries()))
-        
+
         // Get better error message
         let errorMessage = 'Unknown error'
         if (errorData.detail) {
@@ -199,7 +199,7 @@ export default function MyPropertiesPage() {
         } else {
           errorMessage = `Server error (${response.status})`
         }
-        
+
         showNotification('error', `Failed to delete property: ${errorMessage}`)
         setDeleteModal({ show: false, propertySlug: '', propertyTitle: '' })
       }
@@ -242,12 +242,12 @@ export default function MyPropertiesPage() {
 
       if (response.ok) {
         // Update property in state immediately
-        setProperties(prev => prev.map(p => 
+        setProperties(prev => prev.map(p =>
           p.slug === propertySlug ? { ...p, is_active: !currentStatus } : p
         ))
-        
+
         showNotification('success', `Property marked as ${!currentStatus ? 'available' : 'unavailable'}`)
-        
+
         // Re-fetch to ensure sync with backend
         await fetchProperties(token)
       } else {
@@ -295,8 +295,8 @@ export default function MyPropertiesPage() {
       {notification && (
         <div className="fixed top-20 right-4 z-50 animate-slide-in-right">
           <div className={`rounded-lg shadow-lg p-4 max-w-md ${
-            notification.type === 'success' 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
+            notification.type === 'success'
+              ? 'bg-green-50 border border-green-200 text-green-800'
               : 'bg-red-50 border border-red-200 text-red-800'
           }`}>
             <div className="flex items-start">
@@ -333,7 +333,7 @@ export default function MyPropertiesPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             {/* Background overlay */}
-            <div 
+            <div
               className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
               onClick={cancelDelete}
             ></div>

@@ -9,14 +9,14 @@
 
 ### 2. **Browser Notifications (Removed)**
 - **Problem**: Browser `alert()` and `confirm()` dialogs are intrusive and can be blocked
-- **Solution**: 
+- **Solution**:
   - Replaced `confirm()` with beautiful in-app confirmation modal
   - Replaced all `alert()` with elegant toast notifications
   - Added smooth slide-in animations
 
 ### 3. **Database Deletion**
 - **Problem**: Properties weren't being deleted from database
-- **Solution**: 
+- **Solution**:
   - Proper DELETE HTTP request to backend API
   - Backend endpoint: `DELETE /properties/{slug}/`
   - Handles 204 No Content response correctly
@@ -70,8 +70,8 @@ Also updated the availability toggle feature to use:
 ```typescript
 // Notification state
 const [notification, setNotification] = useState<{
-  type: 'success' | 'error', 
-  message: string 
+  type: 'success' | 'error',
+  message: string
 } | null>(null)
 
 // Delete modal state

@@ -31,7 +31,7 @@ class IsOwnerOrReadOnly:
     def has_permission(self, request, view):
         # Allows authenticated users to attempt write operations
         return request.user and request.user.is_authenticated
-    
+
     def has_object_permission(self, request, view, obj):
         # Checks if user owns the property
         return obj.agent.user == request.user
@@ -288,6 +288,6 @@ Try to delete a property and report:
 ---
 
 **Last Updated**: October 9, 2025
-**Commits**: 
+**Commits**:
 - `9697cbc` - Enhanced frontend error logging
 - `6d564be` - Enhanced backend permission logging

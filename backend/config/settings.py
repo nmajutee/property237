@@ -397,16 +397,36 @@ else:
 # ==============================
 
 # Cloudinary Configuration (Free tier with persistent storage)
-if os.getenv('CLOUDINARY_CLOUD_NAME'):
+# Parse CLOUDINARY_URL if available (format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME)
+cloudinary_url = os.getenv('CLOUDINARY_URL')
+if cloudinary_url:
+    # Extract components from CLOUDINARY_URL
+    import re
+    match = re.match(r'cloudinary://([^:]+):([^@]+)@(.+)', cloudinary_url)
+    if match:
+        cloudinary_api_key = match.group(1)
+        cloudinary_api_secret = match.group(2)
+        cloudinary_cloud_name = match.group(3)
+    else:
+        cloudinary_api_key = None
+        cloudinary_api_secret = None
+        cloudinary_cloud_name = None
+else:
+    # Fallback to individual environment variables
+    cloudinary_cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+    cloudinary_api_key = os.getenv('CLOUDINARY_API_KEY')
+    cloudinary_api_secret = os.getenv('CLOUDINARY_API_SECRET')
+
+if cloudinary_cloud_name and cloudinary_api_key and cloudinary_api_secret:
     # Production - Use Cloudinary
     import cloudinary
     import cloudinary.uploader
     import cloudinary.api
 
     cloudinary.config(
-        cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
-        api_key=os.getenv('CLOUDINARY_API_KEY'),
-        api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+        cloud_name=cloudinary_cloud_name,
+        api_key=cloudinary_api_key,
+        api_secret=cloudinary_api_secret,
         secure=True
     )
 
@@ -414,19 +434,24 @@ if os.getenv('CLOUDINARY_CLOUD_NAME'):
     DEFAULT_FILE_STORAGE = 'utils.cloudinary_storage.OptimizedCloudinaryStorage'
 
     # Cloudinary URL prefix
-    MEDIA_URL = f'https://res.cloudinary.com/{os.getenv("CLOUDINARY_CLOUD_NAME")}/'
+    MEDIA_URL = f'https://res.cloudinary.com/{cloudinary_cloud_name}/'
 
     # Cloudinary settings for django-cloudinary-storage
     CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+        'CLOUD_NAME': cloudinary_cloud_name,
+        'API_KEY': cloudinary_api_key,
+        'API_SECRET': cloudinary_api_secret,
         'SECURE': True,
         'MEDIA_TAG': 'media',
         'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
         'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
         'STATIC_TAG': 'static',
     }
+    
+    # Log Cloudinary configuration (without sensitive data)
+    print(f"✓ Cloudinary configured: cloud_name={cloudinary_cloud_name}")
+    print(f"✓ Using storage backend: {DEFAULT_FILE_STORAGE}")
+    print(f"✓ Media URL: {MEDIA_URL}")
 
 elif os.getenv('AWS_STORAGE_BUCKET_NAME'):
     # Alternative: S3 storage
@@ -441,10 +466,12 @@ elif os.getenv('AWS_STORAGE_BUCKET_NAME'):
     AWS_S3_ENCRYPTION = True
 
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"}/media/'
+    print(f"✓ AWS S3 configured: bucket={AWS_STORAGE_BUCKET_NAME}")
 else:
     # Local development
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+    print(f"⚠ Using local media storage (not recommended for production)")
 
 # Static files
 STATIC_URL = '/static/'

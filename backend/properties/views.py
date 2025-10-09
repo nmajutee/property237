@@ -197,7 +197,7 @@ def my_properties_list(request):
             many=True,
             context={'request': request}
         )
-        
+
         # Debug: Log image data for each property
         for prop_data in serializer.data:
             logger.info(f"Property: {prop_data.get('title')}")

@@ -105,6 +105,10 @@ export default function MyPropertiesPage() {
 
       if (response.ok) {
         const data = await response.json()
+        console.log('API Response:', data)
+        console.log('First property:', data.results?.[0])
+        console.log('First property images:', data.results?.[0]?.images)
+        console.log('First property primary_image:', data.results?.[0]?.primary_image)
         setProperties(data.results || data)
       }
     } catch (error) {
@@ -472,7 +476,13 @@ export default function MyPropertiesPage() {
                 {/* Property Image */}
                 <div className="relative h-56">
                   <img
-                    src={property.primary_image || property.images[0]?.image_url || '/placeholder-property.jpg'}
+                    src={(() => {
+                      const imageUrl = property.primary_image || property.images[0]?.image_url || '/placeholder-property.jpg'
+                      console.log(`Property "${property.title}" - Image URL:`, imageUrl)
+                      console.log(`  primary_image:`, property.primary_image)
+                      console.log(`  images[0]:`, property.images[0])
+                      return imageUrl
+                    })()}
                     alt={property.title}
                     className="w-full h-full object-cover"
                   />

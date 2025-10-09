@@ -35,11 +35,22 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # Write permissions only for the owner
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"IsOwnerOrReadOnly check - User: {request.user}, Method: {request.method}")
+        logger.info(f"Object type: {type(obj).__name__}")
+        
         if hasattr(obj, 'user'):
-            return obj.user == request.user
+            result = obj.user == request.user
+            logger.info(f"Has 'user' attr - obj.user: {obj.user}, match: {result}")
+            return result
         elif hasattr(obj, 'agent') and hasattr(obj.agent, 'user'):
-            return obj.agent.user == request.user
+            result = obj.agent.user == request.user
+            logger.info(f"Has 'agent.user' - obj.agent: {obj.agent}, obj.agent.user: {obj.agent.user}, match: {result}")
+            return result
 
+        logger.warning(f"No user or agent.user attribute found on {type(obj).__name__}")
         return False
 
 

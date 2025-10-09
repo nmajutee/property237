@@ -34,78 +34,26 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
 
     def get_image_url(self, obj):
-        """Get full-size image URL with Cloudinary transformations"""
+        """Get full-size image URL"""
         if obj.image:
             url = obj.image.url
-
-            # If using Cloudinary, add transformations for consistent sizing
-            if 'cloudinary' in url or 'res.cloudinary.com' in url:
-                # Fix malformed Cloudinary URLs (missing /image/upload/)
-                url = self._fix_cloudinary_url(url)
-                # Transform to standard size: 1200x800, crop to fill, auto quality
-                url = self._apply_cloudinary_transform(url, 'w_1200,h_800,c_fill,q_auto,f_auto')
+            
+            # AWS S3 URLs are already absolute
+            if url and url.startswith('http'):
                 return url
-
-            # For local paths that don't exist (old data), return placeholder
-            if url.startswith('/media/'):
-                # Return a placeholder image URL
-                return 'https://via.placeholder.com/1200x800/4CAF50/FFFFFF?text=Image+Not+Available'
-
-            # Make URL absolute if not already
+            
+            # For local paths, make absolute
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-
+                    
             return url
-        return 'https://via.placeholder.com/1200x800/4CAF50/FFFFFF?text=No+Image'
+        return None
 
     def get_thumbnail_url(self, obj):
-        """Get thumbnail URL for lists/cards"""
-        if obj.image:
-            url = obj.image.url
-
-            # If using Cloudinary, create optimized thumbnail
-            if 'cloudinary' in url or 'res.cloudinary.com' in url:
-                # Fix malformed Cloudinary URLs (missing /image/upload/)
-                url = self._fix_cloudinary_url(url)
-                # Smaller thumbnail: 400x300, crop to fill, auto quality
-                url = self._apply_cloudinary_transform(url, 'w_400,h_300,c_fill,q_auto,f_auto')
-                return url
-
-            # For local paths that don't exist (old data), return placeholder
-            if url.startswith('/media/'):
-                return 'https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Image+Not+Available'
-
-            # Make URL absolute if not already
-            if url and not url.startswith('http'):
-                request = self.context.get('request')
-                if request:
-                    return request.build_absolute_uri(url)
-
-            return url
-        return 'https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=No+Image'
-
-    def _fix_cloudinary_url(self, url):
-        """Fix malformed Cloudinary URLs that are missing /image/upload/"""
-        if 'res.cloudinary.com' in url and '/upload/' not in url:
-            # URL format: https://res.cloudinary.com/CLOUD_NAME/path/to/image.jpg
-            # Should be: https://res.cloudinary.com/CLOUD_NAME/image/upload/path/to/image.jpg
-            import re
-            match = re.match(r'(https://res\.cloudinary\.com/[^/]+)/(.*)', url)
-            if match:
-                base_url = match.group(1)
-                image_path = match.group(2)
-                return f"{base_url}/image/upload/{image_path}"
-        return url
-
-    def _apply_cloudinary_transform(self, url, transforms):
-        """Apply Cloudinary transformations to image URL"""
-        if '/upload/' in url:
-            # Insert transformations after '/upload/'
-            parts = url.split('/upload/')
-            return f"{parts[0]}/upload/{transforms}/{parts[1]}"
-        return url
+        """Get thumbnail URL - for now same as image_url, can add image processing later"""
+        return self.get_image_url(obj)
 
 
 class PropertyListSerializer(serializers.ModelSerializer):
@@ -131,43 +79,21 @@ class PropertyListSerializer(serializers.ModelSerializer):
             # Fallback to first image if no primary
             primary_image = obj.images.first()
 
-        if primary_image:
+        if primary_image and primary_image.image:
             url = primary_image.image.url
-
-            # Apply Cloudinary transformations for consistent sizing
-            if 'cloudinary' in url or 'res.cloudinary.com' in url:
-                # Fix malformed Cloudinary URLs (missing /image/upload/)
-                url = self._fix_cloudinary_url(url)
-                url = self._apply_cloudinary_transform(url, 'w_800,h_600,c_fill,q_auto,f_auto')
-
-            # Make URL absolute if not already
+            
+            # AWS S3 URLs are already absolute
+            if url and url.startswith('http'):
+                return url
+                
+            # For local paths, make absolute
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
                     return request.build_absolute_uri(url)
-
+                    
             return url
         return None
-
-    def _fix_cloudinary_url(self, url):
-        """Fix malformed Cloudinary URLs that are missing /image/upload/"""
-        if 'res.cloudinary.com' in url and '/upload/' not in url:
-            # URL format: https://res.cloudinary.com/CLOUD_NAME/path/to/image.jpg
-            # Should be: https://res.cloudinary.com/CLOUD_NAME/image/upload/path/to/image.jpg
-            import re
-            match = re.match(r'(https://res\.cloudinary\.com/[^/]+)/(.*)', url)
-            if match:
-                base_url = match.group(1)
-                image_path = match.group(2)
-                return f"{base_url}/image/upload/{image_path}"
-        return url
-
-    def _apply_cloudinary_transform(self, url, transforms):
-        """Apply Cloudinary transformations to image URL"""
-        if '/upload/' in url:
-            parts = url.split('/upload/')
-            return f"{parts[0]}/upload/{transforms}/{parts[1]}"
-        return url
 
 
 class PropertyDetailSerializer(serializers.ModelSerializer):

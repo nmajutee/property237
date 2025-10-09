@@ -44,8 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',
-    'cloudinary',
+    'storages',  # django-storages for AWS S3
     'rest_framework',
     'rest_framework_simplejwt',  # JWT Authentication
     'rest_framework_simplejwt.token_blacklist',  # JWT token blacklist
@@ -396,100 +395,50 @@ else:
 # File Storage & Media
 # ==============================
 
-# Cloudinary Configuration (Free tier with persistent storage)
+# ==============================
+# AWS S3 Storage Configuration
+# ==============================
 print("="*60)
-print("CLOUDINARY CONFIGURATION DEBUG")
+print("AWS S3 STORAGE CONFIGURATION")
 print("="*60)
 
-# Try individual environment variables first (more reliable)
-cloudinary_cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
-cloudinary_api_key = os.getenv('CLOUDINARY_API_KEY')
-cloudinary_api_secret = os.getenv('CLOUDINARY_API_SECRET')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'eu-west-1')
 
-print(f"Individual vars - CLOUDINARY_CLOUD_NAME: {bool(cloudinary_cloud_name)}")
-print(f"Individual vars - CLOUDINARY_API_KEY: {bool(cloudinary_api_key)}")
-print(f"Individual vars - CLOUDINARY_API_SECRET: {bool(cloudinary_api_secret)}")
+print(f"AWS_STORAGE_BUCKET_NAME: {bool(AWS_STORAGE_BUCKET_NAME)}")
+print(f"AWS_ACCESS_KEY_ID: {bool(AWS_ACCESS_KEY_ID)}")
+print(f"AWS_SECRET_ACCESS_KEY: {bool(AWS_SECRET_ACCESS_KEY)}")
+print(f"AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
 
-# If individual vars not set, try parsing CLOUDINARY_URL
-if not (cloudinary_cloud_name and cloudinary_api_key and cloudinary_api_secret):
-    cloudinary_url = os.getenv('CLOUDINARY_URL')
-    print(f"CLOUDINARY_URL present: {bool(cloudinary_url)}")
+if AWS_STORAGE_BUCKET_NAME and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    # Production - Use AWS S3
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     
-    if cloudinary_url:
-        print(f"CLOUDINARY_URL value: {cloudinary_url[:30]}...")  # Show first 30 chars only
-        # Extract components from CLOUDINARY_URL
-        import re
-        match = re.match(r'cloudinary://([^:]+):([^@]+)@(.+)', cloudinary_url)
-        if match:
-            cloudinary_api_key = match.group(1)
-            cloudinary_api_secret = match.group(2)
-            cloudinary_cloud_name = match.group(3)
-            print(f"✓ Successfully parsed CLOUDINARY_URL")
-            print(f"  Cloud Name: {cloudinary_cloud_name}")
-            print(f"  API Key: {cloudinary_api_key[:6]}...")
-        else:
-            print(f"✗ ERROR: Failed to parse CLOUDINARY_URL format")
-    else:
-        print(f"✗ ERROR: No CLOUDINARY_URL or individual variables found")
-
-print(f"Final values: cloud_name={bool(cloudinary_cloud_name)}, api_key={bool(cloudinary_api_key)}, api_secret={bool(cloudinary_api_secret)}")
-print("="*60)
-
-if cloudinary_cloud_name and cloudinary_api_key and cloudinary_api_secret:
-    # Production - Use Cloudinary
-    import cloudinary
-    import cloudinary.uploader
-    import cloudinary.api
-
-    cloudinary.config(
-        cloud_name=cloudinary_cloud_name,
-        api_key=cloudinary_api_key,
-        api_secret=cloudinary_api_secret,
-        secure=True
-    )
-
-    # Use custom storage backend with image optimization
-    DEFAULT_FILE_STORAGE = 'utils.cloudinary_storage.OptimizedCloudinaryStorage'
-
-    # Cloudinary URL prefix
-    MEDIA_URL = f'https://res.cloudinary.com/{cloudinary_cloud_name}/'
-
-    # Cloudinary settings for django-cloudinary-storage
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': cloudinary_cloud_name,
-        'API_KEY': cloudinary_api_key,
-        'API_SECRET': cloudinary_api_secret,
-        'SECURE': True,
-        'MEDIA_TAG': 'media',
-        'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
-        'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
-        'STATIC_TAG': 'static',
+    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN') or f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+    AWS_DEFAULT_ACL = 'public-read'  # Allow public read access to uploaded images
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False  # Don't add auth params to URLs
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',  # Cache for 1 day
     }
 
-    # Log Cloudinary configuration (without sensitive data)
-    print(f"✓ Cloudinary configured: cloud_name={cloudinary_cloud_name}")
-    print(f"✓ Using storage backend: {DEFAULT_FILE_STORAGE}")
-    print(f"✓ Media URL: {MEDIA_URL}")
-
-elif os.getenv('AWS_STORAGE_BUCKET_NAME'):
-    # Alternative: S3 storage
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.StaticS3Boto3Storage'
-
-    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ca-central-1')
-    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN')
-    AWS_DEFAULT_ACL = 'private'
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_S3_ENCRYPTION = True
-
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"}/media/'
-    print(f"✓ AWS S3 configured: bucket={AWS_STORAGE_BUCKET_NAME}")
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+    
+    print(f"✓ AWS S3 configured successfully!")
+    print(f"  Bucket: {AWS_STORAGE_BUCKET_NAME}")
+    print(f"  Region: {AWS_S3_REGION_NAME}")
+    print(f"  Domain: {AWS_S3_CUSTOM_DOMAIN}")
+    print(f"  Media URL: {MEDIA_URL}")
+    print(f"  Storage Backend: {DEFAULT_FILE_STORAGE}")
 else:
     # Local development
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-    print(f"⚠ Using local media storage (not recommended for production)")
+    print(f"⚠ Using local media storage (AWS credentials not found)")
+
+print("="*60)
 
 # Static files
 STATIC_URL = '/static/'

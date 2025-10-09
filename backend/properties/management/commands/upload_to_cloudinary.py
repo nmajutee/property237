@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 cloud_name = None
         else:
             cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
-        
+
         if not cloud_name:
             self.stdout.write(self.style.ERROR('Cloudinary not configured! Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME environment variable.'))
             return

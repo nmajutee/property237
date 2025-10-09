@@ -43,7 +43,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
                 # Transform to standard size: 1200x800, crop to fill, auto quality
                 url = self._apply_cloudinary_transform(url, 'w_1200,h_800,c_fill,q_auto,f_auto')
                 return url
-            
+
             # For local paths that don't exist (old data), return placeholder
             if url.startswith('/media/'):
                 # Return a placeholder image URL
@@ -68,7 +68,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
                 # Smaller thumbnail: 400x300, crop to fill, auto quality
                 url = self._apply_cloudinary_transform(url, 'w_400,h_300,c_fill,q_auto,f_auto')
                 return url
-            
+
             # For local paths that don't exist (old data), return placeholder
             if url.startswith('/media/'):
                 return 'https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Image+Not+Available'

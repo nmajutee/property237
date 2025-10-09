@@ -197,6 +197,15 @@ def my_properties_list(request):
             many=True,
             context={'request': request}
         )
+        
+        # Debug: Log image data for each property
+        for prop_data in serializer.data:
+            logger.info(f"Property: {prop_data.get('title')}")
+            logger.info(f"  Images count: {len(prop_data.get('images', []))}")
+            if prop_data.get('images'):
+                for idx, img in enumerate(prop_data['images']):
+                    logger.info(f"  Image {idx}: image_url={img.get('image_url')}, thumbnail_url={img.get('thumbnail_url')}")
+            logger.info(f"  Primary image: {prop_data.get('primary_image')}")
 
         return Response({
             'count': properties.count(),

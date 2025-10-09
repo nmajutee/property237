@@ -447,7 +447,7 @@ if cloudinary_cloud_name and cloudinary_api_key and cloudinary_api_secret:
         'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
         'STATIC_TAG': 'static',
     }
-    
+
     # Log Cloudinary configuration (without sensitive data)
     print(f"✓ Cloudinary configured: cloud_name={cloudinary_cloud_name}")
     print(f"✓ Using storage backend: {DEFAULT_FILE_STORAGE}")

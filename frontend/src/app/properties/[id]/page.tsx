@@ -308,7 +308,7 @@ export default function PropertyDetailPage() {
 
               <div className="flex items-center text-gray-600 dark:text-gray-400 mb-6">
                 <MapPinIcon className="w-5 h-5 mr-2" />
-                <span>{property.address || property.location}</span>
+                <span>{property.address || `${property.area.name}, ${property.area.city.name}`}</span>
               </div>
 
               <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
@@ -316,17 +316,17 @@ export default function PropertyDetailPage() {
                   <div className="flex items-center">
                     <HomeIcon className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
                     <span className="text-gray-900 dark:text-white font-semibold">
-                      {property.bedrooms} Bedrooms
+                      {property.no_of_bedrooms} Bedrooms
                     </span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-gray-900 dark:text-white font-semibold">
-                      {property.bathrooms} Bathrooms
+                      {property.no_of_bathrooms} Bathrooms
                     </span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-gray-900 dark:text-white font-semibold">
-                      {property.area} m²
+                      {property.square_footage} m²
                     </span>
                   </div>
                 </div>
@@ -349,7 +349,7 @@ export default function PropertyDetailPage() {
                   <div>
                     <p className="text-gray-600 dark:text-gray-400">Property Type</p>
                     <p className="text-gray-900 dark:text-white font-semibold capitalize">
-                      {property.property_type}
+                      {property.property_type.name}
                     </p>
                   </div>
                   <div>
@@ -360,23 +360,31 @@ export default function PropertyDetailPage() {
                   </div>
                   <div>
                     <p className="text-gray-600 dark:text-gray-400">Status</p>
-                    <p className={`font-semibold ${property.is_available ? 'text-green-600' : 'text-red-600'}`}>
-                      {property.is_available ? 'Available' : 'Unavailable'}
+                    <p className={`font-semibold ${property.is_active ? 'text-green-600' : 'text-red-600'}`}>
+                      {property.is_active ? 'Available' : 'Unavailable'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Listing Type</p>
+                    <p className="text-gray-900 dark:text-white font-semibold capitalize">
+                      {property.listing_type}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {property.amenities && property.amenities.length > 0 && (
+              {property.additional_features && property.additional_features.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                    Amenities
+                    Additional Features
                   </h2>
                   <div className="grid grid-cols-2 gap-3">
-                    {property.amenities.map((amenity, index) => (
+                    {property.additional_features.map((feature: any, index: number) => (
                       <div key={index} className="flex items-center">
                         <CheckCircleIcon className="w-5 h-5 text-property237-primary mr-2" />
-                        <span className="text-gray-700 dark:text-gray-300">{amenity}</span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {feature.feature_name}: {feature.feature_value}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -391,12 +399,14 @@ export default function PropertyDetailPage() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6 sticky top-6">
               <div className="mb-6">
                 <p className="text-3xl font-bold text-property237-primary mb-2">
-                  {property.price.toLocaleString()} XAF
+                  {parseFloat(property.price).toLocaleString()} {property.currency}
                 </p>
-                <p className="text-gray-600 dark:text-gray-400">per month</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {property.listing_type === 'sale' ? 'For Sale' : 'Per Month'}
+                </p>
               </div>
 
-              {property.is_available && (
+              {property.is_active && (
                 <button
                   onClick={() => setShowApplicationModal(true)}
                   className="w-full px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors font-semibold mb-4"
@@ -420,13 +430,13 @@ export default function PropertyDetailPage() {
               </h3>
               <div className="flex items-center mb-4">
                 <img
-                  src={property.agent.profile_picture || '/default-avatar.png'}
-                  alt={property.agent.full_name}
-                  className="w-16 h-16 rounded-full mr-4"
+                  src={'/default-avatar.png'}
+                  alt={`${property.agent.user.first_name} ${property.agent.user.last_name}`}
+                  className="w-16 h-16 rounded-full mr-4 object-cover"
                 />
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white flex items-center">
-                    {property.agent.full_name}
+                    {property.agent.user.first_name} {property.agent.user.last_name}
                     {property.agent.is_verified && (
                       <CheckCircleIcon className="w-5 h-5 text-blue-500 ml-2" />
                     )}
@@ -436,12 +446,17 @@ export default function PropertyDetailPage() {
               </div>
               <div className="space-y-2 text-sm">
                 <p className="text-gray-700 dark:text-gray-300">
-                  <strong>Email:</strong> {property.agent.email}
+                  <strong>Email:</strong> {property.agent.user.email}
                 </p>
                 <p className="text-gray-700 dark:text-gray-300">
-                  <strong>Phone:</strong> {property.agent.phone_number}
+                  <strong>Phone:</strong> {property.agent.user.phone_number}
                 </p>
               </div>
+              {property.agent.bio && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{property.agent.bio}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

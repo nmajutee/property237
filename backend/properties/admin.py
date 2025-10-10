@@ -5,14 +5,16 @@ from media.models import PropertyImage
 
 @admin.register(PropertyType)
 class PropertyTypeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description']
-    search_fields = ['name']
+    list_display = ['name', 'category', 'subtype', 'is_active', 'created_at']
+    list_filter = ['category', 'is_active']
+    search_fields = ['name', 'description']
 
 
 @admin.register(PropertyStatus)
 class PropertyStatusAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description']
-    search_fields = ['name']
+    list_display = ['name', 'is_active', 'allows_inquiries']
+    list_filter = ['is_active', 'allows_inquiries']
+    search_fields = ['name', 'description']
 
 
 class PropertyImageInline(admin.TabularInline):
@@ -108,6 +110,7 @@ class PropertyAdmin(admin.ModelAdmin):
 
 @admin.register(PropertyFeature)
 class PropertyFeatureAdmin(admin.ModelAdmin):
-    list_display = ['name', 'icon', 'is_active']
-    list_filter = ['is_active']
-    search_fields = ['name']
+    list_display = ['property_listing', 'feature_name', 'feature_value', 'is_highlighted']
+    list_filter = ['is_highlighted']
+    search_fields = ['feature_name', 'property_listing__title']
+    list_select_related = ['property_listing']

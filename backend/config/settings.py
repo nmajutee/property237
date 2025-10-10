@@ -398,45 +398,38 @@ else:
 # ==============================
 # AWS S3 Storage Configuration
 # ==============================
+# MEDIA STORAGE CONFIGURATION
+# ==============================
 print("="*60)
-print("AWS S3 STORAGE CONFIGURATION")
+print("MEDIA STORAGE CONFIGURATION")
 print("="*60)
 
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'eu-west-1')
+# ImageKit.io configuration
+IMAGEKIT_PRIVATE_KEY = os.getenv('IMAGEKIT_PRIVATE_KEY')
+IMAGEKIT_PUBLIC_KEY = os.getenv('IMAGEKIT_PUBLIC_KEY')
+IMAGEKIT_URL_ENDPOINT = os.getenv('IMAGEKIT_URL_ENDPOINT')
 
-print(f"AWS_STORAGE_BUCKET_NAME: {bool(AWS_STORAGE_BUCKET_NAME)}")
-print(f"AWS_ACCESS_KEY_ID: {bool(AWS_ACCESS_KEY_ID)}")
-print(f"AWS_SECRET_ACCESS_KEY: {bool(AWS_SECRET_ACCESS_KEY)}")
-print(f"AWS_S3_REGION_NAME: {AWS_S3_REGION_NAME}")
+print(f"IMAGEKIT_PRIVATE_KEY: {bool(IMAGEKIT_PRIVATE_KEY)}")
+print(f"IMAGEKIT_PUBLIC_KEY: {bool(IMAGEKIT_PUBLIC_KEY)}")
+print(f"IMAGEKIT_URL_ENDPOINT: {IMAGEKIT_URL_ENDPOINT if IMAGEKIT_URL_ENDPOINT else 'Not set'}")
 
-if AWS_STORAGE_BUCKET_NAME and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    # Production - Use AWS S3
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-    AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN') or f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
-    AWS_DEFAULT_ACL = 'public-read'  # Allow public read access to uploaded images
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_QUERYSTRING_AUTH = False  # Don't add auth params to URLs
-    AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',  # Cache for 1 day
-    }
-
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-
-    print(f"✓ AWS S3 configured successfully!")
-    print(f"  Bucket: {AWS_STORAGE_BUCKET_NAME}")
-    print(f"  Region: {AWS_S3_REGION_NAME}")
-    print(f"  Domain: {AWS_S3_CUSTOM_DOMAIN}")
-    print(f"  Media URL: {MEDIA_URL}")
+if IMAGEKIT_PRIVATE_KEY and IMAGEKIT_PUBLIC_KEY and IMAGEKIT_URL_ENDPOINT:
+    # Production - Use ImageKit
+    DEFAULT_FILE_STORAGE = 'utils.imagekit_storage.ImageKitStorage'
+    MEDIA_URL = IMAGEKIT_URL_ENDPOINT
+    
+    print(f"✓ ImageKit configured successfully!")
+    print(f"  URL Endpoint: {IMAGEKIT_URL_ENDPOINT}")
     print(f"  Storage Backend: {DEFAULT_FILE_STORAGE}")
+    print(f"  ✓ No permission configuration needed!")
+    print(f"  ✓ Automatic optimization enabled!")
+    print(f"  ✓ Global CDN enabled!")
 else:
     # Local development
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-    print(f"⚠ Using local media storage (AWS credentials not found)")
+    print(f"⚠ Using local media storage (ImageKit credentials not found)")
+    print(f"  Add IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, IMAGEKIT_URL_ENDPOINT to use ImageKit")
 
 print("="*60)
 

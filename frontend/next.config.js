@@ -7,10 +7,7 @@ const nextConfig = {
     domains: [
       'localhost',
       'property237.com',
-      'property237-media.s3.eu-west-1.amazonaws.com',
-      'property237-media.s3.amazonaws.com',
-      's3.eu-west-1.amazonaws.com',
-      's3.amazonaws.com'
+      'ik.imagekit.io'
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

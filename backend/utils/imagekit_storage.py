@@ -52,12 +52,27 @@ class ImageKitStorage(Storage):
                 options=upload_options
             )
 
-            logger.info(f"✅ ImageKit upload successful!")
-            logger.info(f"   📎 URL: {result.url}")
-            logger.info(f"   🆔 File ID: {result.file_id}")
+            result_url = getattr(result, 'url', None)
+            result_file_path = getattr(result, 'file_path', None) or getattr(result, 'filePath', None)
+            result_name = getattr(result, 'name', None)
 
-            # Return the full URL (ImageKit provides complete URL)
-            return result.url
+            logger.info("✅ ImageKit upload successful!")
+            logger.info(f"   📎 URL: {result_url}")
+            logger.info(f"   🆔 File ID: {getattr(result, 'file_id', None)}")
+            logger.info(f"   📁 Stored Path: {result_file_path}")
+            logger.info(f"   📄 Stored Name: {result_name}")
+
+            # Prefer ImageKit's returned file path so we can reconstruct the URL later
+            stored_name = result_file_path or result_name or result_url
+
+            if not stored_name:
+                raise ValueError("ImageKit upload did not return a usable identifier for the file")
+
+            # Normalise leading slashes
+            if isinstance(stored_name, str):
+                stored_name = stored_name.lstrip('/')
+
+            return stored_name
 
         except Exception as e:
             logger.error(f"❌ ImageKit upload failed for {name}: {str(e)}")
@@ -65,10 +80,14 @@ class ImageKitStorage(Storage):
 
     def url(self, name):
         """Return the URL for accessing the file"""
-        if name and name.startswith('http'):
+        if not name:
+            return None
+
+        if isinstance(name, str) and name.startswith('http'):
             return name
-        # Construct ImageKit URL
-        return f"{self.url_endpoint}/property_images/{name}"
+
+        normalized_name = name.lstrip('/') if isinstance(name, str) else name
+        return f"{self.url_endpoint}/{normalized_name}"
 
     def exists(self, name):
         """Check if file exists (always return False to allow uploads)"""

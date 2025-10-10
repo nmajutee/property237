@@ -404,35 +404,24 @@ print("="*60)
 print("MEDIA STORAGE CONFIGURATION")
 print("="*60)
 
-# ImageKit.io configuration
-IMAGEKIT_PRIVATE_KEY = os.getenv('IMAGEKIT_PRIVATE_KEY')
-IMAGEKIT_PUBLIC_KEY = os.getenv('IMAGEKIT_PUBLIC_KEY')
-IMAGEKIT_URL_ENDPOINT = os.getenv('IMAGEKIT_URL_ENDPOINT')
-
-print(f"IMAGEKIT_PRIVATE_KEY: {bool(IMAGEKIT_PRIVATE_KEY)}")
-print(f"IMAGEKIT_PUBLIC_KEY: {bool(IMAGEKIT_PUBLIC_KEY)}")
-print(f"IMAGEKIT_URL_ENDPOINT: {IMAGEKIT_URL_ENDPOINT if IMAGEKIT_URL_ENDPOINT else 'Not set'}")
-
-if IMAGEKIT_PRIVATE_KEY and IMAGEKIT_PUBLIC_KEY and IMAGEKIT_URL_ENDPOINT:
-    # Production - Use ImageKit
-    DEFAULT_FILE_STORAGE = 'utils.imagekit_storage.ImageKitStorage'
-    # Ensure MEDIA_URL ends with a slash (Django requirement)
-    MEDIA_URL = IMAGEKIT_URL_ENDPOINT if IMAGEKIT_URL_ENDPOINT.endswith('/') else f"{IMAGEKIT_URL_ENDPOINT}/"
-
-    print(f"✓ ImageKit configured successfully!")
-    print(f"  URL Endpoint: {IMAGEKIT_URL_ENDPOINT}")
-    print(f"  Media URL: {MEDIA_URL}")
-    print(f"  Storage Backend: {DEFAULT_FILE_STORAGE}")
-    print(f"  ✓ No permission configuration needed!")
-    print(f"  ✓ Automatic optimization enabled!")
-    print(f"  ✓ Global CDN enabled!")
+# Use file system storage (simple, reliable, enterprise-ready)
+# For production on Render: use persistent disk at /data/media
+if os.getenv('RENDER'):
+    # Production on Render - use persistent disk
+    MEDIA_ROOT = '/data/media'
+    print(f"✓ Production media storage configured")
+    print(f"  Storage: Render Persistent Disk")
+    print(f"  Path: {MEDIA_ROOT}")
 else:
     # Local development
-    MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-    print(f"⚠ Using local media storage (ImageKit credentials not found)")
-    print(f"  Add IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, IMAGEKIT_URL_ENDPOINT to use ImageKit")
+    print(f"✓ Development media storage configured")
+    print(f"  Path: {MEDIA_ROOT}")
 
+MEDIA_URL = '/media/'
+print(f"  Media URL: {MEDIA_URL}")
+print(f"  ✓ No third-party dependencies!")
+print(f"  ✓ Full control of your files!")
 print("="*60)
 
 # Static files

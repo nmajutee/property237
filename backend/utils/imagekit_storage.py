@@ -21,7 +21,7 @@ class ImageKitStorage(Storage):
             public_key=os.getenv('IMAGEKIT_PUBLIC_KEY'),
             url_endpoint=os.getenv('IMAGEKIT_URL_ENDPOINT')
         )
-        self.url_endpoint = os.getenv('IMAGEKIT_URL_ENDPOINT')
+        self.url_endpoint = os.getenv('IMAGEKIT_URL_ENDPOINT').rstrip('/')
 
     def _save(self, name, content):
         """Save file to ImageKit"""
@@ -31,11 +31,11 @@ class ImageKitStorage(Storage):
 
             # Determine folder based on file path
             if 'property_images' in name or 'property' in name.lower():
-                folder = "/property237/property_images"
+                folder = "property237/property_images"
             elif 'profile' in name.lower():
-                folder = "/property237/profile_pics"
+                folder = "property237/profile_pics"
             else:
-                folder = "/property237/media"
+                folder = "property237/media"
 
             # Upload to ImageKit
             logger.info(f"📤 Uploading {name} to ImageKit folder: {folder}")
@@ -68,7 +68,7 @@ class ImageKitStorage(Storage):
         if name and name.startswith('http'):
             return name
         # Construct ImageKit URL
-        return f"{self.url_endpoint}/property_images/{name}"
+        return f"{self.url_endpoint}/property237/property_images/{name}"
 
     def exists(self, name):
         """Check if file exists (always return False to allow uploads)"""

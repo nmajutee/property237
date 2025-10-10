@@ -24,27 +24,27 @@ class PropertyImageInline(admin.TabularInline):
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'property_type', 'status', 'price', 
+        'title', 'property_type', 'status', 'price',
         'location_display', 'agent', 'created_at', 'is_verified'
     ]
     list_filter = [
-        'property_type', 'status', 'is_verified', 
+        'property_type', 'status', 'is_verified',
         'created_at', 'listing_type'
     ]
     search_fields = ['title', 'description', 'agent__user__email']
     readonly_fields = ['created_at', 'updated_at', 'verified_at']
     inlines = [PropertyImageInline]
-    
+
     fieldsets = (
         ('Basic Information', {
             'fields': (
-                'title', 'description', 'property_type', 
+                'title', 'description', 'property_type',
                 'status', 'listing_type'
             )
         }),
         ('Location', {
             'fields': (
-                'area', 'distance_from_main_road', 'road_is_tarred', 
+                'area', 'distance_from_main_road', 'road_is_tarred',
                 'vehicle_access'
             )
         }),
@@ -63,13 +63,13 @@ class PropertyAdmin(admin.ModelAdmin):
         }),
         ('Amenities', {
             'fields': (
-                'has_parking', 'has_security', 'has_pool', 
+                'has_parking', 'has_security', 'has_pool',
                 'has_gym', 'has_elevator'
             )
         }),
         ('Pricing', {
             'fields': (
-                'price', 'currency', 'initial_months_payable', 
+                'price', 'currency', 'initial_months_payable',
                 'caution_months', 'visit_fee', 'requires_contract_registration'
             )
         }),
@@ -97,21 +97,13 @@ class PropertyAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    
+
     def location_display(self, obj):
         """Display formatted location"""
         if obj.area:
             return f"{obj.area.name}, {obj.area.city.name}, {obj.area.city.region.name}"
         return 'N/A'
     location_display.short_description = 'Location'
-
-
-@admin.register(PropertyImage)
-class PropertyImageAdmin(admin.ModelAdmin):
-    list_display = ['property', 'caption', 'is_primary', 'display_order', 'uploaded_at']
-    list_filter = ['is_primary', 'uploaded_at']
-    search_fields = ['property__title', 'caption']
-    readonly_fields = ['uploaded_at']
 
 
 @admin.register(PropertyFeature)

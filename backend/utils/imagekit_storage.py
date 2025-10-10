@@ -52,27 +52,20 @@ class ImageKitStorage(Storage):
                 options=upload_options
             )
 
+            # ImageKit returns the full CDN URL - use it directly
             result_url = getattr(result, 'url', None)
-            result_file_path = getattr(result, 'file_path', None) or getattr(result, 'filePath', None)
-            result_name = getattr(result, 'name', None)
+            result_file_id = getattr(result, 'file_id', None) or getattr(result, 'fileId', None)
 
             logger.info("✅ ImageKit upload successful!")
             logger.info(f"   📎 URL: {result_url}")
-            logger.info(f"   🆔 File ID: {getattr(result, 'file_id', None)}")
-            logger.info(f"   📁 Stored Path: {result_file_path}")
-            logger.info(f"   📄 Stored Name: {result_name}")
+            logger.info(f"   🆔 File ID: {result_file_id}")
 
-            # Prefer ImageKit's returned file path so we can reconstruct the URL later
-            stored_name = result_file_path or result_name or result_url
+            if not result_url:
+                raise ValueError("ImageKit upload did not return a URL")
 
-            if not stored_name:
-                raise ValueError("ImageKit upload did not return a usable identifier for the file")
-
-            # Normalise leading slashes
-            if isinstance(stored_name, str):
-                stored_name = stored_name.lstrip('/')
-
-            return stored_name
+            # Return the complete ImageKit CDN URL
+            # Django will store this in the database
+            return result_url
 
         except Exception as e:
             logger.error(f"❌ ImageKit upload failed for {name}: {str(e)}")

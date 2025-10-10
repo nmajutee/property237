@@ -417,7 +417,7 @@ if IMAGEKIT_PRIVATE_KEY and IMAGEKIT_PUBLIC_KEY and IMAGEKIT_URL_ENDPOINT:
     # Production - Use ImageKit
     DEFAULT_FILE_STORAGE = 'utils.imagekit_storage.ImageKitStorage'
     MEDIA_URL = IMAGEKIT_URL_ENDPOINT
-    
+
     print(f"✓ ImageKit configured successfully!")
     print(f"  URL Endpoint: {IMAGEKIT_URL_ENDPOINT}")
     print(f"  Storage Backend: {DEFAULT_FILE_STORAGE}")

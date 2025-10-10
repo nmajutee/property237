@@ -2,13 +2,13 @@
 
 ## Why ImageKit? (vs AWS S3)
 
-✅ **5-minute setup** (vs 2+ hours with AWS S3)  
-✅ **No permission headaches** (automatic public access)  
-✅ **Built-in CDN** (global fast delivery)  
-✅ **Automatic image optimization** (faster page loads)  
-✅ **Real-time image transformations** (resize, crop, format conversion)  
-✅ **Video support** (thumbnails, streaming)  
-✅ **Free tier**: 20GB storage, 20GB bandwidth/month  
+✅ **5-minute setup** (vs 2+ hours with AWS S3)
+✅ **No permission headaches** (automatic public access)
+✅ **Built-in CDN** (global fast delivery)
+✅ **Automatic image optimization** (faster page loads)
+✅ **Real-time image transformations** (resize, crop, format conversion)
+✅ **Video support** (thumbnails, streaming)
+✅ **Free tier**: 20GB storage, 20GB bandwidth/month
 
 ---
 
@@ -61,10 +61,10 @@
 
 The backend code is already configured:
 
-✅ **ImageKit SDK installed** (`imagekitio==3.2.0`)  
-✅ **Storage backend created** (`utils/imagekit_storage.py`)  
-✅ **Upload endpoints ready** (`media/imagekit_views.py`)  
-✅ **Django settings configured** (`config/settings.py`)  
+✅ **ImageKit SDK installed** (`imagekitio==3.2.0`)
+✅ **Storage backend created** (`utils/imagekit_storage.py`)
+✅ **Upload endpoints ready** (`media/imagekit_views.py`)
+✅ **Django settings configured** (`config/settings.py`)
 
 Just push to GitHub and Render will deploy:
 
@@ -121,7 +121,7 @@ const getAuthParams = async () => {
 // 2. Upload directly to ImageKit
 const uploadToImageKit = async (file: File) => {
   const authParams = await getAuthParams();
-  
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('fileName', file.name);
@@ -148,8 +148,8 @@ const uploadToImageKit = async (file: File) => {
 ### Basic Image Display
 
 ```tsx
-<img 
-  src={property.image_url} 
+<img
+  src={property.image_url}
   alt={property.title}
   className="w-full h-64 object-cover"
 />
@@ -172,7 +172,7 @@ Then use Next.js Image:
 ```tsx
 import Image from 'next/image';
 
-<Image 
+<Image
   src={property.image_url}
   alt={property.title}
   width={800}
@@ -371,11 +371,11 @@ for obj in objects['Contents']:
 
 Your Property237 app now has:
 
-✅ **Fast CDN image delivery** (global)  
-✅ **Automatic optimization** (WebP, compression)  
-✅ **Real-time transformations** (resize, crop, etc.)  
-✅ **Simple uploads** (no permission headaches)  
-✅ **Video support** (thumbnails, streaming)  
+✅ **Fast CDN image delivery** (global)
+✅ **Automatic optimization** (WebP, compression)
+✅ **Real-time transformations** (resize, crop, etc.)
+✅ **Simple uploads** (no permission headaches)
+✅ **Video support** (thumbnails, streaming)
 
 **Total setup time**: ~10 minutes (vs 2+ hours with AWS S3)
 

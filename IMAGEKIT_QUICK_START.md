@@ -49,11 +49,11 @@
 
 ## 🎯 What's Already Done
 
-✅ Backend code deployed to GitHub  
-✅ ImageKit SDK installed  
-✅ Upload endpoints created  
-✅ Storage backend configured  
-✅ Django settings updated  
+✅ Backend code deployed to GitHub
+✅ ImageKit SDK installed
+✅ Upload endpoints created
+✅ Storage backend configured
+✅ Django settings updated
 
 **You just need to:**
 1. Get ImageKit API keys

@@ -26,14 +26,14 @@ imagekit = ImageKit(
 def upload_property_media(request):
     """
     Upload property images/videos to ImageKit
-    
+
     Endpoint: POST /api/media/upload-property-media/
     Authentication: Required
-    
+
     Body:
         - file: Image or video file
         - property_id (optional): Property ID for organization
-    
+
     Returns:
         - url: ImageKit CDN URL
         - file_id: ImageKit file ID
@@ -46,18 +46,18 @@ def upload_property_media(request):
                 {'error': 'No file provided'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         file = request.FILES['file']
         property_id = request.data.get('property_id', 'new')
-        
+
         logger.info(f"📤 Uploading property media: {file.name}")
         logger.info(f"   User: {request.user.email}")
         logger.info(f"   Property ID: {property_id}")
         logger.info(f"   File size: {file.size} bytes")
-        
+
         # Read file content
         file_content = file.read()
-        
+
         # Upload to ImageKit
         upload_result = imagekit.upload_file(
             file=file_content,
@@ -68,11 +68,11 @@ def upload_property_media(request):
                 tags=['property237', 'property-media', f'user-{request.user.id}']
             )
         )
-        
+
         logger.info(f"✅ Upload successful!")
         logger.info(f"   📎 URL: {upload_result.url}")
         logger.info(f"   🆔 File ID: {upload_result.file_id}")
-        
+
         response_data = {
             'url': upload_result.url,
             'file_id': upload_result.file_id,
@@ -80,13 +80,13 @@ def upload_property_media(request):
             'file_type': upload_result.file_type,
             'size': upload_result.size,
         }
-        
+
         # Add thumbnail URL if available
         if hasattr(upload_result, 'thumbnail_url'):
             response_data['thumbnail_url'] = upload_result.thumbnail_url
-        
+
         return Response(response_data, status=status.HTTP_201_CREATED)
-        
+
     except Exception as e:
         logger.error(f"❌ Upload failed: {str(e)}")
         return Response(
@@ -100,13 +100,13 @@ def upload_property_media(request):
 def upload_profile_picture(request):
     """
     Upload user profile picture to ImageKit
-    
+
     Endpoint: POST /api/media/upload-profile-picture/
     Authentication: Required
-    
+
     Body:
         - file: Image file
-    
+
     Returns:
         - url: ImageKit CDN URL
         - file_id: ImageKit file ID
@@ -118,15 +118,15 @@ def upload_profile_picture(request):
                 {'error': 'No file provided'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         file = request.FILES['file']
-        
+
         logger.info(f"📤 Uploading profile picture: {file.name}")
         logger.info(f"   User: {request.user.email}")
-        
+
         # Read file content
         file_content = file.read()
-        
+
         # Upload to ImageKit
         upload_result = imagekit.upload_file(
             file=file_content,
@@ -137,16 +137,16 @@ def upload_profile_picture(request):
                 tags=['property237', 'profile-picture', f'user-{request.user.id}']
             )
         )
-        
+
         logger.info(f"✅ Profile picture uploaded!")
         logger.info(f"   📎 URL: {upload_result.url}")
-        
+
         return Response({
             'url': upload_result.url,
             'file_id': upload_result.file_id,
             'name': upload_result.name,
         }, status=status.HTTP_201_CREATED)
-        
+
     except Exception as e:
         logger.error(f"❌ Profile picture upload failed: {str(e)}")
         return Response(
@@ -159,9 +159,9 @@ def upload_profile_picture(request):
 def get_imagekit_auth_params(request):
     """
     Generate authentication parameters for client-side uploads
-    
+
     Endpoint: GET /api/media/imagekit-auth/
-    
+
     Returns:
         - signature: Authentication signature
         - expire: Expiration timestamp
@@ -172,7 +172,7 @@ def get_imagekit_auth_params(request):
     try:
         # Generate authentication parameters
         auth_params = imagekit.get_authentication_parameters()
-        
+
         return Response({
             'signature': auth_params['signature'],
             'expire': auth_params['expire'],
@@ -180,7 +180,7 @@ def get_imagekit_auth_params(request):
             'public_key': os.getenv('IMAGEKIT_PUBLIC_KEY'),
             'url_endpoint': os.getenv('IMAGEKIT_URL_ENDPOINT'),
         }, status=status.HTTP_200_OK)
-        
+
     except Exception as e:
         logger.error(f"❌ Failed to generate auth params: {str(e)}")
         return Response(

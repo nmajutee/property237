@@ -330,6 +330,7 @@ class Property(models.Model):
     views_count = models.PositiveIntegerField(default=0)
 
     class Meta:
+        verbose_name_plural = "Properties"
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['listing_type', 'status']),

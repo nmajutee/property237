@@ -266,6 +266,7 @@ class PromotedProperty(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name_plural = "Promoted Properties"
         ordering = ['-priority_score', '-created_at']
 
     def __str__(self):

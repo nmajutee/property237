@@ -165,6 +165,9 @@ class UserPreferences(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name_plural = "User Preferences"
+
     def __str__(self):
         return f"Preferences for {self.user.email}"
 

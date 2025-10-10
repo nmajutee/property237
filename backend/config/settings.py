@@ -416,10 +416,12 @@ print(f"IMAGEKIT_URL_ENDPOINT: {IMAGEKIT_URL_ENDPOINT if IMAGEKIT_URL_ENDPOINT e
 if IMAGEKIT_PRIVATE_KEY and IMAGEKIT_PUBLIC_KEY and IMAGEKIT_URL_ENDPOINT:
     # Production - Use ImageKit
     DEFAULT_FILE_STORAGE = 'utils.imagekit_storage.ImageKitStorage'
-    MEDIA_URL = IMAGEKIT_URL_ENDPOINT
+    # Ensure MEDIA_URL ends with a slash (Django requirement)
+    MEDIA_URL = IMAGEKIT_URL_ENDPOINT if IMAGEKIT_URL_ENDPOINT.endswith('/') else f"{IMAGEKIT_URL_ENDPOINT}/"
 
     print(f"✓ ImageKit configured successfully!")
     print(f"  URL Endpoint: {IMAGEKIT_URL_ENDPOINT}")
+    print(f"  Media URL: {MEDIA_URL}")
     print(f"  Storage Backend: {DEFAULT_FILE_STORAGE}")
     print(f"  ✓ No permission configuration needed!")
     print(f"  ✓ Automatic optimization enabled!")

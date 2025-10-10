@@ -37,25 +37,17 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         """Get full-size image URL"""
         if obj.image:
             url = obj.image.url
-            print(f"DEBUG: PropertyImage {obj.id} image.url = {url}")
 
-            # AWS S3 URLs are already absolute
+            # ImageKit URLs are absolute
             if url and url.startswith('http'):
-                print(f"DEBUG: Returning ImageKit URL: {url}")
                 return url
 
             # For local paths, make absolute
             if url and not url.startswith('http'):
                 request = self.context.get('request')
                 if request:
-                    abs_url = request.build_absolute_uri(url)
-                    print(f"DEBUG: Returning absolute URL: {abs_url}")
-                    return abs_url
+                    return request.build_absolute_uri(url)
 
-        print(f"DEBUG: No image URL for PropertyImage {obj.id}")
-        return None
-
-            return url
         return None
 
     def get_thumbnail_url(self, obj):

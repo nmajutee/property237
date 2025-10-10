@@ -167,8 +167,14 @@ STATICFILES_DIRS = []
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (User uploaded content)
+# Use persistent disk on Render (/data/media) or local path for development
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if os.path.exists('/data'):
+    # Production on Render with persistent disk
+    MEDIA_ROOT = '/data/media'
+else:
+    # Local development
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS settings are configured at the end of this file (after JWT settings)
 # See line ~290 for complete CORS configuration

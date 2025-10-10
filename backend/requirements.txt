@@ -9,7 +9,6 @@ django-filter==24.3
 django-ratelimit==4.1.0
 django-redis==5.4.0
 djangorestframework==3.15.2
-imagekitio==3.2.0
 djangorestframework-simplejwt==5.3.1
 ecdsa==0.19.0
 gunicorn==23.0.0

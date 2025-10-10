@@ -1,15 +1,15 @@
-# Media Storage Setup - Enterprise File System Approach
+# Media Storage Setup - Render File System Approach
 
 ## Overview
-We use **file system storage** with persistent disks - a simple, reliable, enterprise-ready solution with no third-party dependencies.
+We use **local file system storage** on Render with persistent disks - a simple, cost-effective solution perfect for Render deployments.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────┐
 │ User Uploads Image                               │
-│  └─> Frontend sends to /api/properties/         │
-│       └─> Django saves to /data/media/          │
+│  └─> Frontend (Vercel) sends to API             │
+│       └─> Backend (Render) saves to /data/media/│
 │            └─> Returns URL: /media/image.jpg    │
 │                 └─> Frontend displays image      │
 └─────────────────────────────────────────────────┘
@@ -17,35 +17,42 @@ We use **file system storage** with persistent disks - a simple, reliable, enter
 
 ## Benefits
 
-✅ **No Third Party** - No ImageKit, Cloudinary, AWS needed for MVP  
-✅ **Zero Extra Costs** - Use included disk space  
-✅ **Full Control** - Your files, your server, your rules  
-✅ **Simple** - Standard Django file handling  
-✅ **Production Ready** - Used by many enterprise apps  
-✅ **Easy Migration** - Can switch to S3 later by changing one setting
+✅ **No Third Party** - No AWS, ImageKit, Cloudinary needed
+✅ **Cost Effective** - Use Render's included disk space
+✅ **Simple Setup** - No complex cloud storage configuration
+✅ **Full Control** - Your files, your server
+✅ **Production Ready** - Standard Django file handling
+✅ **Easy Migration** - Can switch to cloud storage later if needed
 
 ## Render Configuration
 
-### 1. Add Persistent Disk (Required for Production)
+### 1. Add Persistent Disk (REQUIRED for Production)
+
+**Important**: Render's ephemeral file system is temporary. Without a persistent disk, uploaded images will be lost on each deployment.
 
 In your Render dashboard:
 
-1. Go to your web service
+1. Go to your backend web service (property237 or similar)
 2. Navigate to **"Disks"** section
 3. Click **"Add Disk"**
    - **Name**: `media-storage`
    - **Mount Path**: `/data`
-   - **Size**: Start with **10 GB** (can expand later)
-4. Save and redeploy
+   - **Size**: Start with **10 GB** (can expand to 100GB+ later)
+4. Click **"Save"** and redeploy your service
 
 ### 2. Environment Variables
 
-You don't need any ImageKit/Cloudinary variables. Remove them if present:
+**No external service credentials needed!**
+
+Remove these if present:
 - ❌ `IMAGEKIT_PRIVATE_KEY`
 - ❌ `IMAGEKIT_PUBLIC_KEY`
 - ❌ `IMAGEKIT_URL_ENDPOINT`
+- ❌ `AWS_ACCESS_KEY_ID`
+- ❌ `AWS_SECRET_ACCESS_KEY`
+- ❌ `AWS_STORAGE_BUCKET_NAME`
 
-The app automatically uses file system storage.
+The app automatically uses local file system storage.
 
 ### 3. Directory Structure
 
@@ -127,9 +134,9 @@ du -sh /data/media/*
 
 ## Security Best Practices
 
-✅ **Validation** - Check file types and sizes (already implemented)  
-✅ **Unique Names** - Django auto-generates unique filenames  
-✅ **Access Control** - Only authenticated users can upload  
+✅ **Validation** - Check file types and sizes (already implemented)
+✅ **Unique Names** - Django auto-generates unique filenames
+✅ **Access Control** - Only authenticated users can upload
 ✅ **HTTPS** - All media served over HTTPS (Render provides this)
 
 ## Cost Comparison
@@ -174,8 +181,8 @@ This is a **proven enterprise pattern** for MVPs and scale-ups!
 
 ## Summary
 
-✅ Simple, reliable, no dependencies  
-✅ Production-ready with Render persistent disk  
-✅ Easy to scale later (add CDN or migrate to S3)  
-✅ Industry-standard approach  
+✅ Simple, reliable, no dependencies
+✅ Production-ready with Render persistent disk
+✅ Easy to scale later (add CDN or migrate to S3)
+✅ Industry-standard approach
 ✅ **Your images, your control!**

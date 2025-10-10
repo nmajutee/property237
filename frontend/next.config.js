@@ -6,8 +6,8 @@ const nextConfig = {
   images: {
     domains: [
       'localhost',
-      'property237.com',
-      'ik.imagekit.io'
+      'property237.onrender.com',
+      'property237.com'
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

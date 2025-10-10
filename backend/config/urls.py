@@ -47,9 +47,10 @@ urlpatterns = [
 # Import HttpResponse for health check
 from django.http import HttpResponse
 
-# Serve media files (both development and production)
-# In production, use WhiteNoise or nginx for better performance
+# Serve media files in all environments
+# Media files are stored locally on Render's persistent disk
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+# Static files served by WhiteNoise in production, Django in development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

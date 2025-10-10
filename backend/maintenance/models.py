@@ -1,49 +1,4 @@
 from django.db import models
-from django.conf import settings
-
-
-class MaintenanceCategory(models.Model):
-	name = models.CharField(max_length=100, unique=True)
-	description = models.TextField(blank=True)
-
-	def __str__(self):
-		return self.name
-
-
-
-
-class MaintenanceRequest(models.Model):
-	PRIORITY = (
-		('low', 'Low'),
-		('medium', 'Medium'),
-		('high', 'High'),
-		('urgent', 'Urgent'),
-	)
-	STATUS = (
-		('submitted', 'Submitted'),
-		('acknowledged', 'Acknowledged'),
-		('in_progress', 'In Progress'),
-		('completed', 'Completed'),
-		('closed', 'Closed'),
-	)
-	related_property = models.ForeignKey('properties.Property', on_delete=models.CASCADE, related_name='maintenance_requests')
-	tenant = models.ForeignKey('tenants.Tenant', on_delete=models.SET_NULL, null=True, blank=True, related_name='maintenance_requests')
-	category = models.ForeignKey(MaintenanceCategory, on_delete=models.SET_NULL, null=True, blank=True)
-	title = models.CharField(max_length=255)
-	description = models.TextField()
-	priority = models.CharField(max_length=20, choices=PRIORITY, default='medium')
-	status = models.CharField(max_length=20, choices=STATUS, default='submitted')
-	requested_date = models.DateField(auto_now_add=True)
-	completed_date = models.DateField(null=True, blank=True)
-	estimated_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-	actual_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-	assigned_to = models.ForeignKey('ServiceProvider', on_delete=models.SET_NULL, null=True, blank=True)
-
-	def __str__(self):
-		return f"{self.title} ({self.get_status_display()})"
-
-
-from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone

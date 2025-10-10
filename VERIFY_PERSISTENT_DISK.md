@@ -146,7 +146,7 @@ This is the REAL test!
 2. Look at the image field
 3. Click the image link
 
-### ✅ Success: 
+### ✅ Success:
 - Image URL looks like: `https://your-backend.onrender.com/media/property_images/image_xyz.jpg`
 - Image displays correctly in your browser
 

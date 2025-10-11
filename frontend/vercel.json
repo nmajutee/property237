@@ -2,9 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "installCommand": "npm ci --legacy-peer-deps",
   "framework": "nextjs",
   "regions": ["iad1"],
+  "crons": [],
   "rewrites": [
     {
       "source": "/api/:path*",

@@ -1,0 +1,5 @@
+# Vercel ignore - force clean builds
+.next
+node_modules
+.cache
+.turbo

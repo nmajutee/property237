@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Building2, MapPin, Heart, Home, Key, MapPinned, Droplet, Zap } from 'lucide-react'
+import { Building2, MapPin, Heart, Home, Key, MapPinned } from 'lucide-react'
 
 interface PropertyImage {
   id: number
@@ -95,7 +95,7 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
           </div>
 
           {/* 5 Important Elements - List View */}
-          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap">
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
               <Home className="h-4 w-4 text-property237-primary" />
               <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bedrooms}</span>
@@ -111,15 +111,15 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
               <span className="font-semibold text-gray-900 dark:text-white">{property.distance_from_road || 0}m</span>
             </div>
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <Droplet className="h-4 w-4 text-property237-primary" />
+              <Building2 className="h-4 w-4 text-property237-primary" />
               <span className="font-semibold text-gray-900 dark:text-white text-xs capitalize">
-                {property.water_type ? property.water_type.replace(/_/g, ' ') : 'N/A'}
+                {property.property_type.name}
               </span>
             </div>
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <Zap className="h-4 w-4 text-property237-primary" />
+              <MapPin className="h-4 w-4 text-property237-primary" />
               <span className="font-semibold text-gray-900 dark:text-white text-xs capitalize">
-                {property.electricity_type ? property.electricity_type.replace(/_/g, ' ') : 'N/A'}
+                {property.area.city.name}
               </span>
             </div>
           </div>
@@ -197,15 +197,15 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
             <span className="text-[10px]">Road</span>
           </div>
           <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <Droplet className="h-4 w-4 text-property237-primary mb-1" />
-            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize">
-              {property.water_type ? property.water_type.replace(/_/g, ' ').substring(0, 6) : 'N/A'}
+            <Building2 className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize truncate w-full text-center">
+              {property.property_type.name}
             </span>
           </div>
           <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <Zap className="h-4 w-4 text-property237-primary mb-1" />
-            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize">
-              {property.electricity_type ? property.electricity_type.replace(/_/g, ' ').substring(0, 6) : 'N/A'}
+            <MapPin className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize truncate w-full text-center">
+              {property.area.city.name}
             </span>
           </div>
         </div>

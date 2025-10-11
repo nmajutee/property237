@@ -303,7 +303,7 @@ export default function PropertyDetailPage() {
               onClick={toggleFavorite}
               className="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             >
-              <Heart 
+              <Heart
                 className={`w-6 h-6 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-400'}`}
               />
             </button>

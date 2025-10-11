@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
-import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Image, X } from 'lucide-react'
 import { getApiBaseUrl } from '@/services/api'
 import PropertyCategorySelector from '@/components/properties/PropertyCategorySelector'
 
@@ -1249,7 +1249,7 @@ export default function AddPropertyPage() {
                   </p>
 
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <Image className="mx-auto h-12 w-12 text-gray-400" />
                     <div className="mt-4">
                       <label className="cursor-pointer">
                         <span className="mt-2 block text-sm font-medium text-property237-primary hover:text-red-700">
@@ -1287,7 +1287,7 @@ export default function AddPropertyPage() {
                             onClick={() => removeImage(index)}
                             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <XMarkIcon className="h-4 w-4" />
+                            <X className="h-4 w-4" />
                           </button>
                           {index === 0 && (
                             <div className="absolute bottom-2 left-2 bg-property237-primary text-white text-xs px-2 py-1 rounded">

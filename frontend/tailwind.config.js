@@ -22,13 +22,15 @@ module.exports = {
         error: colors.colors.error,
         cameroon: colors.cameroon,
 
-        // Property237 brand colors (Professional Blue + Gold scheme)
-        'property237-primary': '#1E40AF',    // Deep Blue - Trust & Professionalism
-        'property237-secondary': '#1F2937',  // Charcoal Gray - Grounding
-        'property237-accent': '#F59E0B',     // Gold - Warmth & Premium
+        // Property237 brand colors (Trust & Professionalism - Most Popular)
+        'property237-primary': '#2563EB',    // Deep Blue - Trust, Stability, Professionalism
+        'property237-primary-dark': '#1E3A8A', // Darker Blue for hover states
+        'property237-secondary': '#6B7280',  // Neutral Gray - Modern, Clean
+        'property237-accent': '#F59E0B',     // Gold/Orange - Warmth, Luxury, CTAs
+        'property237-accent-dark': '#D97706', // Darker Gold for hover
         'property237-dark': '#111827',       // Dark background
-        'property237-light': '#F9FAFB',      // Light background
-        'background-light': '#F9FAFB',
+        'property237-light': '#F3F4F6',      // Neutral Light Gray background
+        'background-light': '#F3F4F6',
         'background-dark': '#111827',
 
         // Theme-aware colors (CSS variables)

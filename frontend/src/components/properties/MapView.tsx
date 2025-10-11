@@ -218,9 +218,9 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
               <div class="property-marker">
                 <div class="marker-pin">
                   <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" fill="#1E40AF"/>
+                    <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" fill="#2563EB"/>
                     <circle cx="16" cy="15" r="6" fill="white"/>
-                    <path d="M19 13h-2v-2c0-.55-.45-1-1-1s-1 .45-1 1v2h-2c-.55 0-1 .45-1 1s.45 1 1 1h2v2c0 .55.45 1 1 1s1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1z" fill="#1E40AF"/>
+                    <path d="M19 13h-2v-2c0-.55-.45-1-1-1s-1 .45-1 1v2h-2c-.55 0-1 .45-1 1s.45 1 1 1h2v2c0 .55.45 1 1 1s1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1z" fill="#2563EB"/>
                   </svg>
                 </div>
                 <div class="price-badge">
@@ -331,14 +331,14 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           top: -8px;
           left: 50%;
           transform: translateX(-50%);
-          background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+          background: linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%);
           color: white;
           padding: 4px 10px;
           border-radius: 12px;
           font-weight: 700;
           font-size: 11px;
           white-space: nowrap;
-          box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
           border: 2px solid white;
           z-index: 3;
           display: flex;
@@ -349,7 +349,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
 
         .property-marker:hover .price-badge {
           transform: translateX(-50%) scale(1.05);
-          box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5);
+          box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
         }
 
         .price-amount {
@@ -377,7 +377,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
 
         .leaflet-control-zoom a {
           background: white !important;
-          color: #1E40AF !important;
+          color: #2563EB !important;
           border: none !important;
           font-size: 18px !important;
           font-weight: 700 !important;
@@ -385,7 +385,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
         }
 
         .leaflet-control-zoom a:hover {
-          background: #1E40AF !important;
+          background: #2563EB !important;
           color: white !important;
         }
 
@@ -398,7 +398,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
         }
 
         .leaflet-control-attribution a {
-          color: #1E40AF !important;
+          color: #2563EB !important;
           font-weight: 600 !important;
         }
 

@@ -537,7 +537,7 @@ export default function PropertyDetailPage() {
               {property.is_active && (
                 <button
                   onClick={() => setShowApplicationModal(true)}
-                  className="w-full px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-blue-800 transition-colors font-semibold mb-4"
+                  className="w-full px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-property237-primary-dark transition-colors font-semibold mb-4"
                 >
                   Book Visitation
                 </button>

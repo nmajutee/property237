@@ -1,38 +1,44 @@
 # Property237 Color Scheme Update
 
-## New Professional Color Palette
+## Trust & Professionalism Palette (Most Popular)
 
 ### Primary Colors
-- **Primary Blue**: `#1E40AF` (Deep Blue)
-  - Purpose: Trust, professionalism, main brand color
+- **Primary Blue**: `#2563EB` (Deep Blue)
+  - Purpose: Trust, stability, professionalism, main brand color
   - Used for: Primary buttons, links, icons, borders
+  - Hover: `#1E3A8A` (Darker blue)
   - Replaces: Red `#ff291b`
 
-- **Secondary Gray**: `#1F2937` (Charcoal)
-  - Purpose: Grounding, professional secondary elements
-  - Used for: Secondary text, borders, backgrounds
+- **Neutral Gray**: `#6B7280` (Modern Gray)
+  - Purpose: Modern, clean secondary elements
+  - Used for: Secondary text, borders, subtle backgrounds
+  - Light variant: `#F3F4F6` for backgrounds
 
-- **Accent Gold**: `#F59E0B` 
-  - Purpose: Warmth, premium feel, call-to-action
+- **Accent Gold/Orange**: `#F59E0B` 
+  - Purpose: Warmth, luxury, call-to-action emphasis
   - Used for: Featured properties, highlights, important CTAs
+  - Hover: `#D97706` (Darker gold)
 
 ### Supporting Colors
 - **Success Green**: `#10B981`
   - Available properties
   - Success states
   - Positive actions
+  - Confirmation messages
 
 - **Urgent Red**: `#DC2626`
   - Reserved for urgent CTAs only
   - Error states
   - Critical alerts
+  - Use sparingly
 
 - **Teal**: `#14B8A6`
   - Visitation passes
   - Modern accents
+  - Special features
 
 ### Background Colors
-- **Light Mode**: `#F9FAFB` (Warm gray)
+- **Light Mode**: `#F3F4F6` (Neutral light gray - cleaner, more professional)
 - **Dark Mode**: `#111827` (Deep charcoal)
 
 ## Files Updated

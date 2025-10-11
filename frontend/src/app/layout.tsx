@@ -8,27 +8,27 @@ import "./globals.css"
 const craftworkGrotesk = localFont({
   src: [
     {
-      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Regular.ttf',
+      path: './fonts/craftwork-grotesk/CraftworkGrotesk-Regular.ttf',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Medium.ttf',
+      path: './fonts/craftwork-grotesk/CraftworkGrotesk-Medium.ttf',
       weight: '500',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-SemiBold.ttf',
+      path: './fonts/craftwork-grotesk/CraftworkGrotesk-SemiBold.ttf',
       weight: '600',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Bold.ttf',
+      path: './fonts/craftwork-grotesk/CraftworkGrotesk-Bold.ttf',
       weight: '700',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Heavy.ttf',
+      path: './fonts/craftwork-grotesk/CraftworkGrotesk-Heavy.ttf',
       weight: '800',
       style: 'normal',
     },

@@ -219,7 +219,7 @@ export default function PropertyCategorySelector({
           id="category"
           value={selectedCategory}
           onChange={handleCategoryChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary focus:border-transparent"
           required
         >
           <option value="">Select a category...</option>
@@ -246,7 +246,7 @@ export default function PropertyCategorySelector({
             id="subcategory"
             value={selectedSubcategory}
             onChange={handleSubcategoryChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary focus:border-transparent"
             required
           >
             <option value="">Select a type...</option>
@@ -273,7 +273,7 @@ export default function PropertyCategorySelector({
           id="state"
           value={selectedState}
           onChange={handleStateChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary focus:border-transparent"
           required
         >
           <option value="">Select a status...</option>

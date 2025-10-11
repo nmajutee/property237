@@ -182,7 +182,6 @@ class Property(models.Model):
     )
 
     # Room specifications
-    room_size = models.CharField(max_length=50, blank=True, help_text="e.g., '3m x 4m'")
     has_dressing_cupboard = models.BooleanField(default=False)
 
     # Utilities
@@ -292,12 +291,6 @@ class Property(models.Model):
         on_delete=models.CASCADE,
         related_name='properties'
     )
-    agent_commission_percentage = models.DecimalField(
-        max_digits=5, decimal_places=2,
-        null=True, blank=True,
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        help_text="Agent commission as percentage (0-100%)"
-    )
     agent_commission_months = models.PositiveIntegerField(
         null=True, blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(12)],
@@ -391,10 +384,6 @@ class Property(models.Model):
         elif self.listing_type == 'guest_house':
             if not self.price_per_day:
                 errors['price_per_day'] = "Daily price is required for guest houses"
-
-        # Validate commission fields
-        if self.agent_commission_percentage and self.agent_commission_months:
-            errors['agent_commission_percentage'] = "Specify either percentage or months commission, not both"
 
         if errors:
             raise ValidationError(errors)

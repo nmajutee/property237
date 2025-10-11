@@ -90,7 +90,6 @@ export default function AddPropertyPage() {
     no_of_balconies: 0,
     no_of_floors: 1,
     floor_number: '',
-    room_size: '',
     has_dressing_cupboard: false,
 
     // Utilities
@@ -142,7 +141,6 @@ export default function AddPropertyPage() {
     has_refundable_caution: false,
 
     // Agent Commission
-    agent_commission_percentage: '',
     agent_commission_months: '',
   })
 
@@ -881,18 +879,6 @@ export default function AddPropertyPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Room Size</label>
-                    <input
-                      type="text"
-                      name="room_size"
-                      value={formData.room_size}
-                      onChange={handleInputChange}
-                      placeholder="e.g., 3m x 4m"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
-                    />
-                  </div>
                 </div>
 
                 <div className="flex items-center">
@@ -1083,37 +1069,20 @@ export default function AddPropertyPage() {
                 {/* Agent Commission */}
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3">Agent Commission (Optional)</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700 mb-2">Commission Percentage (%)</label>
-                      <input
-                        type="number"
-                        name="agent_commission_percentage"
-                        value={formData.agent_commission_percentage}
-                        onChange={handleInputChange}
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        placeholder="10"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-700 mb-2">Commission (Months of Rent)</label>
-                      <input
-                        type="number"
-                        name="agent_commission_months"
-                        value={formData.agent_commission_months}
-                        onChange={handleInputChange}
-                        min="0"
-                        max="12"
-                        placeholder="1"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">Commission (Months of Rent)</label>
+                    <input
+                      type="number"
+                      name="agent_commission_months"
+                      value={formData.agent_commission_months}
+                      onChange={handleInputChange}
+                      min="0"
+                      max="12"
+                      placeholder="1"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">Agent commission in months of rent (0-12)</p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-2">Specify either percentage or months, not both</p>
                 </div>
 
                 {/* Sale-specific fields - keeping this for other property details */}

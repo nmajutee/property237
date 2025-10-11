@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import Navbar from '../../components/navigation/Navbar'
 import { Button } from '../../components/ui/Button'
 import { getApiBaseUrl } from '@/services/api'
@@ -10,8 +11,14 @@ import {
   HomeIcon,
   BuildingOfficeIcon,
   CurrencyDollarIcon,
-  AdjustmentsHorizontalIcon
+  AdjustmentsHorizontalIcon,
+  HeartIcon,
+  Squares2X2Icon,
+  ListBulletIcon,
+  ChevronUpIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline'
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid'
 
 interface PropertyImage {
   id: number
@@ -56,6 +63,11 @@ export default function PropertiesPage() {
   const [priceRange, setPriceRange] = useState({ min: '', max: '' })
   const [propertyTypes, setPropertyTypes] = useState<any[]>([{ id: 'all', name: 'All Types' }])
   const [mounted, setMounted] = useState(false)
+  const [showMap, setShowMap] = useState(true)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [selectedBedrooms, setSelectedBedrooms] = useState<string[]>([])
+  const [selectedBathrooms, setSelectedBathrooms] = useState<string>('any')
+  const [rentalPeriod, setRentalPeriod] = useState<'long-term' | 'short-term'>('long-term')
 
   useEffect(() => {
     setMounted(true)
@@ -68,20 +80,20 @@ export default function PropertiesPage() {
       const apiBaseUrl = getApiBaseUrl()
       console.log('Fetching property types from:', `${apiBaseUrl}/properties/types/`)
       const response = await fetch(`${apiBaseUrl}/properties/types/`)
-      
+
       if (!response.ok) {
         console.error('Property types API error:', response.status, response.statusText)
         setPropertyTypes([{ id: 'all', name: 'All Types' }])
         return
       }
-      
+
       const data = await response.json()
       console.log('Property types response:', data)
       console.log('Property types data type:', typeof data, 'Is array:', Array.isArray(data))
-      
+
       // Handle both array response and paginated response
       let typesArray = []
-      
+
       if (Array.isArray(data)) {
         typesArray = data
       } else if (data && data.results && Array.isArray(data.results)) {
@@ -92,7 +104,7 @@ export default function PropertiesPage() {
         console.error('Unexpected property types format:', data)
         typesArray = []
       }
-      
+
       setPropertyTypes([
         { id: 'all', name: 'All Types' },
         ...typesArray
@@ -107,7 +119,7 @@ export default function PropertiesPage() {
     setLoading(true)
     try {
       const apiBaseUrl = getApiBaseUrl()
-      
+
       // Build query parameters
       const params = new URLSearchParams()
 
@@ -134,13 +146,13 @@ export default function PropertiesPage() {
 
       console.log('Fetching properties from:', url)
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         console.error('Properties API error:', response.status, response.statusText)
         setProperties([])
         return
       }
-      
+
       const data = await response.json()
       console.log('Properties data:', data)
       console.log('Number of properties:', data.results?.length || 0)
@@ -165,205 +177,347 @@ export default function PropertiesPage() {
     setSearchTerm('')
     setSelectedType('all')
     setPriceRange({ min: '', max: '' })
+    setSelectedBedrooms([])
+    setSelectedBathrooms('any')
     fetchProperties()
   }
 
+  const toggleBedroom = (value: string) => {
+    setSelectedBedrooms(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <Navbar />
+      
+      {/* Main Container */}
+      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+        {/* Left Sidebar - Filters */}
+        <aside className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Results Count & Map Toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-heading font-semibold text-gray-900 dark:text-white">
+                {properties.length} results
+              </span>
+              <button 
+                onClick={() => setShowMap(!showMap)}
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-property237-primary flex items-center gap-1"
+              >
+                <MapPinIcon className="h-4 w-4" />
+                {showMap ? 'Hide' : 'Show'} map
+              </button>
+            </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Browse Properties
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            Find your perfect home from thousands of verified listings
-          </p>
-        </div>
+            {/* Rental Period */}
+            <div>
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                Rental period
+              </h3>
+              <div className="space-y-2">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={rentalPeriod === 'long-term'}
+                    onChange={() => setRentalPeriod('long-term')}
+                    className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Long term rent</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={rentalPeriod === 'short-term'}
+                    onChange={() => setRentalPeriod('short-term')}
+                    className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Short term rent</span>
+                </label>
+              </div>
+            </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Search Location
-              </label>
-              <div className="relative">
-                <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            {/* Price Range */}
+            <div>
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                Price
+              </h3>
+              <div className="flex gap-2 items-center">
                 <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="City, neighborhood, or address..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
+                  type="number"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                  placeholder="Min"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                />
+                <span className="text-gray-500">—</span>
+                <input
+                  type="number"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                  placeholder="Max"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
                 />
               </div>
             </div>
 
-            {/* Property Type */}
+            {/* Real Estate Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Property Type
-              </label>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
-              >
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                Real estate type
+              </h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
                 {propertyTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
+                  <label key={type.id} className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedType === type.id.toString()}
+                      onChange={() => setSelectedType(selectedType === type.id.toString() ? '' : type.id.toString())}
+                      className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
+                    />
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{type.name}</span>
+                  </label>
                 ))}
+              </div>
+            </div>
+
+            {/* Bedrooms */}
+            <div>
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                Bedroom
+              </h3>
+              <div className="grid grid-cols-4 gap-2">
+                {['1', '2', '3', '4+'].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => toggleBedroom(num)}
+                    className={`py-2 px-3 text-sm font-medium rounded-lg border transition-colors ${
+                      selectedBedrooms.includes(num)
+                        ? 'bg-property237-primary text-white border-property237-primary'
+                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-property237-primary'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bathroom */}
+            <div>
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                Bathroom
+              </h3>
+              <select
+                value={selectedBathrooms}
+                onChange={(e) => setSelectedBathrooms(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+              >
+                <option value="any">Any</option>
+                <option value="combined">Combined</option>
+                <option value="separate">Separate</option>
               </select>
             </div>
 
-            {/* Search Button */}
-            <div className="flex items-end">
-              <Button onClick={handleSearch} className="w-full">
-                <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
+            {/* View Type */}
+            <div>
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                View
+              </h3>
+              <div className="space-y-2">
+                {['Any', 'Courtyard', 'Street'].map((view) => (
+                  <label key={view} className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="view"
+                      defaultChecked={view === 'Any'}
+                      className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
+                    />
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{view}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            <button
+              onClick={handleClearFilters}
+              className="w-full py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            >
+              Clear all filters
+            </button>
+
+            {/* Search by Location */}
+            <div>
+              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+                Search Location
+              </h3>
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="City, neighborhood..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                />
+              </div>
+              <Button onClick={handleSearch} className="w-full mt-3" size="sm">
                 Search
               </Button>
             </div>
           </div>
+        </aside>
 
-          {/* Price Range Filter */}
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Min Price
-              </label>
-              <input
-                type="number"
-                value={priceRange.min}
-                onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                placeholder="0"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Max Price
-              </label>
-              <input
-                type="number"
-                value={priceRange.max}
-                onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                placeholder="Any"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* Clear Filters */}
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-            <button
-              onClick={handleClearFilters}
-              className="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-property237-primary"
-            >
-              Clear All Filters
-            </button>
-          </div>
-        </div>
-
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-gray-600 dark:text-gray-400">
-            <span className="font-semibold text-gray-900 dark:text-white">
-              {properties.length}
-            </span>{' '}
-            properties found
-          </p>
-        </div>
-
-        {/* Property Grid */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-300 dark:bg-gray-700"></div>
-                <div className="p-4 space-y-3">
-                  <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+        {/* Right Content Area */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <h1 className="text-2xl font-heading font-bold text-gray-900 dark:text-white">
+                  Browse Properties
+                </h1>
+                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded ${
+                      viewMode === 'grid'
+                        ? 'bg-white dark:bg-gray-600 text-property237-primary shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    <Squares2X2Icon className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded ${
+                      viewMode === 'list'
+                        ? 'bg-white dark:bg-gray-600 text-property237-primary shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    <ListBulletIcon className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
-            ))}
+              <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary">
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Newest First</option>
+                <option>Oldest First</option>
+              </select>
+            </div>
           </div>
-        ) : properties.length === 0 ? (
-          <div className="text-center py-12">
-            <BuildingOfficeIcon className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No properties found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Try adjusting your search criteria
-            </p>
-            <Button onClick={handleClearFilters}>
-              Clear Filters
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
-              <div
-                key={property.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-              >
-                <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
-                  {property.primary_image || (property.images && property.images.length > 0) ? (
-                    <img
-                      src={property.primary_image || property.images[0]?.image_url || ''}
-                      alt={property.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <BuildingOfficeIcon className="h-16 w-16 text-gray-400" />
-                    </div>
-                  )}
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {property.property_type.name}
-                    </span>
-                  </div>
-                </div>
 
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {property.title}
-                  </h3>
-
-                  <div className="flex items-center text-gray-600 dark:text-gray-400 mb-3">
-                    <MapPinIcon className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{property.area.city.name}, {property.area.name}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span>{property.no_of_bedrooms} beds</span>
-                      <span>{property.no_of_bathrooms} baths</span>
-                      <span className="capitalize">{property.status.name}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div>
-                      <span className="text-2xl font-bold text-property237-primary">
-                        {parseFloat(property.price).toLocaleString()} {property.currency}
-                      </span>
-                      <span className="text-gray-600 dark:text-gray-400 text-sm">/month</span>
-                    </div>
-                    <Button size="sm">View Details</Button>
-                  </div>
-                </div>
+          {/* Map Section */}
+          {showMap && (
+            <div className="h-80 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
+              <div className="text-center">
+                <MapPinIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                <p className="text-gray-600 dark:text-gray-400">Map view coming soon</p>
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Property Grid */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {loading ? (
+              <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden animate-pulse">
+                    <div className="h-48 bg-gray-300 dark:bg-gray-700"></div>
+                    <div className="p-4 space-y-3">
+                      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : properties.length === 0 ? (
+              <div className="text-center py-20">
+                <BuildingOfficeIcon className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-xl font-heading font-semibold text-gray-900 dark:text-white mb-2">
+                  No properties found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Try adjusting your search criteria
+                </p>
+                <Button onClick={handleClearFilters}>
+                  Clear Filters
+                </Button>
+              </div>
+            ) : (
+              <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
+                {properties.map((property) => (
+                  <Link
+                    key={property.id}
+                    href={`/properties/${property.id}`}
+                    className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all"
+                  >
+                    <div className="relative h-56 bg-gray-200 dark:bg-gray-700">
+                      {property.primary_image || (property.images && property.images.length > 0) ? (
+                        <img
+                          src={property.primary_image || property.images[0]?.image_url || ''}
+                          alt={property.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <BuildingOfficeIcon className="h-20 w-20 text-gray-400" />
+                        </div>
+                      )}
+                      <button className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform">
+                        <HeartIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                      </button>
+                      <div className="absolute bottom-4 left-4">
+                        <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-heading font-semibold shadow-lg">
+                          {property.property_type.name}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-lg font-heading font-semibold text-gray-900 dark:text-white group-hover:text-property237-primary transition-colors">
+                          {property.title}
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
+                        <MapPinIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+                        <span className="text-sm truncate">{property.area.city.name}, {property.area.name}</span>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <span className="flex items-center gap-1">
+                          <span className="font-semibold">{property.no_of_bedrooms}</span> beds
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="font-semibold">{property.no_of_bathrooms}</span> baths
+                        </span>
+                        <span className="capitalize text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                          {property.status.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-2xl font-heading font-bold text-property237-primary">
+                            {parseFloat(property.price).toLocaleString()} {property.currency}
+                          </span>
+                          <span className="text-gray-600 dark:text-gray-400 text-sm">/month</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </main>
       </div>
     </div>
   )

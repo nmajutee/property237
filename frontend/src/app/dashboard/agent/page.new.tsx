@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -16,8 +15,6 @@ import {
   HeartIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-  ClockIcon,
-  MapPinIcon,
   CurrencyDollarIcon,
   StarIcon,
   ChatBubbleLeftIcon,

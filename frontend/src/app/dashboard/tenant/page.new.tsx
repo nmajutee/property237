@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -8,14 +7,12 @@ import {
   HomeIcon,
   HeartIcon,
   DocumentTextIcon,
-  CreditCardIcon,
   BellIcon,
   Cog6ToothIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
   ClockIcon,
   CheckCircleIcon,
-  XCircleIcon,
   CalendarIcon,
   ChatBubbleLeftIcon,
 } from '@heroicons/react/24/outline'

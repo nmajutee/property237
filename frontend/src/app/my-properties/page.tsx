@@ -11,6 +11,8 @@ import {
   Plus,
   Home as HomeIcon,
   MapPin,
+  Key,
+  MapPinned,
 } from 'lucide-react'
 
 interface PropertyType {
@@ -515,24 +517,22 @@ export default function MyPropertiesPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span>{property.no_of_bedrooms} bed</span>
-                      <span>{property.no_of_bathrooms} bath</span>
-                      <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                        {property.property_type.name}
-                      </span>
+                  {/* 3 Important Elements */}
+                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+                      <HomeIcon className="h-4 w-4 text-gray-900 dark:text-gray-100" />
+                      <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bedrooms}</span>
+                      <span className="text-xs">Rooms</span>
                     </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center">
-                      <Eye className="w-4 h-4 mr-1 text-gray-900 dark:text-gray-100" />
-                      <span>{property.views_count || 0} views</span>
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+                      <Key className="h-4 w-4 text-gray-900 dark:text-gray-100" />
+                      <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bathrooms}</span>
+                      <span className="text-xs">Baths</span>
                     </div>
-                    <div>
-                      <span>{property.listing_type}</span>
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+                      <Eye className="h-4 w-4 text-gray-900 dark:text-gray-100" />
+                      <span className="font-semibold text-gray-900 dark:text-white">{property.views_count || 0}</span>
+                      <span className="text-xs">Views</span>
                     </div>
                   </div>
 

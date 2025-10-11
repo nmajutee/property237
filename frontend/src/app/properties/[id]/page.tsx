@@ -13,6 +13,13 @@ import {
   BuildingOfficeIcon,
   CheckCircleIcon,
   XMarkIcon,
+  FireIcon,
+  BoltIcon,
+  ShieldCheckIcon,
+  TruckIcon,
+  SparklesIcon,
+  BuildingLibraryIcon,
+  CloudIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid'
 
@@ -88,6 +95,15 @@ interface Property {
   slug: string
   created_at: string
   updated_at: string
+  // Amenities
+  has_parking: boolean
+  has_security: boolean
+  has_pool: boolean
+  has_gym: boolean
+  has_elevator: boolean
+  has_ac_preinstalled: boolean
+  has_hot_water: boolean
+  has_generator: boolean
 }
 
 export default function PropertyDetailPage() {
@@ -392,6 +408,68 @@ export default function PropertyDetailPage() {
                   </div>
                 </div>
               )}
+
+              {/* Amenities Section */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Amenities & Features
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {property.has_parking && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <TruckIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Parking</span>
+                    </div>
+                  )}
+                  {property.has_security && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <ShieldCheckIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Security</span>
+                    </div>
+                  )}
+                  {property.has_pool && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <CloudIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Swimming Pool</span>
+                    </div>
+                  )}
+                  {property.has_gym && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <SparklesIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Gym</span>
+                    </div>
+                  )}
+                  {property.has_elevator && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <BuildingLibraryIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Elevator</span>
+                    </div>
+                  )}
+                  {property.has_ac_preinstalled && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <CloudIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Air Conditioning</span>
+                    </div>
+                  )}
+                  {property.has_hot_water && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <FireIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Hot Water</span>
+                    </div>
+                  )}
+                  {property.has_generator && (
+                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <BoltIcon className="w-6 h-6 text-property237-primary mr-3" />
+                      <span className="text-gray-900 dark:text-white font-medium">Generator</span>
+                    </div>
+                  )}
+                </div>
+                {!property.has_parking && !property.has_security && !property.has_pool && 
+                 !property.has_gym && !property.has_elevator && !property.has_ac_preinstalled &&
+                 !property.has_hot_water && !property.has_generator && (
+                  <p className="text-gray-500 dark:text-gray-400 italic">No amenities specified</p>
+                )}
+              </div>
             </div>
           </div>
 

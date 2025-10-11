@@ -54,6 +54,17 @@ interface Property {
   primary_image: string | null
   featured: boolean
   is_active: boolean
+  agent?: {
+    id: number
+    user: {
+      id: number
+      first_name: string
+      last_name: string
+      profile_picture?: string
+    }
+    average_rating?: number
+    total_reviews?: number
+  }
 }
 
 export default function PropertiesPage() {
@@ -218,7 +229,7 @@ export default function PropertiesPage() {
         {/* Right Content Area - Scrollable */}
         <main className="flex-1 flex flex-col overflow-y-auto">
           {/* Map */}
-          <MapView show={showMap} />
+          <MapView show={showMap} properties={properties} />
 
           {/* Header */}
           <PropertyHeader

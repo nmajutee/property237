@@ -3,6 +3,7 @@ import { ClientThemeProvider } from "../design-system/ClientThemeProvider"
 import localFont from 'next/font/local'
 import { DM_Sans } from 'next/font/google'
 import "./globals.css"
+import 'leaflet/dist/leaflet.css'
 
 // Craftwork Grotesk - For headings, titles, buttons, and UI elements
 const craftworkGrotesk = localFont({

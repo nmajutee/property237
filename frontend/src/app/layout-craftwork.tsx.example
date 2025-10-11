@@ -1,0 +1,55 @@
+// OPTION 1: Using Craftwork Grotesk (after you download the font files)
+// Place .woff2 files in frontend/public/fonts/craftwork-grotesk/
+
+import localFont from 'next/font/local'
+import { ClientThemeProvider } from "../design-system/ClientThemeProvider"
+import "./globals.css"
+
+// Load Craftwork Grotesk from local files
+const craftworkGrotesk = localFont({
+  src: [
+    {
+      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Medium.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-SemiBold.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/craftwork-grotesk/CraftworkGrotesk-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-craftwork-grotesk',
+  display: 'swap',
+})
+
+export const metadata = {
+  title: "Property237 - Real Estate for Living and Investments",
+  description: "Your trusted property management platform in Cameroon",
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en" className={craftworkGrotesk.variable}>
+      <body className={craftworkGrotesk.className}>
+        <ClientThemeProvider>
+          {children}
+        </ClientThemeProvider>
+      </body>
+    </html>
+  )
+}

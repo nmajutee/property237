@@ -28,9 +28,14 @@ class PropertyListCreateAPIView(generics.ListCreateAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Property.objects.filter(is_active=True).select_related(
+        # Public API: Show all active properties that are NOT in draft status
+        return Property.objects.filter(
+            is_active=True
+        ).exclude(
+            status__name='draft'  # Hide draft properties from public
+        ).select_related(
             'property_type', 'status', 'area__city__region', 'agent__user'
-        ).prefetch_related('additional_features').order_by('-created_at')  # media_files is now available
+        ).prefetch_related('additional_features').order_by('-created_at')
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -170,7 +175,8 @@ class PropertyViewingCreateAPIView(generics.CreateAPIView):
 def my_properties_list(request):
     """
     Get properties owned by the current user (agent)
-    Returns all properties created by the authenticated agent
+    Returns ALL properties created by the authenticated agent (including drafts, inactive, etc.)
+    This is different from the public API which only shows published/available properties
     """
     import logging
     logger = logging.getLogger(__name__)

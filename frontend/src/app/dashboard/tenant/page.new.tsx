@@ -140,7 +140,7 @@ export default function TenantDashboard() {
               </span>
             )}
           </Link>
-          <Link href="/chat" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href={"/chat" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <ChatBubbleLeftIcon className="h-5 w-5" />
             Messages
             {stats.messagesUnread > 0 && (

@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { getApiBaseUrl } from '@/services/api'
 import {
-  PencilIcon,
-  TrashIcon,
-  EyeIcon,
-  PlusIcon,
-  HomeIcon,
-  MapPinIcon,
-} from '@heroicons/react/24/outline'
+  Edit,
+  Trash2,
+  Eye,
+  Plus,
+  Home as HomeIcon,
+  MapPin,
+} from 'lucide-react'
 
 interface PropertyType {
   id: number
@@ -347,7 +347,7 @@ export default function MyPropertiesPage() {
               <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                    <TrashIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
+                    <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
@@ -399,7 +399,7 @@ export default function MyPropertiesPage() {
             onClick={() => router.push('/add-property')}
             className="flex items-center px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors"
           >
-            <PlusIcon className="w-5 h-5 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Add Property
           </button>
         </div>
@@ -509,7 +509,7 @@ export default function MyPropertiesPage() {
                   </h3>
 
                   <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-                    <MapPinIcon className="w-5 h-5 mr-2" />
+                    <MapPin className="w-5 h-5 mr-2 text-gray-900 dark:text-gray-100" />
                     <span className="text-sm">
                       {property.area.name}, {property.area.city.name}
                     </span>
@@ -528,7 +528,7 @@ export default function MyPropertiesPage() {
                   {/* Stats */}
                   <div className="flex items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center">
-                      <EyeIcon className="w-4 h-4 mr-1" />
+                      <Eye className="w-4 h-4 mr-1 text-gray-900 dark:text-gray-100" />
                       <span>{property.views_count || 0} views</span>
                     </div>
                     <div>
@@ -550,7 +550,7 @@ export default function MyPropertiesPage() {
                         }}
                         className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
                       >
-                        <EyeIcon className="w-4 h-4 mr-1" />
+                        <Eye className="w-4 h-4 mr-1 text-gray-900 dark:text-gray-100" />
                         View
                       </button>
                       <button
@@ -560,7 +560,7 @@ export default function MyPropertiesPage() {
                         }}
                         className="flex-1 px-3 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors flex items-center justify-center"
                       >
-                        <PencilIcon className="w-4 h-4 mr-1" />
+                        <Edit className="w-4 h-4 mr-1" />
                         Edit
                       </button>
                       <button
@@ -570,7 +570,7 @@ export default function MyPropertiesPage() {
                         }}
                         className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                       >
-                        <TrashIcon className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 

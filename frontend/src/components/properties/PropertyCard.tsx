@@ -64,14 +64,14 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <Building2 className="h-20 w-20 text-gray-400" />
+              <Building2 className="h-20 w-20 text-gray-900 dark:text-gray-100" />
             </div>
           )}
           <button
             onClick={(e) => e.preventDefault()}
             className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform"
           >
-            <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <Heart className="h-5 w-5 text-gray-900 dark:text-gray-100" />
           </button>
           <div className="absolute bottom-4 left-4">
             <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-heading font-semibold shadow-lg">
@@ -88,39 +88,27 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
           </div>
 
           <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-            <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+            <MapPin className="h-4 w-4 mr-1 flex-shrink-0 text-gray-900 dark:text-gray-100" />
             <span className="text-sm">
               {property.area.city.name}, {property.area.name}
             </span>
           </div>
 
-          {/* 5 Important Elements - List View */}
+          {/* 3 Important Elements - List View */}
           <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap">
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <Home className="h-4 w-4 text-property237-primary" />
+              <Home className="h-4 w-4 text-gray-900 dark:text-gray-100" />
               <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bedrooms}</span>
               <span className="text-xs">Rooms</span>
             </div>
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <Key className="h-4 w-4 text-property237-primary" />
+              <Key className="h-4 w-4 text-gray-900 dark:text-gray-100" />
               <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bathrooms}</span>
               <span className="text-xs">Baths</span>
             </div>
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <MapPinned className="h-4 w-4 text-property237-primary" />
+              <MapPinned className="h-4 w-4 text-gray-900 dark:text-gray-100" />
               <span className="font-semibold text-gray-900 dark:text-white">{property.distance_from_road || 0}m</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <Building2 className="h-4 w-4 text-property237-primary" />
-              <span className="font-semibold text-gray-900 dark:text-white text-xs capitalize">
-                {property.property_type.name}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
-              <MapPin className="h-4 w-4 text-property237-primary" />
-              <span className="font-semibold text-gray-900 dark:text-white text-xs capitalize">
-                {property.area.city.name}
-              </span>
             </div>
           </div>
 
@@ -152,11 +140,11 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
           />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <Building2 className="h-20 w-20 text-gray-400" />
+            <Building2 className="h-20 w-20 text-gray-900 dark:text-gray-100" />
           </div>
         )}
         <button className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform">
-          <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <Heart className="h-5 w-5 text-gray-900 dark:text-gray-100" />
         </button>
         <div className="absolute bottom-4 left-4">
           <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-heading font-semibold shadow-lg">
@@ -173,40 +161,28 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
         </div>
 
         <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-          <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+          <MapPin className="h-4 w-4 mr-1 flex-shrink-0 text-gray-900 dark:text-gray-100" />
           <span className="text-sm truncate">
             {property.area.city.name}, {property.area.name}
           </span>
         </div>
 
-        {/* 5 Important Elements */}
-        <div className="grid grid-cols-5 gap-2 text-xs text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+        {/* 3 Important Elements */}
+        <div className="grid grid-cols-3 gap-2 text-xs text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <Home className="h-4 w-4 text-property237-primary mb-1" />
+            <Home className="h-4 w-4 text-gray-900 dark:text-gray-100 mb-1" />
             <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bedrooms}</span>
             <span className="text-[10px]">Rooms</span>
           </div>
           <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <Key className="h-4 w-4 text-property237-primary mb-1" />
+            <Key className="h-4 w-4 text-gray-900 dark:text-gray-100 mb-1" />
             <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bathrooms}</span>
             <span className="text-[10px]">Baths</span>
           </div>
           <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <MapPinned className="h-4 w-4 text-property237-primary mb-1" />
+            <MapPinned className="h-4 w-4 text-gray-900 dark:text-gray-100 mb-1" />
             <span className="font-semibold text-gray-900 dark:text-white">{property.distance_from_road || 0}m</span>
             <span className="text-[10px]">Road</span>
-          </div>
-          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <Building2 className="h-4 w-4 text-property237-primary mb-1" />
-            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize truncate w-full text-center">
-              {property.property_type.name}
-            </span>
-          </div>
-          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-            <MapPin className="h-4 w-4 text-property237-primary mb-1" />
-            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize truncate w-full text-center">
-              {property.area.city.name}
-            </span>
           </div>
         </div>
 

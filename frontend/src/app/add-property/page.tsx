@@ -362,8 +362,21 @@ export default function AddPropertyPage() {
     try {
       const formDataToSend = new FormData()
 
+      // Map new category system to old property_type/status system
+      // TODO: Remove this mapping once backend is fully migrated to new category system
+      const fieldMapping: Record<string, string> = {
+        'category': 'property_type',  // Map category slug to property_type ID
+        'subcategory': 'property_subtype',  // For future use
+        'state': 'status',  // Map state code to status ID
+      }
+
       // Append all form fields, excluding empty optional fields
       Object.entries(formData).forEach(([key, value]) => {
+        // Skip the new category fields - we'll map them separately
+        if (key === 'category' || key === 'subcategory' || key === 'state') {
+          return
+        }
+        
         // Handle tags array specially
         if (key === 'tags' && Array.isArray(value)) {
           value.forEach((tagId) => {
@@ -375,6 +388,11 @@ export default function AddPropertyPage() {
           formDataToSend.append(key, value.toString())
         }
       })
+
+      // For now, set default property_type and status until backend is migrated
+      // property_type: 1 = default type, status: 3 = available
+      formDataToSend.append('property_type', '1')  // Default property type
+      formDataToSend.append('status', '3')  // Available status
 
       // Append images
       images.forEach((image) => {
@@ -1234,7 +1252,7 @@ export default function AddPropertyPage() {
                     <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
                     <div className="mt-4">
                       <label className="cursor-pointer">
-                        <span className="mt-2 block text-sm font-medium text-property237-primary hover:text-green-700">
+                        <span className="mt-2 block text-sm font-medium text-property237-primary hover:text-red-700">
                           Click to upload images
                         </span>
                         <input
@@ -1301,7 +1319,7 @@ export default function AddPropertyPage() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-green-700"
+                    className="px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Next
                   </button>
@@ -1309,7 +1327,7 @@ export default function AddPropertyPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                   >
                     {submitting ? 'Publishing...' : '✅ Publish Property'}
                   </button>

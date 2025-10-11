@@ -36,11 +36,11 @@ class PropertyAdmin(admin.ModelAdmin):
     search_fields = ['title', 'description', 'agent__user__email']
     readonly_fields = ['created_at', 'updated_at', 'verified_at']
     inlines = [PropertyImageInline]
-    
+
     def get_form(self, request, obj=None, **kwargs):
         """Customize form to auto-populate agent if user has profile"""
         form = super().get_form(request, obj, **kwargs)
-        
+
         # Try to get or create agent profile for current user
         from agents.models import AgentProfile
         if not obj:  # Only for new properties
@@ -56,9 +56,9 @@ class PropertyAdmin(admin.ModelAdmin):
             # Set the agent field initial value
             if 'agent' in form.base_fields:
                 form.base_fields['agent'].initial = agent_profile.id
-        
+
         return form
-    
+
     def save_model(self, request, obj, form, change):
         """Auto-assign agent and verified_by if not set"""
         if not change:  # New property
@@ -75,11 +75,11 @@ class PropertyAdmin(admin.ModelAdmin):
                     }
                 )
                 obj.agent = agent_profile
-            
+
             # Set verified_by if property is verified
             if obj.is_verified and not obj.verified_by:
                 obj.verified_by = request.user
-        
+
         super().save_model(request, obj, form, change)
 
     fieldsets = (

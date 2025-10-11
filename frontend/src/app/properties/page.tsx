@@ -32,9 +32,11 @@ export default function PropertiesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
   const [priceRange, setPriceRange] = useState({ min: '', max: '' })
-  const [propertyTypes, setPropertyTypes] = useState<any[]>([])
+  const [propertyTypes, setPropertyTypes] = useState<any[]>([{ id: 'all', name: 'All Types' }])
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     fetchPropertyTypes()
     fetchProperties()
   }, [])
@@ -53,17 +55,26 @@ export default function PropertiesPage() {
       
       const data = await response.json()
       console.log('Property types response:', data)
+      console.log('Property types data type:', typeof data, 'Is array:', Array.isArray(data))
       
-      // Ensure data is an array
+      // Handle both array response and paginated response
+      let typesArray = []
+      
       if (Array.isArray(data)) {
-        setPropertyTypes([
-          { id: 'all', name: 'All Types' },
-          ...data
-        ])
-      } else {
-        console.error('Property types data is not an array:', data)
-        setPropertyTypes([{ id: 'all', name: 'All Types' }])
+        typesArray = data
+      } else if (data && data.results && Array.isArray(data.results)) {
+        // Paginated response
+        typesArray = data.results
+      } else if (data && typeof data === 'object') {
+        // Single object or unexpected format
+        console.error('Unexpected property types format:', data)
+        typesArray = []
       }
+      
+      setPropertyTypes([
+        { id: 'all', name: 'All Types' },
+        ...typesArray
+      ])
     } catch (error) {
       console.error('Error fetching property types:', error)
       setPropertyTypes([{ id: 'all', name: 'All Types' }])

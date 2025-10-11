@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from '../../components/navigation/Navbar'
 import { Button } from '../../components/ui/Button'
+import { getApiBaseUrl } from '@/services/api'
 import {
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -40,7 +41,8 @@ export default function PropertiesPage() {
 
   const fetchPropertyTypes = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/properties/types/')
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/properties/types/`)
       const data = await response.json()
       setPropertyTypes([
         { id: 'all', name: 'All Types' },
@@ -54,6 +56,8 @@ export default function PropertiesPage() {
   const fetchProperties = async (filters?: any) => {
     setLoading(true)
     try {
+      const apiBaseUrl = getApiBaseUrl()
+      
       // Build query parameters
       const params = new URLSearchParams()
 
@@ -75,11 +79,13 @@ export default function PropertiesPage() {
 
       const queryString = params.toString()
       const url = queryString
-        ? `http://localhost:8000/api/properties/?${queryString}`
-        : 'http://localhost:8000/api/properties/'
+        ? `${apiBaseUrl}/properties/?${queryString}`
+        : `${apiBaseUrl}/properties/`
 
+      console.log('Fetching properties from:', url)
       const response = await fetch(url)
       const data = await response.json()
+      console.log('Properties data:', data)
       setProperties(data.results || [])
     } catch (error) {
       console.error('Error fetching properties:', error)

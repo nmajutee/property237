@@ -157,8 +157,9 @@ export default function PropertyDetailPage() {
     }
 
     try {
+      const apiBaseUrl = getApiBaseUrl()
       const response = await fetch(
-        `http://localhost:8000/api/properties/${property?.id}/favorite/`,
+        `${apiBaseUrl}/properties/${property?.id}/favorite/`,
         {
           method: isFavorite ? 'DELETE' : 'POST',
           headers: {
@@ -188,7 +189,8 @@ export default function PropertyDetailPage() {
     setSubmitting(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/applications/', {
+      const apiBaseUrl = getApiBaseUrl()
+      const response = await fetch(`${apiBaseUrl}/applications/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -17,8 +17,14 @@ import {
   CreditCardIcon,
   ChartBarIcon,
   UsersIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  PlusIcon,
+  LanguageIcon,
+  SunIcon,
+  MoonIcon,
+  CurrencyDollarIcon
 } from '@heroicons/react/24/outline'
+import { useTheme } from '@/design-system/ThemeProvider'
 
 interface User {
   id: number
@@ -33,9 +39,14 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false)
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [language, setLanguage] = useState('EN')
+  const [currency, setCurrency] = useState('USD')
   const router = useRouter()
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     setMounted(true)
@@ -88,34 +99,35 @@ export default function Navbar() {
 
   // Public navbar (not logged in)
   const publicLinks = [
-    { href: '/properties', label: 'Browse Properties', icon: BuildingOfficeIcon },
-    { href: '/about', label: 'About', icon: null },
-    { href: '/contact', label: 'Contact', icon: null }
+    { href: '/', label: 'Home' },
+    { href: '/properties', label: 'Properties' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' }
   ]
 
   // Tenant navbar
   const tenantLinks = [
-    { href: '/dashboard/tenant', label: 'Dashboard', icon: HomeIcon },
-    { href: '/properties', label: 'Browse Properties', icon: MagnifyingGlassIcon },
-    { href: '/my-favorites', label: 'My Favorites', icon: BuildingOfficeIcon },
-    { href: '/my-applications', label: 'Applications', icon: DocumentTextIcon }
+    { href: '/dashboard/tenant', label: 'Dashboard' },
+    { href: '/properties', label: 'Properties' },
+    { href: '/my-favorites', label: 'Favorites' },
+    { href: '/my-applications', label: 'Applications' }
   ]
 
   // Agent navbar
   const agentLinks = [
-    { href: '/dashboard/agent', label: 'Dashboard', icon: HomeIcon },
-    { href: '/my-properties', label: 'My Properties', icon: BuildingOfficeIcon },
-    { href: '/add-property', label: 'Add Property', icon: null },
-    { href: '/analytics', label: 'Analytics', icon: ChartBarIcon }
+    { href: '/dashboard/agent', label: 'Dashboard' },
+    { href: '/my-properties', label: 'My Properties' },
+    { href: '/properties', label: 'Properties' },
+    { href: '/analytics', label: 'Analytics' }
   ]
 
   // Admin navbar
   const adminLinks = [
-    { href: '/admin/dashboard', label: 'Dashboard', icon: HomeIcon },
-    { href: '/admin/users', label: 'Users', icon: UsersIcon },
-    { href: '/admin/properties', label: 'Properties', icon: BuildingOfficeIcon },
-    { href: '/admin/transactions', label: 'Transactions', icon: CreditCardIcon },
-    { href: '/admin/analytics', label: 'Analytics', icon: ChartBarIcon }
+    { href: '/admin/dashboard', label: 'Dashboard' },
+    { href: '/admin/users', label: 'Users' },
+    { href: '/admin/properties', label: 'Properties' },
+    { href: '/admin/transactions', label: 'Transactions' },
+    { href: '/admin/analytics', label: 'Analytics' }
   ]
 
   const getNavLinks = () => {
@@ -141,75 +153,84 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href as any}
-                className={`flex items-center space-x-1 text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors font-heading ${
                   pathname === link.href
                     ? 'text-property237-primary'
                     : 'text-gray-700 dark:text-gray-300 hover:text-property237-primary dark:hover:text-property237-primary'
                 }`}
               >
-                {link.icon && <link.icon className="h-4 w-4" />}
-                <span>{link.label}</span>
+                {link.label}
               </Link>
             ))}
           </div>
 
           {/* Right side actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-1">
+            {user && user.user_type === 'agent' && (
+              <Link
+                href="/add-property"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium font-heading text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
+              >
+                <PlusIcon className="h-4 w-4" />
+                <span>Add Property</span>
+              </Link>
+            )}
+
             {user ? (
               <>
-                {/* Credits Badge */}
-                <Link href="/credits">
-                  <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                    <CreditCardIcon className="h-4 w-4" />
-                    <span>Credits</span>
-                  </Button>
-                </Link>
-
                 {/* Notifications */}
-                <button className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary dark:hover:text-property237-primary">
-                  <BellIcon className="h-6 w-6" />
-                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                <button className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors">
+                  <BellIcon className="h-5 w-5" />
+                  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
                 </button>
 
                 {/* Profile Dropdown */}
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium font-heading text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
                   >
                     {user.profile_picture ? (
                       <img
                         src={user.profile_picture}
                         alt={user.full_name}
-                        className="h-8 w-8 rounded-full"
+                        className="h-5 w-5 rounded-full"
                       />
                     ) : (
-                      <UserCircleIcon className="h-8 w-8 text-gray-700 dark:text-gray-300" />
+                      <UserCircleIcon className="h-5 w-5" />
                     )}
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {user.full_name}
-                    </span>
+                    <span>{user.full_name}</span>
                   </button>
 
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50">
                       <Link
                         href="/profile"
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setIsProfileOpen(false)}
                       >
-                        <UserCircleIcon className="h-5 w-5" />
+                        <UserCircleIcon className="h-4 w-4" />
                         <span>My Profile</span>
+                      </Link>
+                      <Link
+                        href="/credits"
+                        className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <CreditCardIcon className="h-4 w-4" />
+                        <span>Credits</span>
                       </Link>
                       <Link
                         href="/settings"
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setIsProfileOpen(false)}
                       >
-                        <Cog6ToothIcon className="h-5 w-5" />
+                        <Cog6ToothIcon className="h-4 w-4" />
                         <span>Settings</span>
                       </Link>
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
@@ -217,7 +238,7 @@ export default function Navbar() {
                         onClick={handleLogout}
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                        <ArrowRightOnRectangleIcon className="h-4 w-4" />
                         <span>Logout</span>
                       </button>
                     </div>
@@ -225,15 +246,88 @@ export default function Navbar() {
                 </div>
               </>
             ) : (
-              <>
-                <Link href="/sign-in">
-                  <Button variant="outline">Sign In</Button>
-                </Link>
-                <Link href="/sign-up">
-                  <Button>Get Started</Button>
-                </Link>
-              </>
+              <Link
+                href="/sign-in"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium font-heading text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
+              >
+                <UserCircleIcon className="h-5 w-5" />
+                <span>Sign In</span>
+              </Link>
             )}
+
+            {/* Divider */}
+            <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
+
+            {/* Language Switcher */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
+                title="Change Language"
+              >
+                <LanguageIcon className="h-5 w-5" />
+              </button>
+              {isLanguageOpen && (
+                <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50">
+                  {['EN', 'FR', 'ES'].map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => {
+                        setLanguage(lang)
+                        setIsLanguageOpen(false)
+                      }}
+                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                        language === lang ? 'text-property237-primary font-semibold' : 'text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Theme Switcher */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? (
+                <SunIcon className="h-5 w-5" />
+              ) : (
+                <MoonIcon className="h-5 w-5" />
+              )}
+            </button>
+
+            {/* Currency Switcher */}
+            <div className="relative">
+              <button
+                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
+                title="Change Currency"
+              >
+                <CurrencyDollarIcon className="h-5 w-5" />
+              </button>
+              {isCurrencyOpen && (
+                <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50">
+                  {['USD', 'EUR', 'XAF'].map((curr) => (
+                    <button
+                      key={curr}
+                      onClick={() => {
+                        setCurrency(curr)
+                        setIsCurrencyOpen(false)
+                      }}
+                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                        currency === curr ? 'text-property237-primary font-semibold' : 'text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {curr}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -258,15 +352,14 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href as any}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium ${
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium font-heading ${
                   pathname === link.href
                     ? 'bg-property237-light text-property237-primary'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                {link.icon && <link.icon className="h-5 w-5" />}
-                <span>{link.label}</span>
+                {link.label}
               </Link>
             ))}
 

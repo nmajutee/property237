@@ -4,11 +4,11 @@ from . import views, views_admin
 app_name = 'properties'
 
 urlpatterns = [
+    # Property CRUD (must be BEFORE category_urls to avoid conflicts)
+    path('', views.PropertyListCreateAPIView.as_view(), name='property-list-create'),
+
     # Category API endpoints (NEW - Cameroon-specific categories)
     path('', include('properties.category_urls')),
-    
-    # Property CRUD
-    path('', views.PropertyListCreateAPIView.as_view(), name='property-list-create'),
 
     # Agent's properties
     path('my-properties/', views.my_properties_list, name='my-properties'),

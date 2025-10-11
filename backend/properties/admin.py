@@ -102,7 +102,7 @@ class PropertyAdmin(admin.ModelAdmin):
             'fields': (
                 'no_of_bedrooms', 'no_of_living_rooms', 'no_of_bathrooms',
                 'no_of_kitchens', 'kitchen_type', 'no_of_balconies',
-                'no_of_floors', 'floor_number', 'room_size', 'has_dressing_cupboard'
+                'no_of_floors', 'floor_number', 'has_dressing_cupboard'
             )
         }),
         ('Utilities', {
@@ -137,7 +137,7 @@ class PropertyAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Agent Information', {
-            'fields': ('agent', 'agent_commission_percentage', 'agent_commission_months')
+            'fields': ('agent', 'agent_commission_months')
         }),
         ('Verification', {
             'fields': ('is_verified', 'verified_at', 'verified_by')

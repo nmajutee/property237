@@ -142,7 +142,6 @@ Close to international schools, embassies, and shopping centers.
             'no_of_balconies': 1,
             'no_of_floors': 3,
             'floor_number': 2,
-            'room_size': 120,
             'has_dressing_cupboard': True,
             'electricity_type': 'private_meter',
             'electricity_payment': 'prepaid',
@@ -162,7 +161,6 @@ Close to international schools, embassies, and shopping centers.
             'visit_fee': Decimal('5000'),
             'requires_contract_registration': True,
             'agent': agent_profile,
-            'agent_commission_percentage': Decimal('10.00'),
             'agent_commission_months': 1,
             'is_verified': True,
             'verified_by': user

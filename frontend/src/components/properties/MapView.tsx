@@ -82,7 +82,7 @@ const cameroonCities: Record<string, [number, number]> = {
 // Geocode using Nominatim (OpenStreetMap)
 async function geocodeAddress(city: string, area: string): Promise<[number, number] | null> {
   const address = `${area}, ${city}, Cameroon`
-  
+
   // Check cache first
   if (geocodeCache.has(address)) {
     return geocodeCache.get(address)!
@@ -98,7 +98,7 @@ async function geocodeAddress(city: string, area: string): Promise<[number, numb
   try {
     // Rate limiting: wait a bit between requests
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
       {
@@ -107,7 +107,7 @@ async function geocodeAddress(city: string, area: string): Promise<[number, numb
         }
       }
     )
-    
+
     if (response.ok) {
       const data = await response.json()
       if (data.length > 0) {
@@ -150,7 +150,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
 
     async function geocodeProperties() {
       const coordsMap = new Map<number, [number, number]>()
-      
+
       // Limit to first 20 properties to avoid rate limiting
       for (const property of properties.slice(0, 20)) {
         const coords = await geocodeAddress(property.area.city.name, property.area.name)
@@ -158,7 +158,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           coordsMap.set(property.id, coords)
         }
       }
-      
+
       setPropertyCoordinates(coordsMap)
       setLoading(false)
     }
@@ -279,12 +279,12 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           background: transparent !important;
           border: none !important;
         }
-        
+
         .price-marker {
           position: relative;
           cursor: pointer;
         }
-        
+
         .price-tag {
           background: #DC2626;
           color: white;
@@ -296,12 +296,12 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
           transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+
         .price-marker:hover .price-tag {
           transform: scale(1.05);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        
+
         .price-arrow {
           width: 0;
           height: 0;
@@ -310,7 +310,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           border-top: 8px solid #DC2626;
           margin: 0 auto;
         }
-        
+
         .leaflet-container {
           font-family: inherit;
         }

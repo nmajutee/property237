@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { BuildingOfficeIcon, MapPinIcon, HeartIcon } from '@heroicons/react/24/outline'
+import { Building2, MapPin, Heart, Home, Key, MapPinned, Droplet, Zap } from 'lucide-react'
 
 interface PropertyImage {
   id: number
@@ -33,6 +33,9 @@ interface Property {
   }
   no_of_bedrooms: number
   no_of_bathrooms: number
+  distance_from_road?: number
+  water_type?: string
+  electricity_type?: string
   images: PropertyImage[]
   primary_image: string | null
   featured: boolean
@@ -61,14 +64,14 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <BuildingOfficeIcon className="h-20 w-20 text-gray-400" />
+              <Building2 className="h-20 w-20 text-gray-400" />
             </div>
           )}
           <button
             onClick={(e) => e.preventDefault()}
             className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform"
           >
-            <HeartIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </button>
           <div className="absolute bottom-4 left-4">
             <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-heading font-semibold shadow-lg">
@@ -85,22 +88,40 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
           </div>
 
           <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-            <MapPinIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+            <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
             <span className="text-sm">
               {property.area.city.name}, {property.area.name}
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-            <span className="flex items-center gap-1">
-              <span className="font-semibold">{property.no_of_bedrooms}</span> beds
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="font-semibold">{property.no_of_bathrooms}</span> baths
-            </span>
-            <span className="capitalize text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-              {property.status.name}
-            </span>
+          {/* 5 Important Elements - List View */}
+          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+              <Home className="h-4 w-4 text-property237-primary" />
+              <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bedrooms}</span>
+              <span className="text-xs">Rooms</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+              <Key className="h-4 w-4 text-property237-primary" />
+              <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bathrooms}</span>
+              <span className="text-xs">Baths</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+              <MapPinned className="h-4 w-4 text-property237-primary" />
+              <span className="font-semibold text-gray-900 dark:text-white">{property.distance_from_road || 0}m</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+              <Droplet className="h-4 w-4 text-property237-primary" />
+              <span className="font-semibold text-gray-900 dark:text-white text-xs capitalize">
+                {property.water_type ? property.water_type.replace(/_/g, ' ') : 'N/A'}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded">
+              <Zap className="h-4 w-4 text-property237-primary" />
+              <span className="font-semibold text-gray-900 dark:text-white text-xs capitalize">
+                {property.electricity_type ? property.electricity_type.replace(/_/g, ' ') : 'N/A'}
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center justify-between mt-auto">
@@ -131,11 +152,11 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
           />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <BuildingOfficeIcon className="h-20 w-20 text-gray-400" />
+            <Building2 className="h-20 w-20 text-gray-400" />
           </div>
         )}
         <button className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform">
-          <HeartIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </button>
         <div className="absolute bottom-4 left-4">
           <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-heading font-semibold shadow-lg">
@@ -152,22 +173,41 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
         </div>
 
         <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-          <MapPinIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+          <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
           <span className="text-sm truncate">
             {property.area.city.name}, {property.area.name}
           </span>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-          <span className="flex items-center gap-1">
-            <span className="font-semibold">{property.no_of_bedrooms}</span> beds
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="font-semibold">{property.no_of_bathrooms}</span> baths
-          </span>
-          <span className="capitalize text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-            {property.status.name}
-          </span>
+        {/* 5 Important Elements */}
+        <div className="grid grid-cols-5 gap-2 text-xs text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
+            <Home className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bedrooms}</span>
+            <span className="text-[10px]">Rooms</span>
+          </div>
+          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
+            <Key className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white">{property.no_of_bathrooms}</span>
+            <span className="text-[10px]">Baths</span>
+          </div>
+          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
+            <MapPinned className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white">{property.distance_from_road || 0}m</span>
+            <span className="text-[10px]">Road</span>
+          </div>
+          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
+            <Droplet className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize">
+              {property.water_type ? property.water_type.replace(/_/g, ' ').substring(0, 6) : 'N/A'}
+            </span>
+          </div>
+          <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
+            <Zap className="h-4 w-4 text-property237-primary mb-1" />
+            <span className="font-semibold text-gray-900 dark:text-white text-[10px] capitalize">
+              {property.electricity_type ? property.electricity_type.replace(/_/g, ' ').substring(0, 6) : 'N/A'}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center justify-between">

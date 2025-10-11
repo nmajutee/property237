@@ -46,11 +46,21 @@ urlpatterns = [
 
 # Import HttpResponse for health check
 from django.http import HttpResponse
+from django.views.static import serve
+import re
 
-# Serve media files in all environments
+# Serve media files in all environments (including production)
 # Media files are stored locally on Render's persistent disk
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# Static files served by WhiteNoise in production, Django in development
+# WhiteNoise only serves static files, so we need explicit media serving
 if settings.DEBUG:
+    # Development: Use Django's static file serving
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    # Production: Serve media files with Django's serve view
+    # This is necessary because WhiteNoise doesn't handle media files
+    urlpatterns += [
+        path('media/<path:path>', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]

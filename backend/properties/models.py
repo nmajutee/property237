@@ -3,6 +3,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 
+# Import category models
+from .category_models import Category, PropertyTag, PropertyState
+
 User = get_user_model()
 
 

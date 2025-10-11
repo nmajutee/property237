@@ -2,6 +2,9 @@ from django.contrib import admin
 from .models import Property, PropertyType, PropertyStatus, PropertyFeature
 from media.models import PropertyImage
 
+# Import category admin configurations
+from .category_admin import CategoryAdmin, PropertyTagAdmin, PropertyStateAdmin
+
 
 @admin.register(PropertyType)
 class PropertyTypeAdmin(admin.ModelAdmin):

@@ -185,12 +185,14 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           center: defaultCenter,
           zoom: defaultZoom,
           scrollWheelZoom: true,
+          zoomControl: true,
         })
 
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19,
+        // Add professional CartoDB Positron tiles (clean, minimal, business-focused)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20,
         }).addTo(map)
 
         mapInstanceRef.current = map
@@ -210,21 +212,30 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
           if (coords) {
             bounds.push(coords)
 
-            // Create custom icon with price
+            // Create professional custom icon with price
+            const formattedPrice = parseFloat(property.price).toLocaleString()
             const priceIconHtml = `
-              <div class="price-marker">
-                <div class="price-tag">
-                  ${parseFloat(property.price).toLocaleString()} ${property.currency}
+              <div class="property-marker">
+                <div class="marker-pin">
+                  <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" fill="#1E40AF"/>
+                    <circle cx="16" cy="15" r="6" fill="white"/>
+                    <path d="M19 13h-2v-2c0-.55-.45-1-1-1s-1 .45-1 1v2h-2c-.55 0-1 .45-1 1s.45 1 1 1h2v2c0 .55.45 1 1 1s1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1z" fill="#1E40AF"/>
+                  </svg>
                 </div>
-                <div class="price-arrow"></div>
+                <div class="price-badge">
+                  <span class="price-amount">${formattedPrice}</span>
+                  <span class="price-currency">${property.currency}</span>
+                </div>
               </div>
             `
 
             const customIcon = L.divIcon({
               html: priceIconHtml,
-              className: 'custom-price-marker',
-              iconSize: [120, 40],
-              iconAnchor: [60, 40],
+              className: 'property-map-marker',
+              iconSize: [32, 40],
+              iconAnchor: [16, 40],
+              popupAnchor: [0, -40],
             })
 
             const marker = L.marker(coords, { icon: customIcon })
@@ -285,48 +296,129 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
   return (
     <div className="relative">
       <style jsx global>{`
-        .custom-price-marker {
+        /* Professional map marker styling */
+        .property-map-marker {
           background: transparent !important;
           border: none !important;
         }
 
-        .price-marker {
+        .property-marker {
           position: relative;
           cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transition: all 0.3s ease;
         }
 
-        .price-tag {
-          background: #DC2626;
+        .property-marker:hover {
+          transform: translateY(-4px);
+          filter: drop-shadow(0 8px 16px rgba(30, 64, 175, 0.3));
+        }
+
+        .marker-pin {
+          position: relative;
+          z-index: 2;
+          transition: transform 0.3s ease;
+        }
+
+        .property-marker:hover .marker-pin {
+          transform: scale(1.1);
+        }
+
+        .price-badge {
+          position: absolute;
+          top: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
           color: white;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-weight: 600;
-          font-size: 12px;
+          padding: 4px 10px;
+          border-radius: 12px;
+          font-weight: 700;
+          font-size: 11px;
           white-space: nowrap;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-          transition: transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+          border: 2px solid white;
+          z-index: 3;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          transition: all 0.3s ease;
         }
 
-        .price-marker:hover .price-tag {
-          transform: scale(1.05);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        .property-marker:hover .price-badge {
+          transform: translateX(-50%) scale(1.05);
+          box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5);
         }
 
-        .price-arrow {
-          width: 0;
-          height: 0;
-          border-left: 6px solid transparent;
-          border-right: 6px solid transparent;
-          border-top: 8px solid #DC2626;
-          margin: 0 auto;
+        .price-amount {
+          font-weight: 800;
+          letter-spacing: -0.5px;
         }
 
+        .price-currency {
+          font-size: 9px;
+          opacity: 0.9;
+          font-weight: 600;
+        }
+
+        /* Leaflet map container styling */
         .leaflet-container {
-          font-family: inherit;
+          background: #F3F4F6 !important;
+          font-family: 'DM Sans', system-ui, sans-serif;
         }
+
+        /* Custom zoom control styling */
+        .leaflet-control-zoom {
+          border: none !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .leaflet-control-zoom a {
+          background: white !important;
+          color: #1E40AF !important;
+          border: none !important;
+          font-size: 18px !important;
+          font-weight: 700 !important;
+          transition: all 0.2s ease !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+          background: #1E40AF !important;
+          color: white !important;
+        }
+
+        /* Attribution styling */
+        .leaflet-control-attribution {
+          background: rgba(255, 255, 255, 0.9) !important;
+          padding: 4px 8px !important;
+          font-size: 10px !important;
+          border-radius: 4px !important;
+        }
+
+        .leaflet-control-attribution a {
+          color: #1E40AF !important;
+          font-weight: 600 !important;
+        }
+
       `}</style>
 
-      <div ref={mapRef} className={`${height} w-full rounded-lg overflow-hidden`} />
+      <div className="relative">
+        <div ref={mapRef} className={`${height} w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg`} />
+        
+        {/* Map Info Badge */}
+        {!loading && properties.length > 0 && (
+          <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[500]">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-property237-primary rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {propertyCoordinates.size} {propertyCoordinates.size === 1 ? 'Property' : 'Properties'} on map
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Property Card Popup */}
       {selectedProperty && (

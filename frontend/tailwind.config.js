@@ -22,12 +22,14 @@ module.exports = {
         error: colors.colors.error,
         cameroon: colors.cameroon,
 
-        // Property237 brand colors (inspired by modern real estate design)
-        'property237-primary': '#ff291b',    // Red accent from design
-        'property237-dark': '#171717',       // Dark background
-        'property237-light': '#f9f9fa',      // Light background
-        'background-light': '#f6f8f7',
-        'background-dark': '#112117',
+        // Property237 brand colors (Professional Blue + Gold scheme)
+        'property237-primary': '#1E40AF',    // Deep Blue - Trust & Professionalism
+        'property237-secondary': '#1F2937',  // Charcoal Gray - Grounding
+        'property237-accent': '#F59E0B',     // Gold - Warmth & Premium
+        'property237-dark': '#111827',       // Dark background
+        'property237-light': '#F9FAFB',      // Light background
+        'background-light': '#F9FAFB',
+        'background-dark': '#111827',
 
         // Theme-aware colors (CSS variables)
         background: 'var(--color-background)',
@@ -41,10 +43,12 @@ module.exports = {
         ring: 'var(--color-ring)',
 
         // Property-specific colors
-        'property-featured': '#ff6b35',
-        'property-premium': '#f7b801',
-        'visitation-pass': '#00d4aa',
-        'escrow': '#6366f1',
+        'property-featured': '#F59E0B',      // Gold - Featured listings
+        'property-premium': '#D97706',       // Darker Gold - Premium properties
+        'property-success': '#10B981',       // Green - Available, Success states
+        'property-urgent': '#DC2626',        // Red - Urgent CTAs only
+        'visitation-pass': '#14B8A6',        // Teal - Visitation features
+        'escrow': '#6366f1',                 // Indigo - Escrow/financial
       },
       fontFamily: {
         ...typography.fontFamily,

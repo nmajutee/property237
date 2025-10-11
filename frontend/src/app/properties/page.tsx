@@ -16,12 +16,12 @@ import Link from 'next/link'
 // Dynamically import MapView to prevent SSR issues with Leaflet
 const MapView = dynamic(
   () => import('@/components/properties/MapView'),
-  { 
+  {
     ssr: false,
     loading: () => (
       <div className="h-96 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
         <div className="text-center px-4">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-red-600 mx-auto mb-2"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-property237-primary mx-auto mb-2"></div>
           <p className="text-sm text-gray-600 dark:text-gray-400">Loading map...</p>
         </div>
       </div>

@@ -42,15 +42,15 @@ Just push to GitHub and Vercel will rebuild from scratch!
 
 ## What Changed:
 
-1. **package.json**: 
+1. **package.json**:
    - Build script now clears .next before building
    - Postinstall script clears .next after npm install
 
-2. **vercel.json**: 
+2. **vercel.json**:
    - Changed installCommand to `npm ci --legacy-peer-deps` (clean install)
    - Added empty `crons` array to trigger config change
 
-3. **.vercelignore**: 
+3. **.vercelignore**:
    - Forces Vercel to ignore cache directories
 
 ## After Push:

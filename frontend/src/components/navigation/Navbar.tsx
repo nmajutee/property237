@@ -39,11 +39,8 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false)
-  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [language, setLanguage] = useState('EN')
-  const [currency, setCurrency] = useState('USD')
   const router = useRouter()
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
@@ -100,7 +97,9 @@ export default function Navbar() {
   // Public navbar (not logged in)
   const publicLinks = [
     { href: '/', label: 'Home' },
-    { href: '/properties', label: 'Properties' },
+    { href: '/properties', label: 'Buy' },
+    { href: '/properties?type=rent', label: 'Rent' },
+    { href: '/agents', label: 'Find Agents' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' }
   ]
@@ -108,7 +107,8 @@ export default function Navbar() {
   // Tenant navbar
   const tenantLinks = [
     { href: '/dashboard/tenant', label: 'Dashboard' },
-    { href: '/properties', label: 'Properties' },
+    { href: '/properties', label: 'Buy' },
+    { href: '/properties?type=rent', label: 'Rent' },
     { href: '/my-favorites', label: 'Favorites' },
     { href: '/my-applications', label: 'Applications' }
   ]
@@ -116,8 +116,9 @@ export default function Navbar() {
   // Agent navbar
   const agentLinks = [
     { href: '/dashboard/agent', label: 'Dashboard' },
-    { href: '/my-properties', label: 'My Properties' },
+    { href: '/my-properties', label: 'My Listings' },
     { href: '/properties', label: 'Properties' },
+    { href: '/my-clients', label: 'Clients' },
     { href: '/analytics', label: 'Analytics' }
   ]
 
@@ -126,6 +127,7 @@ export default function Navbar() {
     { href: '/admin/dashboard', label: 'Dashboard' },
     { href: '/admin/users', label: 'Users' },
     { href: '/admin/properties', label: 'Properties' },
+    { href: '/admin/agents', label: 'Agents' },
     { href: '/admin/transactions', label: 'Transactions' },
     { href: '/admin/analytics', label: 'Analytics' }
   ]
@@ -258,34 +260,14 @@ export default function Navbar() {
             {/* Divider */}
             <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
 
-            {/* Language Switcher */}
-            <div className="relative">
-              <button
-                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                className="p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
-                title="Change Language"
-              >
-                <LanguageIcon className="h-5 w-5" />
-              </button>
-              {isLanguageOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50">
-                  {['EN', 'FR', 'ES'].map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => {
-                        setLanguage(lang)
-                        setIsLanguageOpen(false)
-                      }}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                        language === lang ? 'text-property237-primary font-semibold' : 'text-gray-700 dark:text-gray-300'
-                      }`}
-                    >
-                      {lang}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Language Switcher - Toggle Button */}
+            <button
+              onClick={() => setLanguage(language === 'EN' ? 'FR' : 'EN')}
+              className="px-3 py-1.5 text-sm font-heading font-semibold text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
+              title={`Switch to ${language === 'EN' ? 'French' : 'English'}`}
+            >
+              {language}
+            </button>
 
             {/* Theme Switcher */}
             <button
@@ -299,35 +281,6 @@ export default function Navbar() {
                 <MoonIcon className="h-5 w-5" />
               )}
             </button>
-
-            {/* Currency Switcher */}
-            <div className="relative">
-              <button
-                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-                className="p-2 text-gray-700 dark:text-gray-300 hover:text-property237-primary transition-colors"
-                title="Change Currency"
-              >
-                <CurrencyDollarIcon className="h-5 w-5" />
-              </button>
-              {isCurrencyOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50">
-                  {['USD', 'EUR', 'XAF'].map((curr) => (
-                    <button
-                      key={curr}
-                      onClick={() => {
-                        setCurrency(curr)
-                        setIsCurrencyOpen(false)
-                      }}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                        currency === curr ? 'text-property237-primary font-semibold' : 'text-gray-700 dark:text-gray-300'
-                      }`}
-                    >
-                      {curr}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Mobile menu button */}

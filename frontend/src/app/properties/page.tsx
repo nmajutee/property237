@@ -199,7 +199,7 @@ export default function PropertiesPage() {
           <div className="p-5 space-y-5 overflow-y-auto flex-1">
             {/* Rental Period */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-2.5">
+              <h3 className="text-base font-heading font-bold text-gray-900 dark:text-white mb-3">
                 Rental period
               </h3>
               <div className="space-y-2">
@@ -226,7 +226,7 @@ export default function PropertiesPage() {
 
             {/* Real Estate Type */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-2.5">
+              <h3 className="text-base font-heading font-bold text-gray-900 dark:text-white mb-3">
                 Property type
               </h3>
               <div className="space-y-2 max-h-36 overflow-y-auto">
@@ -238,7 +238,7 @@ export default function PropertiesPage() {
                       onChange={() => setSelectedType(selectedType === type.id.toString() ? '' : type.id.toString())}
                       className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{type.name}</span>
+                    <span className="ml-2 text-sm font-heading text-gray-700 dark:text-gray-300">{type.name}</span>
                   </label>
                 ))}
               </div>
@@ -246,7 +246,7 @@ export default function PropertiesPage() {
 
             {/* Bedrooms */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-2.5">
+              <h3 className="text-base font-heading font-bold text-gray-900 dark:text-white mb-3">
                 Bedrooms
               </h3>
               <div className="grid grid-cols-4 gap-2">
@@ -268,13 +268,13 @@ export default function PropertiesPage() {
 
             {/* Bathroom */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-2.5">
+              <h3 className="text-base font-heading font-bold text-gray-900 dark:text-white mb-3">
                 Bathroom
               </h3>
               <select
                 value={selectedBathrooms}
                 onChange={(e) => setSelectedBathrooms(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm font-heading text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
               >
                 <option value="any">Any</option>
                 <option value="combined">Combined</option>
@@ -284,7 +284,7 @@ export default function PropertiesPage() {
 
             {/* View Type */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-2.5">
+              <h3 className="text-base font-heading font-bold text-gray-900 dark:text-white mb-3">
                 View
               </h3>
               <div className="space-y-2">
@@ -296,7 +296,7 @@ export default function PropertiesPage() {
                       defaultChecked={view === 'Any'}
                       className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{view}</span>
+                    <span className="ml-2 text-sm font-heading text-gray-700 dark:text-gray-300">{view}</span>
                   </label>
                 ))}
               </div>
@@ -304,20 +304,20 @@ export default function PropertiesPage() {
 
             {/* Search by Location */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-2.5">
+              <h3 className="text-base font-heading font-bold text-gray-900 dark:text-white mb-3">
                 Location
               </h3>
-              <div className="relative mb-2">
+              <div className="relative mb-2.5">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="City, area..."
-                  className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                  className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm font-heading text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
                 />
               </div>
-              <Button onClick={handleSearch} className="w-full text-sm py-2" size="sm">
+              <Button onClick={handleSearch} className="w-full text-sm font-heading py-2" size="sm">
                 Search
               </Button>
             </div>
@@ -325,18 +325,18 @@ export default function PropertiesPage() {
             {/* Clear Filters Button */}
             <button
               onClick={handleClearFilters}
-              className="w-full py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="w-full py-2 px-4 text-sm font-heading font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
             >
               Clear filters
             </button>
           </div>
         </aside>
 
-        {/* Right Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden">
-          {/* Map Section */}
+        {/* Right Content Area - Scrollable */}
+        <main className="flex-1 flex flex-col overflow-y-auto">
+          {/* Map Section - Not Fixed */}
           {showMap && (
-            <div className="h-96 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
+            <div className="h-96 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0">
               <div className="text-center">
                 <MapPinIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
                 <p className="text-sm text-gray-600 dark:text-gray-400">Map view coming soon</p>
@@ -345,7 +345,7 @@ export default function PropertiesPage() {
           )}
 
           {/* Header Below Map */}
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 sticky top-0 z-10">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
                 <h1 className="text-2xl font-heading font-bold text-gray-900 dark:text-white">
@@ -422,7 +422,7 @@ export default function PropertiesPage() {
           </div>
 
           {/* Property Grid */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="p-6">
             {loading ? (
               <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
                 {[1, 2, 3, 4, 5, 6].map((i) => (

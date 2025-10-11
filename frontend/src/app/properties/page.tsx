@@ -191,92 +191,54 @@ export default function PropertiesPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <Navbar />
-      
+
       {/* Main Container */}
       <div className="flex h-[calc(100vh-64px)] overflow-hidden">
         {/* Left Sidebar - Filters */}
-        <aside className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
-          <div className="p-6 space-y-6">
-            {/* Results Count & Map Toggle */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-heading font-semibold text-gray-900 dark:text-white">
-                {properties.length} results
-              </span>
-              <button 
-                onClick={() => setShowMap(!showMap)}
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-property237-primary flex items-center gap-1"
-              >
-                <MapPinIcon className="h-4 w-4" />
-                {showMap ? 'Hide' : 'Show'} map
-              </button>
-            </div>
-
+        <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+          <div className="p-4 space-y-4 overflow-y-auto flex-1">
             {/* Rental Period */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+              <h3 className="text-xs font-heading font-semibold text-gray-900 dark:text-white mb-2">
                 Rental period
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
                     checked={rentalPeriod === 'long-term'}
                     onChange={() => setRentalPeriod('long-term')}
-                    className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
+                    className="w-3.5 h-3.5 text-property237-primary border-gray-300 focus:ring-property237-primary"
                   />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Long term rent</span>
+                  <span className="ml-2 text-xs text-gray-700 dark:text-gray-300">Long term</span>
                 </label>
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
                     checked={rentalPeriod === 'short-term'}
                     onChange={() => setRentalPeriod('short-term')}
-                    className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
+                    className="w-3.5 h-3.5 text-property237-primary border-gray-300 focus:ring-property237-primary"
                   />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Short term rent</span>
+                  <span className="ml-2 text-xs text-gray-700 dark:text-gray-300">Short term</span>
                 </label>
-              </div>
-            </div>
-
-            {/* Price Range */}
-            <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
-                Price
-              </h3>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="number"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                  placeholder="Min"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
-                />
-                <span className="text-gray-500">—</span>
-                <input
-                  type="number"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                  placeholder="Max"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
-                />
               </div>
             </div>
 
             {/* Real Estate Type */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
-                Real estate type
+              <h3 className="text-xs font-heading font-semibold text-gray-900 dark:text-white mb-2">
+                Property type
               </h3>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
+              <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {propertyTypes.map((type) => (
                   <label key={type.id} className="flex items-center cursor-pointer">
                     <input
                       type="checkbox"
                       checked={selectedType === type.id.toString()}
                       onChange={() => setSelectedType(selectedType === type.id.toString() ? '' : type.id.toString())}
-                      className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
+                      className="w-3.5 h-3.5 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{type.name}</span>
+                    <span className="ml-2 text-xs text-gray-700 dark:text-gray-300">{type.name}</span>
                   </label>
                 ))}
               </div>
@@ -284,15 +246,15 @@ export default function PropertiesPage() {
 
             {/* Bedrooms */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
-                Bedroom
+              <h3 className="text-xs font-heading font-semibold text-gray-900 dark:text-white mb-2">
+                Bedrooms
               </h3>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-1.5">
                 {['1', '2', '3', '4+'].map((num) => (
                   <button
                     key={num}
                     onClick={() => toggleBedroom(num)}
-                    className={`py-2 px-3 text-sm font-medium rounded-lg border transition-colors ${
+                    className={`py-1.5 px-2 text-xs font-medium rounded border transition-colors ${
                       selectedBedrooms.includes(num)
                         ? 'bg-property237-primary text-white border-property237-primary'
                         : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-property237-primary'
@@ -306,13 +268,13 @@ export default function PropertiesPage() {
 
             {/* Bathroom */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+              <h3 className="text-xs font-heading font-semibold text-gray-900 dark:text-white mb-2">
                 Bathroom
               </h3>
               <select
                 value={selectedBathrooms}
                 onChange={(e) => setSelectedBathrooms(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
               >
                 <option value="any">Any</option>
                 <option value="combined">Combined</option>
@@ -322,104 +284,142 @@ export default function PropertiesPage() {
 
             {/* View Type */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
+              <h3 className="text-xs font-heading font-semibold text-gray-900 dark:text-white mb-2">
                 View
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {['Any', 'Courtyard', 'Street'].map((view) => (
                   <label key={view} className="flex items-center cursor-pointer">
                     <input
                       type="radio"
                       name="view"
                       defaultChecked={view === 'Any'}
-                      className="w-4 h-4 text-property237-primary border-gray-300 focus:ring-property237-primary"
+                      className="w-3.5 h-3.5 text-property237-primary border-gray-300 focus:ring-property237-primary"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{view}</span>
+                    <span className="ml-2 text-xs text-gray-700 dark:text-gray-300">{view}</span>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Clear Filters Button */}
-            <button
-              onClick={handleClearFilters}
-              className="w-full py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-            >
-              Clear all filters
-            </button>
-
             {/* Search by Location */}
             <div>
-              <h3 className="text-sm font-heading font-semibold text-gray-900 dark:text-white mb-3">
-                Search Location
+              <h3 className="text-xs font-heading font-semibold text-gray-900 dark:text-white mb-2">
+                Location
               </h3>
-              <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <div className="relative mb-2">
+                <MagnifyingGlassIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="City, neighborhood..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                  placeholder="City, area..."
+                  className="w-full pl-7 pr-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
                 />
               </div>
-              <Button onClick={handleSearch} className="w-full mt-3" size="sm">
+              <Button onClick={handleSearch} className="w-full text-xs py-1.5" size="sm">
                 Search
               </Button>
             </div>
+
+            {/* Clear Filters Button */}
+            <button
+              onClick={handleClearFilters}
+              className="w-full py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            >
+              Clear filters
+            </button>
           </div>
         </aside>
 
         {/* Right Content Area */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <h1 className="text-2xl font-heading font-bold text-gray-900 dark:text-white">
+          {/* Map Section */}
+          {showMap && (
+            <div className="h-64 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
+              <div className="text-center">
+                <MapPinIcon className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                <p className="text-sm text-gray-600 dark:text-gray-400">Map view coming soon</p>
+              </div>
+            </div>
+          )}
+
+          {/* Header Below Map */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-heading font-bold text-gray-900 dark:text-white">
                   Browse Properties
                 </h1>
-                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {properties.length} results
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setShowMap(!showMap)}
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-property237-primary flex items-center gap-1"
+                >
+                  <MapPinIcon className="h-3.5 w-3.5" />
+                  {showMap ? 'Hide' : 'Show'} map
+                </button>
+                <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded p-0.5">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded ${
+                    className={`p-1.5 rounded ${
                       viewMode === 'grid'
                         ? 'bg-white dark:bg-gray-600 text-property237-primary shadow-sm'
                         : 'text-gray-600 dark:text-gray-400'
                     }`}
                   >
-                    <Squares2X2Icon className="h-5 w-5" />
+                    <Squares2X2Icon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded ${
+                    className={`p-1.5 rounded ${
                       viewMode === 'list'
                         ? 'bg-white dark:bg-gray-600 text-property237-primary shadow-sm'
                         : 'text-gray-600 dark:text-gray-400'
                     }`}
                   >
-                    <ListBulletIcon className="h-5 w-5" />
+                    <ListBulletIcon className="h-4 w-4" />
                   </button>
                 </div>
+                <select className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary">
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Newest First</option>
+                  <option>Oldest First</option>
+                </select>
               </div>
-              <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary">
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Newest First</option>
-                <option>Oldest First</option>
-              </select>
             </div>
           </div>
 
-          {/* Map Section */}
-          {showMap && (
-            <div className="h-80 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
-              <div className="text-center">
-                <MapPinIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                <p className="text-gray-600 dark:text-gray-400">Map view coming soon</p>
+          {/* Price Filter Below Header */}
+          <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-heading font-semibold text-gray-900 dark:text-white">
+                Price:
+              </span>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                  placeholder="Min"
+                  className="w-24 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                />
+                <span className="text-xs text-gray-500">—</span>
+                <input
+                  type="number"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                  placeholder="Max"
+                  className="w-24 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-property237-primary"
+                />
               </div>
             </div>
-          )}
+          </div>
 
           {/* Property Grid */}
           <div className="flex-1 overflow-y-auto p-6">

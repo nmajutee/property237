@@ -24,6 +24,11 @@ import {
   Square3Stack3DIcon,
   ArrowsPointingOutIcon,
   KeyIcon,
+  BeakerIcon,
+  WrenchScrewdriverIcon,
+  ArrowsUpDownIcon,
+  WifiIcon,
+  RocketLaunchIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid'
 
@@ -338,32 +343,60 @@ export default function PropertyDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
+              {/* Title */}
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                 {property.title}
               </h1>
 
+              {/* Location */}
               <div className="flex items-center text-gray-600 dark:text-gray-400 mb-6">
                 <MapPinIcon className="w-5 h-5 mr-2" />
                 <span>{property.address || `${property.area.name}, ${property.area.city.name}`}</span>
               </div>
 
-              <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-6">
-                  <div className="flex items-center">
-                    <HomeIcon className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
-                    <span className="text-gray-900 dark:text-white font-semibold">
-                      {property.no_of_bedrooms} Bedrooms
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-gray-900 dark:text-white font-semibold">
-                      {property.no_of_bathrooms} Bathrooms
-                    </span>
-                  </div>
+              {/* Key Property Details (inline, with icons) */}
+              <div className="flex flex-wrap items-center gap-6 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center">
+                  <HomeIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                  <span className="text-gray-900 dark:text-white font-semibold">
+                    {property.no_of_bedrooms} Bedrooms
+                  </span>
                 </div>
+                <div className="flex items-center">
+                  <KeyIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                  <span className="text-gray-900 dark:text-white font-semibold">
+                    {property.no_of_bathrooms} Bathrooms
+                  </span>
+                </div>
+                {property.water_type && (
+                  <div className="flex items-center">
+                    <BeakerIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                    <span className="text-gray-900 dark:text-white font-semibold capitalize">
+                      {property.water_type} Water
+                    </span>
+                  </div>
+                )}
+                {property.electricity_type && (
+                  <div className="flex items-center">
+                    <BoltIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                    <span className="text-gray-900 dark:text-white font-semibold capitalize">
+                      {property.electricity_type}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* Property Details Section */}
+              {/* Description Section */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Description
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                  {property.description}
+                </p>
+              </div>
+
+              {/* Other Property Details Section */}
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                   Property Details
@@ -387,24 +420,6 @@ export default function PropertyDetailPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start">
-                    <HomeIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
-                    <div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">Bedrooms</p>
-                      <p className="text-gray-900 dark:text-white font-semibold">
-                        {property.no_of_bedrooms}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <ArrowsPointingOutIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
-                    <div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">Bathrooms</p>
-                      <p className="text-gray-900 dark:text-white font-semibold">
-                        {property.no_of_bathrooms}
-                      </p>
-                    </div>
-                  </div>
                   {property.no_of_living_rooms > 0 && (
                     <div className="flex items-start">
                       <ArrowsPointingOutIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
@@ -418,7 +433,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.no_of_kitchens > 0 && (
                     <div className="flex items-start">
-                      <FireIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <WrenchScrewdriverIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Kitchens</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -429,7 +444,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.no_of_balconies > 0 && (
                     <div className="flex items-start">
-                      <KeyIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <BuildingOfficeIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Balconies</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -451,7 +466,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.floor_number && (
                     <div className="flex items-start">
-                      <Square3Stack3DIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <ArrowsUpDownIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Floor Number</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -460,37 +475,30 @@ export default function PropertyDetailPage() {
                       </div>
                     </div>
                   )}
-                  {property.electricity_type && (
-                    <div className="flex items-start">
-                      <BoltIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Electricity</p>
-                        <p className="text-gray-900 dark:text-white font-semibold capitalize">
-                          {property.electricity_type}
-                        </p>
-                      </div>
-                    </div>
+                </div>
+              </div>
+
+              {/* Tags Section */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Property Tags
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-property237-primary text-white">
+                    {property.property_type.name}
+                  </span>
+                  <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                    property.listing_type === 'rent'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  }`}>
+                    {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                  </span>
+                  {property.area && (
+                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                      {property.area.city.name}
+                    </span>
                   )}
-                  {property.water_type && (
-                    <div className="flex items-start">
-                      <CloudIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Water Supply</p>
-                        <p className="text-gray-900 dark:text-white font-semibold capitalize">
-                          {property.water_type}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex items-start">
-                    <CheckCircleIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
-                    <div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">Status</p>
-                      <p className={`font-semibold ${property.is_active ? 'text-green-600' : 'text-red-600'}`}>
-                        {property.is_active ? 'Available' : 'Unavailable'}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -511,110 +519,6 @@ export default function PropertyDetailPage() {
                   </div>
                 </div>
               )}
-
-              {/* Amenities Section */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Amenities & Features
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {property.has_parking && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <TruckIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Parking</span>
-                    </div>
-                  )}
-                  {property.has_security && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <ShieldCheckIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Security</span>
-                    </div>
-                  )}
-                  {property.has_pool && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <CloudIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Swimming Pool</span>
-                    </div>
-                  )}
-                  {property.has_gym && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <SparklesIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Gym</span>
-                    </div>
-                  )}
-                  {property.has_elevator && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <BuildingLibraryIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Elevator</span>
-                    </div>
-                  )}
-                  {property.has_ac_preinstalled && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <CloudIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Air Conditioning</span>
-                    </div>
-                  )}
-                  {property.has_hot_water && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <FireIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Hot Water</span>
-                    </div>
-                  )}
-                  {property.has_generator && (
-                    <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <BoltIcon className="w-6 h-6 text-property237-primary mr-3" />
-                      <span className="text-gray-900 dark:text-white font-medium">Generator</span>
-                    </div>
-                  )}
-                </div>
-                {!property.has_parking && !property.has_security && !property.has_pool && 
-                 !property.has_gym && !property.has_elevator && !property.has_ac_preinstalled &&
-                 !property.has_hot_water && !property.has_generator && (
-                  <p className="text-gray-500 dark:text-gray-400 italic">No amenities specified</p>
-                )}
-              </div>
-
-              {/* Tags Section */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                  <TagIcon className="w-6 h-6 mr-2 text-property237-primary" />
-                  Property Tags
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-property237-primary text-white">
-                    {property.property_type.name}
-                  </span>
-                  <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                    property.listing_type === 'rent' 
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                  }`}>
-                    {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
-                  </span>
-                  {property.is_active && (
-                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      <CheckCircleIcon className="w-4 h-4 mr-1" />
-                      Available
-                    </span>
-                  )}
-                  {property.area && (
-                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                      <MapPinIcon className="w-4 h-4 mr-1" />
-                      {property.area.city.name}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Description Section */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Description
-                </h2>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                  {property.description}
-                </p>
-              </div>
             </div>
           </div>
 
@@ -634,9 +538,9 @@ export default function PropertyDetailPage() {
               {property.is_active && (
                 <button
                   onClick={() => setShowApplicationModal(true)}
-                  className="w-full px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors font-semibold mb-4"
+                  className="w-full px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-red-700 transition-colors font-semibold mb-4"
                 >
-                  Apply Now
+                  Book Visitation
                 </button>
               )}
 
@@ -646,6 +550,68 @@ export default function PropertyDetailPage() {
               >
                 Contact Agent
               </button>
+            </div>
+
+            {/* Amenities Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Amenities & Features
+              </h2>
+              <div className="space-y-3">
+                {property.has_parking && (
+                  <div className="flex items-center">
+                    <TruckIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Parking</span>
+                  </div>
+                )}
+                {property.has_security && (
+                  <div className="flex items-center">
+                    <ShieldCheckIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Security</span>
+                  </div>
+                )}
+                {property.has_pool && (
+                  <div className="flex items-center">
+                    <WifiIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Swimming Pool</span>
+                  </div>
+                )}
+                {property.has_gym && (
+                  <div className="flex items-center">
+                    <RocketLaunchIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Gym</span>
+                  </div>
+                )}
+                {property.has_elevator && (
+                  <div className="flex items-center">
+                    <ArrowsUpDownIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Elevator</span>
+                  </div>
+                )}
+                {property.has_ac_preinstalled && (
+                  <div className="flex items-center">
+                    <CloudIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Air Conditioning</span>
+                  </div>
+                )}
+                {property.has_hot_water && (
+                  <div className="flex items-center">
+                    <BeakerIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Hot Water</span>
+                  </div>
+                )}
+                {property.has_generator && (
+                  <div className="flex items-center">
+                    <BoltIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <span className="text-gray-700 dark:text-gray-300">Generator</span>
+                  </div>
+                )}
+                {!property.has_parking && !property.has_security && !property.has_pool &&
+                 !property.has_gym && !property.has_elevator && !property.has_ac_preinstalled &&
+                 !property.has_hot_water && !property.has_generator && (
+                  <p className="text-gray-500 dark:text-gray-400 italic">No amenities specified</p>
+                )}
+              </div>
             </div>
 
             {/* Agent Card */}

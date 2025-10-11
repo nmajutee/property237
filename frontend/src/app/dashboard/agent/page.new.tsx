@@ -165,18 +165,15 @@ export default function AgentDashboard() {
             <ArrowTrendingUpIcon className="h-5 w-5" />
             Analytics
           </Link>
-          {/* @ts-expect-error - Next.js routing */}
-          <Link href="/credits" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href={"/credits" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <CreditCardIcon className="h-5 w-5" />
             Credits
           </Link>
-          {/* @ts-expect-error - Next.js routing */}
-          <Link href="/chat" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href={"/chat" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <ChatBubbleLeftIcon className="h-5 w-5" />
             Messages
           </Link>
-          {/* @ts-expect-error - Next.js routing */}
-          <Link href="/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href={"/settings" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <Cog6ToothIcon className="h-5 w-5" />
             Settings
           </Link>

@@ -140,7 +140,6 @@ export default function TenantDashboard() {
               </span>
             )}
           </Link>
-          {/* @ts-expect-error - Next.js routing */}
           <Link href="/chat" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <ChatBubbleLeftIcon className="h-5 w-5" />
             Messages
@@ -150,8 +149,7 @@ export default function TenantDashboard() {
               </span>
             )}
           </Link>
-          {/* @ts-expect-error - Next.js routing */}
-          <Link href="/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href={"/settings" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <Cog6ToothIcon className="h-5 w-5" />
             Settings
           </Link>
@@ -205,8 +203,7 @@ export default function TenantDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {statCards.map((stat, index) => (
-            // @ts-expect-error - Next.js routing
-            <Link key={index} href={stat.link}>
+            <Link key={index} href={stat.link as any}>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
                 <div className="flex items-start justify-between">
                   <div>

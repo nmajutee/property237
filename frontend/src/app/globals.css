@@ -1,66 +1,79 @@
-/* Local font imports */
-@import '../assets/fonts/manrope-local.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Typography System - Manrope Based */
+/* Global Typography System - Craftwork Grotesk + DM Sans */
 @layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background-light dark:bg-background-dark text-black dark:text-white font-display;
+    @apply bg-background-light dark:bg-background-dark text-black dark:text-white font-body;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Typography Scale */
+  /* Typography Scale - All headings use Craftwork Grotesk */
   h1, .text-h1 {
-    @apply text-4xl lg:text-5xl font-bold tracking-tight text-black dark:text-white;
+    @apply text-4xl lg:text-5xl font-bold tracking-tight text-black dark:text-white font-heading;
   }
 
   h2, .text-h2 {
-    @apply text-3xl lg:text-4xl font-bold tracking-tight text-black dark:text-white;
+    @apply text-3xl lg:text-4xl font-bold tracking-tight text-black dark:text-white font-heading;
   }
 
   h3, .text-h3 {
-    @apply text-2xl lg:text-3xl font-bold tracking-tight text-black dark:text-white;
+    @apply text-2xl lg:text-3xl font-bold tracking-tight text-black dark:text-white font-heading;
   }
 
   h4, .text-h4 {
-    @apply text-xl lg:text-2xl font-bold tracking-tight text-black dark:text-white;
+    @apply text-xl lg:text-2xl font-bold tracking-tight text-black dark:text-white font-heading;
   }
 
   h5, .text-h5 {
-    @apply text-lg font-bold text-black dark:text-white;
+    @apply text-lg font-bold text-black dark:text-white font-heading;
   }
 
   h6, .text-h6 {
-    @apply text-base font-bold text-black dark:text-white;
+    @apply text-base font-bold text-black dark:text-white font-heading;
   }
 
+  /* Body text uses DM Sans */
   p, .text-body {
-    @apply text-base font-medium text-black/80 dark:text-white/80 leading-relaxed;
+    @apply text-base font-medium text-black/80 dark:text-white/80 leading-relaxed font-body;
   }
 
   .text-small {
-    @apply text-sm font-medium text-black/60 dark:text-white/60;
+    @apply text-sm font-medium text-black/60 dark:text-white/60 font-body;
   }
 
   .text-caption {
-    @apply text-xs font-medium text-black/60 dark:text-white/60;
+    @apply text-xs font-medium text-black/60 dark:text-white/60 font-body;
   }
 
   .text-muted {
-    @apply text-black/60 dark:text-white/60;
+    @apply text-black/60 dark:text-white/60 font-body;
   }
 
   .text-emphasis {
-    @apply font-bold text-black dark:text-white;
+    @apply font-bold text-black dark:text-white font-heading;
+  }
+
+  /* Buttons and UI elements use Craftwork Grotesk */
+  button, .btn {
+    @apply font-heading;
+  }
+
+  /* Labels and form elements */
+  label {
+    @apply font-heading font-medium;
+  }
+
+  /* Navigation items */
+  nav a {
+    @apply font-heading;
   }
 }
 

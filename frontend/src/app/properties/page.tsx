@@ -42,14 +42,31 @@ export default function PropertiesPage() {
   const fetchPropertyTypes = async () => {
     try {
       const apiBaseUrl = getApiBaseUrl()
+      console.log('Fetching property types from:', `${apiBaseUrl}/properties/types/`)
       const response = await fetch(`${apiBaseUrl}/properties/types/`)
+      
+      if (!response.ok) {
+        console.error('Property types API error:', response.status, response.statusText)
+        setPropertyTypes([{ id: 'all', name: 'All Types' }])
+        return
+      }
+      
       const data = await response.json()
-      setPropertyTypes([
-        { id: 'all', name: 'All Types' },
-        ...data
-      ])
+      console.log('Property types response:', data)
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setPropertyTypes([
+          { id: 'all', name: 'All Types' },
+          ...data
+        ])
+      } else {
+        console.error('Property types data is not an array:', data)
+        setPropertyTypes([{ id: 'all', name: 'All Types' }])
+      }
     } catch (error) {
       console.error('Error fetching property types:', error)
+      setPropertyTypes([{ id: 'all', name: 'All Types' }])
     }
   }
 
@@ -84,11 +101,20 @@ export default function PropertiesPage() {
 
       console.log('Fetching properties from:', url)
       const response = await fetch(url)
+      
+      if (!response.ok) {
+        console.error('Properties API error:', response.status, response.statusText)
+        setProperties([])
+        return
+      }
+      
       const data = await response.json()
       console.log('Properties data:', data)
+      console.log('Number of properties:', data.results?.length || 0)
       setProperties(data.results || [])
     } catch (error) {
       console.error('Error fetching properties:', error)
+      setProperties([])
     } finally {
       setLoading(false)
     }

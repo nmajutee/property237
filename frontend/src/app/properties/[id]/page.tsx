@@ -5,32 +5,32 @@ import { useParams, useRouter } from 'next/navigation'
 import Navbar from '../../../components/navigation/Navbar'
 import { getApiBaseUrl } from '@/services/api'
 import {
-  HeartIcon as HeartOutline,
-  MapPinIcon,
-  HomeIcon,
-  CurrencyDollarIcon,
-  CalendarIcon,
-  BuildingOfficeIcon,
-  CheckCircleIcon,
-  XMarkIcon,
-  FireIcon,
-  BoltIcon,
-  ShieldCheckIcon,
-  TruckIcon,
-  SparklesIcon,
-  BuildingLibraryIcon,
-  CloudIcon,
-  TagIcon,
-  Square3Stack3DIcon,
-  ArrowsPointingOutIcon,
-  KeyIcon,
-  BeakerIcon,
-  WrenchScrewdriverIcon,
-  ArrowsUpDownIcon,
-  WifiIcon,
-  RocketLaunchIcon,
-} from '@heroicons/react/24/outline'
-import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid'
+  Heart,
+  MapPin,
+  Home,
+  DollarSign,
+  Calendar,
+  Building2,
+  CheckCircle,
+  X,
+  Flame,
+  Zap,
+  ShieldCheck,
+  Car,
+  Sparkles,
+  Building,
+  Cloud,
+  Tag,
+  Layers,
+  Maximize2,
+  Key,
+  Droplet,
+  Wrench,
+  ArrowUpDown,
+  Waves,
+  Dumbbell,
+  Snowflake,
+} from 'lucide-react'
 
 interface PropertyImage {
   id: number
@@ -303,11 +303,9 @@ export default function PropertyDetailPage() {
               onClick={toggleFavorite}
               className="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
             >
-              {isFavorite ? (
-                <HeartSolid className="w-6 h-6 text-red-500" />
-              ) : (
-                <HeartOutline className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              )}
+              <Heart 
+                className={`w-6 h-6 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-400'}`}
+              />
             </button>
           </div>
 
@@ -350,29 +348,27 @@ export default function PropertyDetailPage() {
 
               {/* Location */}
               <div className="flex items-center text-gray-600 dark:text-gray-400 mb-6">
-                <MapPinIcon className="w-5 h-5 mr-2" />
+                <MapPin className="w-5 h-5 mr-2" />
                 <span>{property.address || `${property.area.name}, ${property.area.city.name}`}</span>
               </div>
 
               {/* Key Property Details (inline, with icons) */}
               <div className="flex flex-wrap items-center gap-6 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center">
-                  <HomeIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                  <Home className="w-5 h-5 mr-2 text-property237-primary" />
                   <span className="text-gray-900 dark:text-white font-semibold">
                     {property.no_of_bedrooms} Bedrooms
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <KeyIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                  <Key className="w-5 h-5 mr-2 text-property237-primary" />
                   <span className="text-gray-900 dark:text-white font-semibold">
                     {property.no_of_bathrooms} Bathrooms
                   </span>
                 </div>
                 {property.water_type && (
                   <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-property237-primary" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-                    </svg>
+                    <Droplet className="w-5 h-5 mr-2 text-property237-primary" />
                     <span className="text-gray-900 dark:text-white font-semibold capitalize">
                       {property.water_type.replace(/_/g, ' ')} Water
                     </span>
@@ -380,7 +376,7 @@ export default function PropertyDetailPage() {
                 )}
                 {property.electricity_type && (
                   <div className="flex items-center">
-                    <BoltIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                    <Zap className="w-5 h-5 mr-2 text-property237-primary" />
                     <span className="text-gray-900 dark:text-white font-semibold capitalize">
                       {property.electricity_type.replace(/_/g, ' ')}
                     </span>
@@ -405,7 +401,7 @@ export default function PropertyDetailPage() {
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-start">
-                    <BuildingOfficeIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <Building2 className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                     <div>
                       <p className="text-gray-600 dark:text-gray-400 text-sm">Property Type</p>
                       <p className="text-gray-900 dark:text-white font-semibold capitalize">
@@ -414,7 +410,7 @@ export default function PropertyDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <TagIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <Tag className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                     <div>
                       <p className="text-gray-600 dark:text-gray-400 text-sm">Listing Type</p>
                       <p className="text-gray-900 dark:text-white font-semibold capitalize">
@@ -424,7 +420,7 @@ export default function PropertyDetailPage() {
                   </div>
                   {property.no_of_living_rooms > 0 && (
                     <div className="flex items-start">
-                      <ArrowsPointingOutIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <Maximize2 className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Living Rooms</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -435,7 +431,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.no_of_kitchens > 0 && (
                     <div className="flex items-start">
-                      <WrenchScrewdriverIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <Wrench className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Kitchens</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -446,7 +442,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.no_of_balconies > 0 && (
                     <div className="flex items-start">
-                      <BuildingOfficeIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <Building className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Balconies</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -457,7 +453,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.no_of_floors > 0 && (
                     <div className="flex items-start">
-                      <Square3Stack3DIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <Layers className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Total Floors</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -468,7 +464,7 @@ export default function PropertyDetailPage() {
                   )}
                   {property.floor_number && (
                     <div className="flex items-start">
-                      <ArrowsUpDownIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <ArrowUpDown className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
                       <div>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">Floor Number</p>
                         <p className="text-gray-900 dark:text-white font-semibold">
@@ -498,6 +494,7 @@ export default function PropertyDetailPage() {
                   </span>
                   {property.area && (
                     <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                      <MapPin className="w-4 h-4 mr-1" />
                       {property.area.city.name}
                     </span>
                   )}
@@ -512,7 +509,7 @@ export default function PropertyDetailPage() {
                   <div className="grid grid-cols-2 gap-3">
                     {property.additional_features.map((feature: any, index: number) => (
                       <div key={index} className="flex items-center">
-                        <CheckCircleIcon className="w-5 h-5 text-property237-primary mr-2" />
+                        <CheckCircle className="w-5 h-5 text-property237-primary mr-2" />
                         <span className="text-gray-700 dark:text-gray-300">
                           {feature.feature_name}: {feature.feature_value}
                         </span>
@@ -562,53 +559,49 @@ export default function PropertyDetailPage() {
               <div className="space-y-3">
                 {property.has_parking && (
                   <div className="flex items-center">
-                    <TruckIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <Car className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Parking</span>
                   </div>
                 )}
                 {property.has_security && (
                   <div className="flex items-center">
-                    <ShieldCheckIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <ShieldCheck className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Security</span>
                   </div>
                 )}
                 {property.has_pool && (
                   <div className="flex items-center">
-                    <WifiIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <Waves className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Swimming Pool</span>
                   </div>
                 )}
                 {property.has_gym && (
                   <div className="flex items-center">
-                    <RocketLaunchIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <Dumbbell className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Gym</span>
                   </div>
                 )}
                 {property.has_elevator && (
                   <div className="flex items-center">
-                    <ArrowsUpDownIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <ArrowUpDown className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Elevator</span>
                   </div>
                 )}
                 {property.has_ac_preinstalled && (
                   <div className="flex items-center">
-                    <svg className="w-5 h-5 text-property237-primary mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.25L12 21.75M12 2.25L9 5.25M12 2.25L15 5.25M12 21.75L9 18.75M12 21.75L15 18.75M21.75 12L2.25 12M21.75 12L18.75 9M21.75 12L18.75 15M2.25 12L5.25 9M2.25 12L5.25 15M18.364 18.364L5.636 5.636M18.364 18.364L15.536 16.95M18.364 18.364L16.95 15.536M5.636 5.636L8.464 7.05M5.636 5.636L7.05 8.464M18.364 5.636L5.636 18.364M18.364 5.636L16.95 8.464M18.364 5.636L15.536 7.05M5.636 18.364L8.464 16.95M5.636 18.364L7.05 15.536" />
-                    </svg>
+                    <Snowflake className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Air Conditioning</span>
                   </div>
                 )}
                 {property.has_hot_water && (
                   <div className="flex items-center">
-                    <svg className="w-5 h-5 text-property237-primary mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5c1.657 0 3-1.567 3-3.5s-1.343-3.5-3-3.5-3 1.567-3 3.5 1.343 3.5 3 3.5zm0 0v4.5M9 6.5c0-1 .5-2 1.5-2.5M12 4c0-1 .5-1.5 1-2M15 6.5c0-1-.5-2-1.5-2.5" />
-                    </svg>
+                    <Flame className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Hot Water</span>
                   </div>
                 )}
                 {property.has_generator && (
                   <div className="flex items-center">
-                    <BoltIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <Zap className="w-5 h-5 text-property237-primary mr-3" />
                     <span className="text-gray-700 dark:text-gray-300">Generator</span>
                   </div>
                 )}
@@ -635,7 +628,7 @@ export default function PropertyDetailPage() {
                   <p className="font-semibold text-gray-900 dark:text-white flex items-center">
                     {property.agent.user.first_name} {property.agent.user.last_name}
                     {property.agent.is_verified && (
-                      <CheckCircleIcon className="w-5 h-5 text-blue-500 ml-2" />
+                      <CheckCircle className="w-5 h-5 text-blue-500 ml-2" />
                     )}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Real Estate Agent</p>
@@ -671,7 +664,7 @@ export default function PropertyDetailPage() {
                 onClick={() => setShowApplicationModal(false)}
                 className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
-                <XMarkIcon className="w-6 h-6" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 

@@ -51,7 +51,7 @@ module.exports = {
         // Craftwork Grotesk - For headings, titles, buttons (geometric, bold)
         'display': ['var(--font-craftwork-grotesk)', 'Craftwork Grotesk', 'system-ui', 'sans-serif'],
         'heading': ['var(--font-craftwork-grotesk)', 'Craftwork Grotesk', 'system-ui', 'sans-serif'],
-        
+
         // DM Sans - For body text, descriptions (humanist, readable)
         'sans': ['var(--font-body)', 'DM Sans', 'system-ui', 'sans-serif'],
         'body': ['var(--font-body)', 'DM Sans', 'system-ui', 'sans-serif'],

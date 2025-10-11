@@ -51,7 +51,7 @@ try:
     agent = user.agents_profile
     print(f"\n✅ Agent Profile ID: {agent.id}")
     print(f"   Properties: {agent.properties.count()}")
-    
+
     for prop in agent.properties.all():
         print(f"   - {prop.title}")
 except Exception as e:

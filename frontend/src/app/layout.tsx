@@ -38,7 +38,7 @@ const craftworkGrotesk = localFont({
 })
 
 // DM Sans - For body text, descriptions, and readable content
-const dmSans = DM_Sans({ 
+const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-body',

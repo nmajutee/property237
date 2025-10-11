@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { ClientThemeProvider } from "../design-system/ClientThemeProvider"
 import localFont from 'next/font/local'
 import { DM_Sans } from 'next/font/google'
@@ -52,7 +53,7 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <html lang="en" className={`${craftworkGrotesk.variable} ${dmSans.variable}`}>

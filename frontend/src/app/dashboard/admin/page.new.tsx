@@ -24,6 +24,7 @@ import {
   ServerIcon,
   BanknotesIcon,
   UserGroupIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline'
 
 interface User {
@@ -77,7 +78,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await authAPI.getProfile()
+        const userData = await authAPI.getProfile() as User
         setUser(userData)
         
         // Redirect if not admin
@@ -261,10 +262,9 @@ export default function AdminDashboard() {
         
         <nav className="px-3 pb-6">
           {navigationItems.map((item) => (
-            // @ts-expect-error - Next.js routing
             <Link
               key={item.name}
-              href={item.href}
+              href={item.href as any}
               className={`flex items-center justify-between px-3 py-2.5 mb-1 rounded-lg text-sm font-medium transition-colors ${
                 item.active
                   ? 'bg-property237-primary text-white'
@@ -454,9 +454,8 @@ export default function AdminDashboard() {
                     Recent Registrations
                   </h3>
                 </div>
-                {/* @ts-expect-error - Next.js routing */}
                 <Link
-                  href="/dashboard/admin/users"
+                  href={"/dashboard/admin/users" as any}
                   className="text-sm font-medium text-property237-primary hover:text-property237-primary-dark"
                 >
                   View all
@@ -518,9 +517,8 @@ export default function AdminDashboard() {
                     Property Approvals
                   </h3>
                 </div>
-                {/* @ts-expect-error - Next.js routing */}
                 <Link
-                  href="/dashboard/admin/properties"
+                  href={"/dashboard/admin/properties" as any}
                   className="text-sm font-medium text-property237-primary hover:text-property237-primary-dark"
                 >
                   View all
@@ -610,9 +608,8 @@ export default function AdminDashboard() {
               </h3>
             </div>
             <div className="space-y-3">
-              {/* @ts-expect-error - Next.js routing */}
               <Link
-                href="/dashboard/admin/users/new"
+                href={"/dashboard/admin/users/new" as any}
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <UserGroupIcon className="h-5 w-5 text-property237-primary" />
@@ -620,9 +617,8 @@ export default function AdminDashboard() {
                   Add New User
                 </span>
               </Link>
-              {/* @ts-expect-error - Next.js routing */}
               <Link
-                href="/dashboard/admin/properties"
+                href={"/dashboard/admin/properties" as any}
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <BuildingOfficeIcon className="h-5 w-5 text-property237-primary" />
@@ -630,9 +626,8 @@ export default function AdminDashboard() {
                   Moderate Properties
                 </span>
               </Link>
-              {/* @ts-expect-error - Next.js routing */}
               <Link
-                href="/dashboard/admin/reports"
+                href={"/dashboard/admin/reports" as any}
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <DocumentTextIcon className="h-5 w-5 text-property237-primary" />
@@ -640,9 +635,8 @@ export default function AdminDashboard() {
                   Generate Report
                 </span>
               </Link>
-              {/* @ts-expect-error - Next.js routing */}
               <Link
-                href="/dashboard/admin/settings"
+                href={"/dashboard/admin/settings" as any}
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <Cog6ToothIcon className="h-5 w-5 text-property237-primary" />

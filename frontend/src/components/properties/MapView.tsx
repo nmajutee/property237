@@ -164,7 +164,6 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
 
     async function initializeMap() {
       const L = (await import('leaflet')).default
-      await import('leaflet/dist/leaflet.css')
 
       if (!isMounted || !mapRef.current) return
 

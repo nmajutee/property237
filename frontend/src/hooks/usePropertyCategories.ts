@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getApiBaseUrl } from '@/services/api';
 
 // Type definitions
 export interface Category {
@@ -49,7 +50,8 @@ export interface CategoryFormData {
   tags: PropertyTag[];
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/properties';
+// Helper function to get API base URL
+const getPropertiesApiUrl = () => `${getApiBaseUrl()}/properties`;
 
 /**
  * Hook to fetch all parent categories
@@ -63,6 +65,7 @@ export function useParentCategories() {
     const fetchCategories = async () => {
       try {
         setLoading(true);
+        const API_BASE_URL = getPropertiesApiUrl();
         const response = await fetch(`${API_BASE_URL}/categories/parents/`);
         if (!response.ok) throw new Error('Failed to fetch categories');
         const data = await response.json();
@@ -98,6 +101,7 @@ export function useSubcategories(parentSlug: string | null) {
     const fetchSubcategories = async () => {
       try {
         setLoading(true);
+        const API_BASE_URL = getPropertiesApiUrl();
         const response = await fetch(`${API_BASE_URL}/categories/${parentSlug}/subcategories/`);
         if (!response.ok) throw new Error('Failed to fetch subcategories');
         const data = await response.json();
@@ -129,6 +133,7 @@ export function usePropertyStates(publicOnly: boolean = false) {
     const fetchStates = async () => {
       try {
         setLoading(true);
+        const API_BASE_URL = getPropertiesApiUrl();
         const endpoint = publicOnly ? '/states/public/' : '/states/';
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error('Failed to fetch states');
@@ -160,6 +165,7 @@ export function usePropertyTags(categoryId: number | null = null) {
     const fetchTags = async () => {
       try {
         setLoading(true);
+        const API_BASE_URL = getPropertiesApiUrl();
         const endpoint = categoryId
           ? `/tags/for_category/${categoryId}/`
           : '/tags/';
@@ -193,6 +199,7 @@ export function useCategoryFormData(categoryId: number | null = null) {
     const fetchFormData = async () => {
       try {
         setLoading(true);
+        const API_BASE_URL = getPropertiesApiUrl();
         const endpoint = categoryId
           ? `/form-data/for_category/${categoryId}/`
           : '/form-data/';

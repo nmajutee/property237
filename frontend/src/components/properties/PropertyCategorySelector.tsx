@@ -12,6 +12,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getApiBaseUrl } from '@/services/api';
 
 // Type definitions
 interface Category {
@@ -55,14 +56,14 @@ interface FormData {
 interface PropertyCategorySelectorProps {
   onChange: (data: FormData) => void;
   initialValues?: Partial<FormData>;
-  apiBaseUrl?: string;
 }
 
 export default function PropertyCategorySelector({
   onChange,
   initialValues = {},
-  apiBaseUrl = 'http://localhost:8000/api/properties',
 }: PropertyCategorySelectorProps) {
+  // Get the correct API base URL (works in both dev and production)
+  const apiBaseUrl = `${getApiBaseUrl()}/properties`;
   // State management
   const [parentCategories, setParentCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Category[]>([]);

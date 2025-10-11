@@ -114,9 +114,12 @@ export default function PropertyCategorySelector({
       const response = await fetch(`${apiBaseUrl}/categories/parents/`);
       if (!response.ok) throw new Error('Failed to fetch categories');
       const data = await response.json();
-      setParentCategories(data);
+      // Ensure data is an array
+      setParentCategories(Array.isArray(data) ? data : []);
     } catch (err) {
+      console.error('Error fetching parent categories:', err);
       setError(err instanceof Error ? err.message : 'Failed to load categories');
+      setParentCategories([]);
     } finally {
       setLoading(false);
     }
@@ -127,7 +130,8 @@ export default function PropertyCategorySelector({
       const response = await fetch(`${apiBaseUrl}/categories/${categorySlug}/subcategories/`);
       if (!response.ok) throw new Error('Failed to fetch subcategories');
       const data = await response.json();
-      setSubcategories(data);
+      // Ensure data is an array
+      setSubcategories(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching subcategories:', err);
       setSubcategories([]);
@@ -139,9 +143,11 @@ export default function PropertyCategorySelector({
       const response = await fetch(`${apiBaseUrl}/states/`);
       if (!response.ok) throw new Error('Failed to fetch states');
       const data = await response.json();
-      setStates(data);
+      // Ensure data is an array
+      setStates(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching states:', err);
+      setStates([]);
     }
   };
 
@@ -153,7 +159,8 @@ export default function PropertyCategorySelector({
       const response = await fetch(`${apiBaseUrl}/tags/for_category/${category.id}/`);
       if (!response.ok) throw new Error('Failed to fetch tags');
       const data = await response.json();
-      setTags(data);
+      // Ensure data is an array
+      setTags(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching tags:', err);
       setTags([]);

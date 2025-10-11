@@ -69,10 +69,12 @@ export function useParentCategories() {
         const response = await fetch(`${API_BASE_URL}/categories/parents/`);
         if (!response.ok) throw new Error('Failed to fetch categories');
         const data = await response.json();
-        setCategories(data);
+        // Ensure data is an array
+        setCategories(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load categories');
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -105,7 +107,8 @@ export function useSubcategories(parentSlug: string | null) {
         const response = await fetch(`${API_BASE_URL}/categories/${parentSlug}/subcategories/`);
         if (!response.ok) throw new Error('Failed to fetch subcategories');
         const data = await response.json();
-        setSubcategories(data);
+        // Ensure data is an array
+        setSubcategories(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load subcategories');
@@ -138,10 +141,12 @@ export function usePropertyStates(publicOnly: boolean = false) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error('Failed to fetch states');
         const data = await response.json();
-        setStates(data);
+        // Ensure data is an array
+        setStates(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load states');
+        setStates([]);
       } finally {
         setLoading(false);
       }
@@ -172,10 +177,12 @@ export function usePropertyTags(categoryId: number | null = null) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error('Failed to fetch tags');
         const data = await response.json();
-        setTags(data);
+        // Ensure data is an array
+        setTags(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load tags');
+        setTags([]);
       } finally {
         setLoading(false);
       }
@@ -206,10 +213,19 @@ export function useCategoryFormData(categoryId: number | null = null) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error('Failed to fetch form data');
         const data = await response.json();
-        setFormData(data);
+        // Validate formData structure
+        if (data && typeof data === 'object') {
+          setFormData({
+            parents: Array.isArray(data.parents) ? data.parents : [],
+            subcategories: Array.isArray(data.subcategories) ? data.subcategories : [],
+            states: Array.isArray(data.states) ? data.states : [],
+            tags: Array.isArray(data.tags) ? data.tags : [],
+          });
+        }
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load form data');
+        setFormData(null);
       } finally {
         setLoading(false);
       }

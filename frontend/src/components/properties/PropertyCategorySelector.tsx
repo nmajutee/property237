@@ -143,8 +143,9 @@ export default function PropertyCategorySelector({
       const response = await fetch(`${apiBaseUrl}/states/`);
       if (!response.ok) throw new Error('Failed to fetch states');
       const data = await response.json();
-      // Ensure data is an array
-      setStates(Array.isArray(data) ? data : []);
+      // Handle paginated response (data.results) or direct array
+      const statesArray = data.results || data;
+      setStates(Array.isArray(statesArray) ? statesArray : []);
     } catch (err) {
       console.error('Error fetching states:', err);
       setStates([]);
@@ -159,8 +160,9 @@ export default function PropertyCategorySelector({
       const response = await fetch(`${apiBaseUrl}/tags/for_category/${category.id}/`);
       if (!response.ok) throw new Error('Failed to fetch tags');
       const data = await response.json();
-      // Ensure data is an array
-      setTags(Array.isArray(data) ? data : []);
+      // Handle paginated response (data.results) or direct array
+      const tagsArray = data.results || data;
+      setTags(Array.isArray(tagsArray) ? tagsArray : []);
     } catch (err) {
       console.error('Error fetching tags:', err);
       setTags([]);

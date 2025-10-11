@@ -141,8 +141,9 @@ export function usePropertyStates(publicOnly: boolean = false) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error('Failed to fetch states');
         const data = await response.json();
-        // Ensure data is an array
-        setStates(Array.isArray(data) ? data : []);
+        // Handle paginated response (data.results) or direct array
+        const statesArray = data.results || data;
+        setStates(Array.isArray(statesArray) ? statesArray : []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load states');
@@ -177,8 +178,9 @@ export function usePropertyTags(categoryId: number | null = null) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         if (!response.ok) throw new Error('Failed to fetch tags');
         const data = await response.json();
-        // Ensure data is an array
-        setTags(Array.isArray(data) ? data : []);
+        // Handle paginated response (data.results) or direct array
+        const tagsArray = data.results || data;
+        setTags(Array.isArray(tagsArray) ? tagsArray : []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load tags');

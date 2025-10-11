@@ -376,7 +376,7 @@ export default function AddPropertyPage() {
         if (key === 'category' || key === 'subcategory' || key === 'state') {
           return
         }
-        
+
         // Handle tags array specially
         if (key === 'tags' && Array.isArray(value)) {
           value.forEach((tagId) => {

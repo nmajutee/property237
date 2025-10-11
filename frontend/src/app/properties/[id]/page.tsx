@@ -20,6 +20,10 @@ import {
   SparklesIcon,
   BuildingLibraryIcon,
   CloudIcon,
+  TagIcon,
+  Square3Stack3DIcon,
+  ArrowsPointingOutIcon,
+  KeyIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid'
 
@@ -72,6 +76,12 @@ interface AgentProfile {
   is_verified: boolean
 }
 
+interface PropertyTag {
+  id: number
+  name: string
+  color: string
+}
+
 interface Property {
   id: number
   title: string
@@ -84,9 +94,12 @@ interface Property {
   price: string
   currency: string
   no_of_bedrooms: number
+  no_of_living_rooms: number
   no_of_bathrooms: number
-  square_footage: number
-  year_built: number | null
+  no_of_kitchens: number
+  no_of_balconies: number
+  no_of_floors: number
+  floor_number: string
   images: PropertyImage[]
   featured: boolean
   is_active: boolean
@@ -104,6 +117,11 @@ interface Property {
   has_ac_preinstalled: boolean
   has_hot_water: boolean
   has_generator: boolean
+  // Utilities
+  electricity_type: string
+  water_type: string
+  // Tags (if available)
+  tags?: PropertyTag[]
 }
 
 export default function PropertyDetailPage() {
@@ -342,51 +360,136 @@ export default function PropertyDetailPage() {
                       {property.no_of_bathrooms} Bathrooms
                     </span>
                   </div>
-                  <div className="flex items-center">
-                    <span className="text-gray-900 dark:text-white font-semibold">
-                      {property.square_footage} m²
-                    </span>
-                  </div>
                 </div>
               </div>
 
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Description
-                </h2>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                  {property.description}
-                </p>
-              </div>
-
+              {/* Property Details Section */}
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                   Property Details
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400">Property Type</p>
-                    <p className="text-gray-900 dark:text-white font-semibold capitalize">
-                      {property.property_type.name}
-                    </p>
+                  <div className="flex items-start">
+                    <BuildingOfficeIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">Property Type</p>
+                      <p className="text-gray-900 dark:text-white font-semibold capitalize">
+                        {property.property_type.name}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400">Year Built</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">
-                      {property.year_built || 'N/A'}
-                    </p>
+                  <div className="flex items-start">
+                    <TagIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">Listing Type</p>
+                      <p className="text-gray-900 dark:text-white font-semibold capitalize">
+                        {property.listing_type}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400">Status</p>
-                    <p className={`font-semibold ${property.is_active ? 'text-green-600' : 'text-red-600'}`}>
-                      {property.is_active ? 'Available' : 'Unavailable'}
-                    </p>
+                  <div className="flex items-start">
+                    <HomeIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">Bedrooms</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">
+                        {property.no_of_bedrooms}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400">Listing Type</p>
-                    <p className="text-gray-900 dark:text-white font-semibold capitalize">
-                      {property.listing_type}
-                    </p>
+                  <div className="flex items-start">
+                    <ArrowsPointingOutIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">Bathrooms</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">
+                        {property.no_of_bathrooms}
+                      </p>
+                    </div>
+                  </div>
+                  {property.no_of_living_rooms > 0 && (
+                    <div className="flex items-start">
+                      <ArrowsPointingOutIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Living Rooms</p>
+                        <p className="text-gray-900 dark:text-white font-semibold">
+                          {property.no_of_living_rooms}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {property.no_of_kitchens > 0 && (
+                    <div className="flex items-start">
+                      <FireIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Kitchens</p>
+                        <p className="text-gray-900 dark:text-white font-semibold">
+                          {property.no_of_kitchens}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {property.no_of_balconies > 0 && (
+                    <div className="flex items-start">
+                      <KeyIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Balconies</p>
+                        <p className="text-gray-900 dark:text-white font-semibold">
+                          {property.no_of_balconies}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {property.no_of_floors > 0 && (
+                    <div className="flex items-start">
+                      <Square3Stack3DIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Total Floors</p>
+                        <p className="text-gray-900 dark:text-white font-semibold">
+                          {property.no_of_floors}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {property.floor_number && (
+                    <div className="flex items-start">
+                      <Square3Stack3DIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Floor Number</p>
+                        <p className="text-gray-900 dark:text-white font-semibold">
+                          {property.floor_number}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {property.electricity_type && (
+                    <div className="flex items-start">
+                      <BoltIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Electricity</p>
+                        <p className="text-gray-900 dark:text-white font-semibold capitalize">
+                          {property.electricity_type}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {property.water_type && (
+                    <div className="flex items-start">
+                      <CloudIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Water Supply</p>
+                        <p className="text-gray-900 dark:text-white font-semibold capitalize">
+                          {property.water_type}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-start">
+                    <CheckCircleIcon className="w-5 h-5 mr-2 text-property237-primary mt-0.5" />
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">Status</p>
+                      <p className={`font-semibold ${property.is_active ? 'text-green-600' : 'text-red-600'}`}>
+                        {property.is_active ? 'Available' : 'Unavailable'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -469,6 +572,48 @@ export default function PropertyDetailPage() {
                  !property.has_hot_water && !property.has_generator && (
                   <p className="text-gray-500 dark:text-gray-400 italic">No amenities specified</p>
                 )}
+              </div>
+
+              {/* Tags Section */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <TagIcon className="w-6 h-6 mr-2 text-property237-primary" />
+                  Property Tags
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-property237-primary text-white">
+                    {property.property_type.name}
+                  </span>
+                  <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                    property.listing_type === 'rent' 
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  }`}>
+                    {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                  </span>
+                  {property.is_active && (
+                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                      <CheckCircleIcon className="w-4 h-4 mr-1" />
+                      Available
+                    </span>
+                  )}
+                  {property.area && (
+                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                      <MapPinIcon className="w-4 h-4 mr-1" />
+                      {property.area.city.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Description Section */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Description
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                  {property.description}
+                </p>
               </div>
             </div>
           </div>

@@ -13,17 +13,39 @@ import {
   AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline'
 
+interface PropertyImage {
+  id: number
+  image_url: string
+  image_type: string
+  is_primary: boolean
+}
+
 interface Property {
   id: number
   title: string
-  description: string
-  price: number
-  location: string
-  bedrooms: number
-  bathrooms: number
-  area: number
-  property_type: string
-  images: string[]
+  slug: string
+  property_type: {
+    id: number
+    name: string
+  }
+  status: {
+    id: number
+    name: string
+  }
+  price: string
+  currency: string
+  area: {
+    name: string
+    city: {
+      name: string
+    }
+  }
+  no_of_bedrooms: number
+  no_of_bathrooms: number
+  images: PropertyImage[]
+  primary_image: string | null
+  featured: boolean
+  is_active: boolean
 }
 
 export default function PropertiesPage() {
@@ -292,9 +314,9 @@ export default function PropertiesPage() {
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
               >
                 <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
-                  {property.images && property.images.length > 0 ? (
+                  {property.primary_image || (property.images && property.images.length > 0) ? (
                     <img
-                      src={property.images[0]}
+                      src={property.primary_image || property.images[0]?.image_url || ''}
                       alt={property.title}
                       className="w-full h-full object-cover"
                     />
@@ -305,7 +327,7 @@ export default function PropertiesPage() {
                   )}
                   <div className="absolute top-4 left-4">
                     <span className="bg-property237-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {property.property_type}
+                      {property.property_type.name}
                     </span>
                   </div>
                 </div>
@@ -317,25 +339,21 @@ export default function PropertiesPage() {
 
                   <div className="flex items-center text-gray-600 dark:text-gray-400 mb-3">
                     <MapPinIcon className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{property.location}</span>
+                    <span className="text-sm">{property.area.city.name}, {property.area.name}</span>
                   </div>
-
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                    {property.description}
-                  </p>
 
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span>{property.bedrooms} beds</span>
-                      <span>{property.bathrooms} baths</span>
-                      <span>{property.area} m²</span>
+                      <span>{property.no_of_bedrooms} beds</span>
+                      <span>{property.no_of_bathrooms} baths</span>
+                      <span className="capitalize">{property.status.name}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div>
                       <span className="text-2xl font-bold text-property237-primary">
-                        {property.price.toLocaleString()} FCFA
+                        {parseFloat(property.price).toLocaleString()} {property.currency}
                       </span>
                       <span className="text-gray-600 dark:text-gray-400 text-sm">/month</span>
                     </div>

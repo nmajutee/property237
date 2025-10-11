@@ -370,9 +370,11 @@ export default function PropertyDetailPage() {
                 </div>
                 {property.water_type && (
                   <div className="flex items-center">
-                    <BeakerIcon className="w-5 h-5 mr-2 text-property237-primary" />
+                    <svg className="w-5 h-5 mr-2 text-property237-primary" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                    </svg>
                     <span className="text-gray-900 dark:text-white font-semibold capitalize">
-                      {property.water_type} Water
+                      {property.water_type.replace(/_/g, ' ')} Water
                     </span>
                   </div>
                 )}
@@ -380,7 +382,7 @@ export default function PropertyDetailPage() {
                   <div className="flex items-center">
                     <BoltIcon className="w-5 h-5 mr-2 text-property237-primary" />
                     <span className="text-gray-900 dark:text-white font-semibold capitalize">
-                      {property.electricity_type}
+                      {property.electricity_type.replace(/_/g, ' ')}
                     </span>
                   </div>
                 )}
@@ -525,7 +527,7 @@ export default function PropertyDetailPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Price Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6 sticky top-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6 sticky top-24">
               <div className="mb-6">
                 <p className="text-3xl font-bold text-property237-primary mb-2">
                   {parseFloat(property.price).toLocaleString()} {property.currency}
@@ -590,13 +592,17 @@ export default function PropertyDetailPage() {
                 )}
                 {property.has_ac_preinstalled && (
                   <div className="flex items-center">
-                    <CloudIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <svg className="w-5 h-5 text-property237-primary mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.25L12 21.75M12 2.25L9 5.25M12 2.25L15 5.25M12 21.75L9 18.75M12 21.75L15 18.75M21.75 12L2.25 12M21.75 12L18.75 9M21.75 12L18.75 15M2.25 12L5.25 9M2.25 12L5.25 15M18.364 18.364L5.636 5.636M18.364 18.364L15.536 16.95M18.364 18.364L16.95 15.536M5.636 5.636L8.464 7.05M5.636 5.636L7.05 8.464M18.364 5.636L5.636 18.364M18.364 5.636L16.95 8.464M18.364 5.636L15.536 7.05M5.636 18.364L8.464 16.95M5.636 18.364L7.05 15.536" />
+                    </svg>
                     <span className="text-gray-700 dark:text-gray-300">Air Conditioning</span>
                   </div>
                 )}
                 {property.has_hot_water && (
                   <div className="flex items-center">
-                    <BeakerIcon className="w-5 h-5 text-property237-primary mr-3" />
+                    <svg className="w-5 h-5 text-property237-primary mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5c1.657 0 3-1.567 3-3.5s-1.343-3.5-3-3.5-3 1.567-3 3.5 1.343 3.5 3 3.5zm0 0v4.5M9 6.5c0-1 .5-2 1.5-2.5M12 4c0-1 .5-1.5 1-2M15 6.5c0-1-.5-2-1.5-2.5" />
+                    </svg>
                     <span className="text-gray-700 dark:text-gray-300">Hot Water</span>
                   </div>
                 )}

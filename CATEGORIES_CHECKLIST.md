@@ -273,6 +273,6 @@
 
 ---
 
-**Last Updated**: October 2024  
-**Next Review**: After Sprint 1 completion  
+**Last Updated**: October 2024
+**Next Review**: After Sprint 1 completion
 **Owner**: Property237 Development Team

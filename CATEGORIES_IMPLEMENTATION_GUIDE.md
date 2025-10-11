@@ -75,17 +75,17 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, max_length=120)
     code = models.CharField(max_length=50, unique=True, blank=True, null=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, 
-                              null=True, blank=True, 
+    parent = models.ForeignKey('self', on_delete=models.CASCADE,
+                              null=True, blank=True,
                               related_name='subcategories')
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
-    
+
     def is_parent(self):
         return self.parent is None
-    
+
     def get_all_subcategories(self):
         if self.is_parent():
             return self.subcategories.filter(is_active=True)
@@ -105,7 +105,7 @@ class PropertyTag(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True, max_length=120)
     description = models.TextField(blank=True)
-    applies_to = models.ManyToManyField(Category, blank=True, 
+    applies_to = models.ManyToManyField(Category, blank=True,
                                        related_name='tags')
     color = models.CharField(max_length=7, default='#3B82F6')
     icon = models.CharField(max_length=50, blank=True)
@@ -131,7 +131,7 @@ class PropertyState(models.Model):
     code = models.CharField(max_length=50, unique=True, choices=STATUS_CHOICES)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    applies_to = models.ManyToManyField(Category, blank=True, 
+    applies_to = models.ManyToManyField(Category, blank=True,
                                        related_name='states')
     color = models.CharField(max_length=7, default='#10B981')
     allows_inquiries = models.BooleanField(default=True)
@@ -335,7 +335,7 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'code', 'description']
     prepopulated_fields = {'slug': ('name',)}
     ordering = ['parent', 'order', 'name']
-    
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('parent')
@@ -353,9 +353,9 @@ class PropertyTagAdmin(admin.ModelAdmin):
 
 @admin.register(PropertyState)
 class PropertyStateAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'color', 'allows_inquiries', 
+    list_display = ['name', 'code', 'color', 'allows_inquiries',
                    'is_publicly_visible', 'is_active']
-    list_filter = ['allows_inquiries', 'is_publicly_visible', 
+    list_filter = ['allows_inquiries', 'is_publicly_visible',
                   'is_active', 'applies_to']
     search_fields = ['name', 'code', 'description']
     filter_horizontal = ['applies_to']
@@ -512,7 +512,7 @@ export default function PropertyForm({ mode, initialData }: PropertyFormProps) {
       )}
 
       {/* Rest of form fields... */}
-      
+
       <button type="submit">
         {mode === 'create' ? 'Create Property' : 'Update Property'}
       </button>
@@ -632,7 +632,7 @@ class Property(models.Model):
     # Old fields (keep for now)
     property_type = models.ForeignKey(PropertyType, ...)  # Keep
     status = models.ForeignKey(PropertyStatus, ...)  # Keep
-    
+
     # New fields
     category = models.ForeignKey(Category, null=True, blank=True, ...)
     state = models.CharField(
@@ -656,7 +656,7 @@ def migrate_data_forward(apps, schema_editor):
     Property = apps.get_model('properties', 'Property')
     Category = apps.get_model('properties', 'Category')
     PropertyState = apps.get_model('properties', 'PropertyState')
-    
+
     for prop in Property.objects.all():
         # Migrate property_type to category
         old_type = prop.property_type.subtype
@@ -665,13 +665,13 @@ def migrate_data_forward(apps, schema_editor):
             parent = Category.objects.get(code=parent_code)
             subcategory = Category.objects.get(name=subcat_name, parent=parent)
             prop.category = subcategory
-        
+
         # Migrate status to state
         old_status = prop.status.name
         if old_status in STATUS_MIGRATION_MAP:
             new_state_code = STATUS_MIGRATION_MAP[old_status]
             prop.state = new_state_code
-        
+
         prop.save()
 
 def migrate_data_backward(apps, schema_editor):
@@ -696,7 +696,7 @@ class Property(models.Model):
     # Remove old fields
     # property_type = ...  # DELETE
     # status = ...  # DELETE
-    
+
     # Keep new fields
     category = models.ForeignKey(Category, ...)
     state = models.CharField(...)
@@ -723,11 +723,11 @@ class CategoryTestCase(TestCase):
             name='Apartments',
             parent=self.parent
         )
-    
+
     def test_is_parent(self):
         self.assertTrue(self.parent.is_parent())
         self.assertFalse(self.subcat.is_parent())
-    
+
     def test_get_subcategories(self):
         subcats = self.parent.get_all_subcategories()
         self.assertEqual(subcats.count(), 1)
@@ -738,12 +738,12 @@ class PropertyTagTestCase(TestCase):
         tag = PropertyTag.objects.create(name='For Sale')
         # No applies_to set = applies to all
         self.assertEqual(tag.applies_to.count(), 0)
-    
+
     def test_applies_to_category(self):
         category = Category.objects.create(name='Residential', code='RESIDENTIAL')
         tag = PropertyTag.objects.create(name='Furnished')
         tag.applies_to.add(category)
-        
+
         self.assertTrue(tag.applies_to_category(category))
 ```
 
@@ -759,11 +759,11 @@ class CategoryAPITestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn('Residential', str(response.data))
-    
+
     def test_get_subcategories(self):
         parent = Category.objects.create(name='Residential', code='RESIDENTIAL', slug='residential')
         Category.objects.create(name='Apartments', parent=parent)
-        
+
         url = reverse('category-subcategories', kwargs={'slug': 'residential'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -858,6 +858,6 @@ For questions or issues:
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: October 2024  
+**Version**: 1.0.0
+**Last Updated**: October 2024
 **Maintainer**: Property237 Development Team

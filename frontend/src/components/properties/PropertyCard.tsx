@@ -64,7 +64,10 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
               <BuildingOfficeIcon className="h-20 w-20 text-gray-400" />
             </div>
           )}
-          <button className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform">
+          <button
+            onClick={(e) => e.preventDefault()}
+            className="absolute top-4 right-4 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:scale-110 transition-transform"
+          >
             <HeartIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </button>
           <div className="absolute bottom-4 left-4">

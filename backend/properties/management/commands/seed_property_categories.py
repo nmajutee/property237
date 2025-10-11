@@ -92,7 +92,7 @@ class Command(BaseCommand):
         }
 
         parent_categories = {}
-        
+
         # Create parent categories
         for code, data in categories_data.items():
             parent, created = Category.objects.get_or_create(
@@ -328,10 +328,10 @@ class Command(BaseCommand):
                 name=tag_data['name'],
                 defaults=tag_data
             )
-            
+
             if applies_to:
                 tag.applies_to.set(applies_to)
-            
+
             status = '✓ Created' if created else '• Exists'
             self.stdout.write(f"  {status}: {tag.name}")
 

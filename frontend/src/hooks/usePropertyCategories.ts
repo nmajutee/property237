@@ -1,7 +1,7 @@
 /**
  * React Hook for Property Categories
  * Cameroon-Specific Implementation
- * 
+ *
  * Provides easy access to categories, states, and tags data
  */
 
@@ -232,8 +232,8 @@ export function getStateByCode(states: PropertyState[], code: string): PropertyS
  * Utility function to filter tags by category
  */
 export function filterTagsByCategory(tags: PropertyTag[], categoryId: number): PropertyTag[] {
-  return tags.filter(tag => 
-    tag.applies_to_categories.length === 0 || 
+  return tags.filter(tag =>
+    tag.applies_to_categories.length === 0 ||
     tag.applies_to_categories.includes(categoryId)
   );
 }

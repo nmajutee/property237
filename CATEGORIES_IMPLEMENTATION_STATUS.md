@@ -179,7 +179,7 @@ class Property(models.Model):
         blank=True
     )
     tags = models.ManyToManyField(PropertyTag, blank=True, related_name='properties')
-    
+
     # Keep old fields temporarily
     property_type = models.ForeignKey(PropertyType, ...)  # Will remove later
     status = models.ForeignKey(PropertyStatus, ...)  # Will remove later
@@ -278,7 +278,7 @@ urlpatterns = [
     # Existing patterns
     path('', views.PropertyListCreateView.as_view()),
     # ... more patterns
-    
+
     # New category endpoints
     path('', include(category_urls)),
 ]
@@ -559,7 +559,7 @@ curl http://localhost:8000/api/properties/form-data/for_category/1/
 
 ---
 
-**Implementation Date**: October 2024  
-**Status**: Phase 1 Complete (Models, API, Documentation)  
-**Next Phase**: Database Migrations & Admin Configuration  
+**Implementation Date**: October 2024
+**Status**: Phase 1 Complete (Models, API, Documentation)
+**Next Phase**: Database Migrations & Admin Configuration
 **Estimated Completion**: 5 weeks from start

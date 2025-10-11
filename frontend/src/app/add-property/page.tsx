@@ -5,18 +5,28 @@ import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { getApiBaseUrl } from '@/services/api'
+import PropertyCategorySelector from '@/components/properties/PropertyCategorySelector'
 
 // Interfaces matching backend models
-interface PropertyType {
+interface Category {
   id: number
   name: string
-  category: string
-  subtype?: string
+  parent?: number
+  parent_name?: string
 }
 
-interface PropertyStatus {
+interface PropertyState {
   id: number
   name: string
+  code: string
+  color: string
+}
+
+interface PropertyTag {
+  id: number
+  name: string
+  color: string
+  applies_to_categories: string[]
 }
 
 interface Region {
@@ -45,8 +55,6 @@ export default function AddPropertyPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Metadata from backend
-  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([])
-  const [propertyStatuses, setPropertyStatuses] = useState<PropertyStatus[]>([])
   const [regions, setRegions] = useState<Region[]>([])
   const [cities, setCities] = useState<City[]>([])
   const [areas, setAreas] = useState<Area[]>([])
@@ -61,8 +69,10 @@ export default function AddPropertyPage() {
     // Basic Information
     title: '',
     description: '',
-    property_type: '',
-    status: '',
+    category: '',
+    subcategory: '',
+    state: '',
+    tags: [] as number[],
     listing_type: 'rent',
 
     // Location
@@ -157,62 +167,39 @@ export default function AddPropertyPage() {
       const apiBaseUrl = getApiBaseUrl()
 
       // Fetch all metadata in parallel (these endpoints are public - no auth needed)
-      const [typesRes, statusesRes, regionsRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/properties/types/`),
-        fetch(`${apiBaseUrl}/properties/statuses/`),
+      const [regionsRes] = await Promise.all([
         fetch(`${apiBaseUrl}/locations/regions/`)
       ])
 
       // Check if all responses are OK
-      if (!typesRes.ok || !statusesRes.ok || !regionsRes.ok) {
+      if (!regionsRes.ok) {
         console.error('API Error:', {
-          types: typesRes.status,
-          statuses: statusesRes.status,
           regions: regionsRes.status
         })
 
         // Check for authentication issues
-        if (typesRes.status === 401 || statusesRes.status === 401 || regionsRes.status === 401) {
+        if (regionsRes.status === 401) {
           setError('Session expired. Please sign in again.')
           setTimeout(() => router.push('/sign-in'), 2000)
           return
         }
 
-        setError('⚠️ Warning: Could not load all property metadata. Some dropdowns may be empty. Please ensure the database is seeded.')
+        setError('⚠️ Warning: Could not load location metadata. Some dropdowns may be empty.')
         setLoading(false)
         return
       }
 
       // Only parse JSON if responses are OK
-      const typesData = await typesRes.json()
-      const statusesData = await statusesRes.json()
       const regionsData = await regionsRes.json()
 
-      const types = typesData.results || typesData
-      const statuses = statusesData.results || statusesData
       const regionsList = regionsData.results || regionsData
 
-      setPropertyTypes(types)
-      setPropertyStatuses(statuses)
       setRegions(regionsList)
-
-      // Set default values
-      if (types.length > 0) {
-        setFormData(prev => ({ ...prev, property_type: types[0].id.toString() }))
-      }
-      if (statuses.length > 0) {
-        const availableStatus = statuses.find((s: PropertyStatus) => s.name === 'available')
-        if (availableStatus) {
-          setFormData(prev => ({ ...prev, status: availableStatus.id.toString() }))
-        } else {
-          setFormData(prev => ({ ...prev, status: statuses[0].id.toString() }))
-        }
-      }
 
       setLoading(false)
     } catch (err) {
       console.error('Error fetching metadata:', err)
-      setError('⚠️ Warning: Could not load property types and locations. The form will still work, but you may need to refresh if dropdowns are empty.')
+      setError('⚠️ Warning: Could not load locations. The form will still work, but you may need to refresh if dropdowns are empty.')
       setLoading(false)
     }
   }
@@ -324,8 +311,12 @@ export default function AddPropertyPage() {
         setError('Description is required')
         return false
       }
-      if (!formData.property_type) {
-        setError('Property type is required')
+      if (!formData.category || !formData.subcategory) {
+        setError('Property category and subcategory are required')
+        return false
+      }
+      if (!formData.state) {
+        setError('Property state is required')
         return false
       }
     } else if (step === 2) {
@@ -375,8 +366,14 @@ export default function AddPropertyPage() {
 
       // Append all form fields, excluding empty optional fields
       Object.entries(formData).forEach(([key, value]) => {
+        // Handle tags array specially
+        if (key === 'tags' && Array.isArray(value)) {
+          value.forEach((tagId) => {
+            formDataToSend.append('tags', tagId.toString())
+          })
+        }
         // Include boolean false values and 0, but exclude empty strings
-        if (value === false || value === 0 || (value !== '' && value !== null && value !== undefined)) {
+        else if (value === false || value === 0 || (value !== '' && value !== null && value !== undefined)) {
           formDataToSend.append(key, value.toString())
         }
       })
@@ -513,7 +510,7 @@ export default function AddPropertyPage() {
         <Navbar />
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-property237-primary mx-auto mb-4"></div>
             <p className="text-gray-600">Loading form...</p>
           </div>
         </div>
@@ -543,13 +540,13 @@ export default function AddPropertyPage() {
               <div key={s} className="flex-1 flex items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    s <= step ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'
+                    s <= step ? 'bg-property237-primary text-white' : 'bg-gray-200 text-gray-600'
                   }`}
                 >
                   {s}
                 </div>
                 {s < 5 && (
-                  <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-green-600' : 'bg-gray-200'}`} />
+                  <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-property237-primary' : 'bg-gray-200'}`} />
                 )}
               </div>
             ))}
@@ -565,7 +562,7 @@ export default function AddPropertyPage() {
             ].map((label, index) => (
               <div key={index} className="flex-1 flex items-center">
                 <span className={`text-xs text-center w-10 ${
-                  index + 1 <= step ? 'text-green-600 font-medium' : 'text-gray-600'
+                  index + 1 <= step ? 'text-property237-primary font-medium' : 'text-gray-600'
                 }`}>
                   {label}
                 </span>
@@ -577,8 +574,8 @@ export default function AddPropertyPage() {
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 bg-green-50 border-2 border-green-500 text-green-800 px-6 py-4 rounded-lg flex items-center shadow-lg">
-            <svg className="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mb-6 bg-property237-primary/10 border-2 border-property237-primary text-property237-primary px-6 py-4 rounded-lg flex items-center shadow-lg">
+            <svg className="w-6 h-6 mr-3 text-property237-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <span className="font-semibold">{successMessage}</span>
@@ -606,7 +603,7 @@ export default function AddPropertyPage() {
             {/* STEP 1: Basic Information */}
             {step === 1 && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Step 1 of 5: Basic Information</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4 font-heading">Step 1 of 5: Basic Information</h2>
 
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Property Title *</label>
@@ -617,7 +614,7 @@ export default function AddPropertyPage() {
                     onChange={handleInputChange}
                     required
                     placeholder="e.g., Modern 2-Bedroom Apartment in Douala"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                   />
                 </div>
 
@@ -630,61 +627,39 @@ export default function AddPropertyPage() {
                     required
                     rows={5}
                     placeholder="Describe your property in detail..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Property Type *</label>
-                    <select
-                      name="property_type"
-                      value={formData.property_type}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                    >
-                      <option value="">Select</option>
-                      {propertyTypes.map((type) => (
-                        <option key={type.id} value={type.id}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                {/* Property Category Selector */}
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">Property Category *</label>
+                  <PropertyCategorySelector
+                    onChange={(data) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        category: data.category?.toString() || '',
+                        subcategory: data.subcategory?.toString() || '',
+                        state: data.state?.toString() || '',
+                        tags: (data.tags || []).map(tag => parseInt(tag, 10))
+                      }))
+                    }}
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Listing Type *</label>
-                    <select
-                      name="listing_type"
-                      value={formData.listing_type}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                    >
-                      <option value="rent">For Rent</option>
-                      <option value="sale">For Sale</option>
-                      <option value="guest_house">Guest House</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Status *</label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                    >
-                      <option value="">Select</option>
-                      {propertyStatuses.map((status) => (
-                        <option key={status.id} value={status.id}>
-                          {status.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">Listing Type *</label>
+                  <select
+                    name="listing_type"
+                    value={formData.listing_type}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
+                  >
+                    <option value="rent">For Rent</option>
+                    <option value="sale">For Sale</option>
+                    <option value="guest_house">Guest House</option>
+                  </select>
                 </div>
               </div>
             )}
@@ -704,7 +679,7 @@ export default function AddPropertyPage() {
                         value={selectedRegion}
                         onChange={handleRegionChange}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       >
                         <option value="">Select Region</option>
                         {regions.map((region) => (
@@ -722,7 +697,7 @@ export default function AddPropertyPage() {
                         onChange={handleCityChange}
                         required
                         disabled={!selectedRegion}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary disabled:bg-gray-100"
                       >
                         <option value="">Select City</option>
                         {cities.map((city) => (
@@ -741,7 +716,7 @@ export default function AddPropertyPage() {
                         onChange={handleInputChange}
                         required
                         disabled={!selectedCity}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary disabled:bg-gray-100"
                       >
                         <option value="">Select Area</option>
                         {areas.map((area) => (
@@ -765,7 +740,7 @@ export default function AddPropertyPage() {
                       min="0"
                       max="50000"
                       placeholder="100"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
 
@@ -775,7 +750,7 @@ export default function AddPropertyPage() {
                       name="vehicle_access"
                       value={formData.vehicle_access}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     >
                       <option value="">Select</option>
                       <option value="bike">Reachable by Bike</option>
@@ -791,7 +766,7 @@ export default function AddPropertyPage() {
                     name="road_is_tarred"
                     checked={formData.road_is_tarred}
                     onChange={handleInputChange}
-                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                   />
                   <label className="ml-2 text-gray-700">Road is Tarred</label>
                 </div>
@@ -806,7 +781,7 @@ export default function AddPropertyPage() {
                       onChange={handleInputChange}
                       min="0"
                       max="50"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
 
@@ -819,7 +794,7 @@ export default function AddPropertyPage() {
                       onChange={handleInputChange}
                       min="1"
                       max="20"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
 
@@ -832,7 +807,7 @@ export default function AddPropertyPage() {
                       onChange={handleInputChange}
                       min="0"
                       max="20"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
 
@@ -845,7 +820,7 @@ export default function AddPropertyPage() {
                       onChange={handleInputChange}
                       min="1"
                       max="10"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
                 </div>
@@ -857,7 +832,7 @@ export default function AddPropertyPage() {
                       name="kitchen_type"
                       value={formData.kitchen_type}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     >
                       <option value="">Select</option>
                       <option value="full_size">Full Size Kitchen</option>
@@ -874,7 +849,7 @@ export default function AddPropertyPage() {
                       onChange={handleInputChange}
                       min="0"
                       max="20"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
 
@@ -887,7 +862,7 @@ export default function AddPropertyPage() {
                       onChange={handleInputChange}
                       min="1"
                       max="100"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
                 </div>
@@ -903,7 +878,7 @@ export default function AddPropertyPage() {
                       min="1"
                       max="100"
                       placeholder="Which floor?"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
 
@@ -915,7 +890,7 @@ export default function AddPropertyPage() {
                       value={formData.room_size}
                       onChange={handleInputChange}
                       placeholder="e.g., 3m x 4m"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                     />
                   </div>
                 </div>
@@ -926,7 +901,7 @@ export default function AddPropertyPage() {
                     name="has_dressing_cupboard"
                     checked={formData.has_dressing_cupboard}
                     onChange={handleInputChange}
-                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                   />
                   <label className="ml-2 text-gray-700">Has Dressing Cupboard</label>
                 </div>
@@ -953,7 +928,7 @@ export default function AddPropertyPage() {
                         min="0"
                         step="1000"
                         placeholder="150000"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       />
                     </div>
 
@@ -963,7 +938,7 @@ export default function AddPropertyPage() {
                         name="currency"
                         value={formData.currency}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       >
                         <option value="XAF">XAF (CFA Franc)</option>
                         <option value="USD">USD</option>
@@ -987,7 +962,7 @@ export default function AddPropertyPage() {
                             min="1"
                             max="24"
                             placeholder="6"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                           />
                         </div>
 
@@ -1001,7 +976,7 @@ export default function AddPropertyPage() {
                             min="0"
                             max="12"
                             placeholder="2"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                           />
                         </div>
 
@@ -1014,7 +989,7 @@ export default function AddPropertyPage() {
                             onChange={handleInputChange}
                             min="0"
                             placeholder="5000"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                           />
                         </div>
                       </div>
@@ -1039,7 +1014,7 @@ export default function AddPropertyPage() {
                         name="electricity_type"
                         value={formData.electricity_type}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       >
                         <option value="">Select</option>
                         <option value="private_meter">Private Meter</option>
@@ -1053,7 +1028,7 @@ export default function AddPropertyPage() {
                         name="electricity_payment"
                         value={formData.electricity_payment}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       >
                         <option value="">Select</option>
                         <option value="prepaid">Prepaid</option>
@@ -1067,7 +1042,7 @@ export default function AddPropertyPage() {
                         name="water_type"
                         value={formData.water_type}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       >
                         <option value="">Select</option>
                         <option value="camwater">Camwater</option>
@@ -1097,7 +1072,7 @@ export default function AddPropertyPage() {
                           name={amenity.key}
                           checked={formData[amenity.key as keyof typeof formData] as boolean}
                           onChange={handleInputChange}
-                          className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                          className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                         />
                         <span className="text-gray-700">{amenity.label}</span>
                       </label>
@@ -1120,7 +1095,7 @@ export default function AddPropertyPage() {
                         max="100"
                         step="0.1"
                         placeholder="10"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       />
                     </div>
 
@@ -1134,7 +1109,7 @@ export default function AddPropertyPage() {
                         min="0"
                         max="12"
                         placeholder="1"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       />
                     </div>
                   </div>
@@ -1156,7 +1131,7 @@ export default function AddPropertyPage() {
                           min="0"
                           step="0.01"
                           placeholder="500"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                         />
                       </div>
 
@@ -1166,7 +1141,7 @@ export default function AddPropertyPage() {
                           name="land_title_type"
                           value={formData.land_title_type}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                         >
                           <option value="">Select</option>
                           <option value="global">Global Land Title</option>
@@ -1184,7 +1159,7 @@ export default function AddPropertyPage() {
                           value={formData.cadastral_id}
                           onChange={handleInputChange}
                           placeholder="Official registry ID"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                         />
                       </div>
 
@@ -1194,7 +1169,7 @@ export default function AddPropertyPage() {
                           name="has_land_title"
                           checked={formData.has_land_title}
                           onChange={handleInputChange}
-                          className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                          className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                         />
                         <label className="ml-2 text-gray-700">Has Land Title</label>
                       </div>
@@ -1206,10 +1181,10 @@ export default function AddPropertyPage() {
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png"
                         onChange={handleDocumentChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       />
                       {titleDocument && (
-                        <p className="text-sm text-green-600 mt-1">✓ {titleDocument.name}</p>
+                        <p className="text-sm text-property237-primary mt-1">✓ {titleDocument.name}</p>
                       )}
                     </div>
 
@@ -1221,7 +1196,7 @@ export default function AddPropertyPage() {
                         onChange={handleInputChange}
                         rows={3}
                         placeholder="List other documents or notes"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                       />
                     </div>
                   </div>
@@ -1241,7 +1216,7 @@ export default function AddPropertyPage() {
                           onChange={handleInputChange}
                           min="0"
                           placeholder="25000"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-property237-primary"
                         />
                       </div>
 
@@ -1252,7 +1227,7 @@ export default function AddPropertyPage() {
                             name="price_negotiable"
                             checked={formData.price_negotiable}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                            className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                           />
                           <span className="text-gray-700">Price Negotiable</span>
                         </label>
@@ -1263,7 +1238,7 @@ export default function AddPropertyPage() {
                             name="has_refundable_caution"
                             checked={formData.has_refundable_caution}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                            className="w-4 h-4 text-property237-primary border-gray-300 rounded focus:ring-property237-primary"
                           />
                           <span className="text-gray-700">Has Refundable Caution</span>
                         </label>
@@ -1290,7 +1265,7 @@ export default function AddPropertyPage() {
                     <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
                     <div className="mt-4">
                       <label className="cursor-pointer">
-                        <span className="mt-2 block text-sm font-medium text-green-600 hover:text-green-700">
+                        <span className="mt-2 block text-sm font-medium text-property237-primary hover:text-green-700">
                           Click to upload images
                         </span>
                         <input
@@ -1328,7 +1303,7 @@ export default function AddPropertyPage() {
                             <XMarkIcon className="h-4 w-4" />
                           </button>
                           {index === 0 && (
-                            <div className="absolute bottom-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                            <div className="absolute bottom-2 left-2 bg-property237-primary text-white text-xs px-2 py-1 rounded">
                               Primary
                             </div>
                           )}
@@ -1357,7 +1332,7 @@ export default function AddPropertyPage() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    className="px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-green-700"
                   >
                     Next
                   </button>
@@ -1365,7 +1340,7 @@ export default function AddPropertyPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
                     {submitting ? 'Publishing...' : '✅ Publish Property'}
                   </button>
@@ -1378,3 +1353,4 @@ export default function AddPropertyPage() {
     </div>
   )
 }
+

@@ -19,14 +19,14 @@ class Category(models.Model):
     COMMERCIAL = 'COMMERCIAL'
     LAND = 'LAND'
     INVESTMENT = 'INVESTMENT'
-    
+
     PARENT_CATEGORIES = [
         (RESIDENTIAL, 'Residential'),
         (COMMERCIAL, 'Commercial'),
         (LAND, 'Land'),
         (INVESTMENT, 'Investment'),
     ]
-    
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, max_length=120)
     code = models.CharField(max_length=50, unique=True, blank=True, null=True,
@@ -138,7 +138,7 @@ class PropertyState(models.Model):
     RESERVED = 'reserved'
     EXPIRED = 'expired'
     DRAFT = 'draft'
-    
+
     STATUS_CHOICES = [
         (AVAILABLE, 'Available'),
         (SOLD, 'Sold'),
@@ -153,7 +153,7 @@ class PropertyState(models.Model):
         (EXPIRED, 'Expired'),
         (DRAFT, 'Draft'),
     ]
-    
+
     code = models.CharField(max_length=50, unique=True, choices=STATUS_CHOICES)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)

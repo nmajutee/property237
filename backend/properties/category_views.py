@@ -20,7 +20,7 @@ from .category_serializers import (
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for property categories
-    
+
     Endpoints:
     - GET /categories/ - List all parent categories
     - GET /categories/{id}/ - Get category details
@@ -44,13 +44,13 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     def subcategories(self, request, slug=None):
         """Get all subcategories for a parent category"""
         parent = self.get_object()
-        
+
         if not parent.is_parent():
             return Response(
                 {'error': 'This is not a parent category'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         subcats = parent.get_all_subcategories()
         serializer = SubcategorySerializer(subcats, many=True)
         return Response(serializer.data)
@@ -66,7 +66,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 class PropertyTagViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for property tags
-    
+
     Endpoints:
     - GET /tags/ - List all active tags
     - GET /tags/{id}/ - Get tag details
@@ -87,14 +87,14 @@ class PropertyTagViewSet(viewsets.ReadOnlyModelViewSet):
                 {'error': 'Category not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Tags with no specific categories OR tags that include this category
         tags = PropertyTag.objects.filter(
             is_active=True
         ).filter(
             Q(applies_to__isnull=True) | Q(applies_to=category)
         ).distinct()
-        
+
         serializer = self.get_serializer(tags, many=True)
         return Response(serializer.data)
 
@@ -102,7 +102,7 @@ class PropertyTagViewSet(viewsets.ReadOnlyModelViewSet):
 class PropertyStateViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for property states
-    
+
     Endpoints:
     - GET /states/ - List all active states
     - GET /states/{code}/ - Get state details
@@ -131,14 +131,14 @@ class PropertyStateViewSet(viewsets.ReadOnlyModelViewSet):
                 {'error': 'Category not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # States with no specific categories OR states that include this category
         states = PropertyState.objects.filter(
             is_active=True
         ).filter(
             Q(applies_to__isnull=True) | Q(applies_to=category)
         ).distinct()
-        
+
         serializer = self.get_serializer(states, many=True)
         return Response(serializer.data)
 
@@ -147,7 +147,7 @@ class PropertyFormDataViewSet(viewsets.ViewSet):
     """
     Special viewset to provide all form data in one request
     Optimizes frontend form initialization
-    
+
     Endpoint:
     - GET /form-data/ - Get categories, tags, states
     - GET /form-data/for_category/{category_id}/ - Get filtered data for specific category
@@ -181,27 +181,27 @@ class PropertyFormDataViewSet(viewsets.ViewSet):
                 {'error': 'Category not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Get subcategories
         if category.is_parent():
             subcategories = category.get_all_subcategories()
         else:
             subcategories = Category.objects.none()
-        
+
         # Get applicable tags
         tags = PropertyTag.objects.filter(
             is_active=True
         ).filter(
             Q(applies_to__isnull=True) | Q(applies_to=category)
         ).distinct()
-        
+
         # Get applicable states
         states = PropertyState.objects.filter(
             is_active=True
         ).filter(
             Q(applies_to__isnull=True) | Q(applies_to=category)
         ).distinct()
-        
+
         return Response({
             'category': CategorySerializer(category).data,
             'subcategories': SubcategorySerializer(subcategories, many=True).data,

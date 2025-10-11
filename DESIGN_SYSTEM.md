@@ -70,7 +70,7 @@ frontend/src/components/properties/
 
 **Responsive Behavior**:
 - **Grid Mode**: Vertical card, h-56 image, hover scale
-- **List Mode**: 
+- **List Mode**:
   - Mobile: Vertical layout (`flex-col`)
   - Desktop: Horizontal layout (`sm:flex-row`), w-72 image
 
@@ -115,7 +115,7 @@ frontend/src/components/properties/
 - `onOpenFilters`: () => void (mobile only)
 
 **Responsive Behavior**:
-- **Mobile**: 
+- **Mobile**:
   - Hamburger icon for filters (`md:hidden`)
   - Vertical layout (`flex-col`)
   - Smaller text (`text-lg`)
@@ -189,20 +189,20 @@ export default function PropertiesPage() {
         isOpen={isMobileFilterOpen}
         onClose={() => setIsMobileFilterOpen(false)}
       />
-      
+
       <main className="flex-1 flex flex-col overflow-y-auto">
         <MapView show={showMap} />
-        
+
         <PropertyHeader
           {...headerProps}
           onOpenFilters={() => setIsMobileFilterOpen(true)}
         />
-        
+
         <PriceFilterBar
           priceRange={priceRange}
           setPriceRange={setPriceRange}
         />
-        
+
         <div className="p-4 sm:p-6">
           <PropertyGrid
             properties={properties}
@@ -369,6 +369,6 @@ For questions or issues related to the design system:
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2024  
+**Version**: 1.0.0
+**Last Updated**: 2024
 **Maintainer**: Property237 Development Team

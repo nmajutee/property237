@@ -10,7 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
     """Serializer for property categories"""
     subcategories = serializers.SerializerMethodField()
     is_parent = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Category
         fields = [
@@ -33,17 +33,17 @@ class SubcategorySerializer(serializers.ModelSerializer):
     """Simplified serializer for subcategories (no nesting)"""
     parent_name = serializers.CharField(source='parent.name', read_only=True)
     parent_code = serializers.CharField(source='parent.code', read_only=True)
-    
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'description', 'icon', 
+        fields = ['id', 'name', 'slug', 'description', 'icon',
                  'parent', 'parent_name', 'parent_code', 'order']
 
 
 class PropertyTagSerializer(serializers.ModelSerializer):
     """Serializer for property tags"""
     applies_to_categories = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = PropertyTag
         fields = [
@@ -63,7 +63,7 @@ class PropertyStateSerializer(serializers.ModelSerializer):
     """Serializer for property states"""
     applies_to_categories = serializers.SerializerMethodField()
     display_name = serializers.CharField(source='name', read_only=True)
-    
+
     class Meta:
         model = PropertyState
         fields = [
@@ -87,7 +87,7 @@ class CategoryWithFiltersSerializer(serializers.ModelSerializer):
     subcategories = SubcategorySerializer(many=True, read_only=True)
     applicable_tags = serializers.SerializerMethodField()
     applicable_states = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Category
         fields = [

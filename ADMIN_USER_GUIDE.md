@@ -1,6 +1,6 @@
 # Property237 Admin Guide - Managing Categories, Tags & States
 
-**For**: Property237 Administrators & Managers  
+**For**: Property237 Administrators & Managers
 **Purpose**: Learn how to manage property categories, tags, and states through the Django admin panel
 
 ---
@@ -342,7 +342,7 @@ These are the standard states (don't delete these):
    ```
 4. Click **"Save"**
 
-**To Remove Later**: 
+**To Remove Later**:
 - Don't delete it
 - Just uncheck **"Is active"**
 
@@ -529,6 +529,6 @@ If you need assistance:
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: October 2024  
+**Document Version**: 1.0
+**Last Updated**: October 2024
 **For**: Property237 Admin Panel Users

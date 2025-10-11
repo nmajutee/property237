@@ -1,7 +1,7 @@
 /**
  * Property Category Selector Component
  * Cameroon-Specific Implementation
- * 
+ *
  * Features:
  * - Parent category selection (Residential, Commercial, Land, Investment)
  * - Dynamic subcategory dropdown based on parent selection

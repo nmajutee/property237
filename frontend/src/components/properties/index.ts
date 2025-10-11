@@ -8,7 +8,7 @@ export { default as PriceFilterBar } from './PriceFilterBar';
 export { default as PropertyCategorySelector } from './PropertyCategorySelector';
 
 // MapView must be dynamically imported to avoid SSR issues with Leaflet
-export const MapView = dynamic(() => import('./MapView'), { 
+export const MapView = dynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
     <div className="h-96 bg-gray-200 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">

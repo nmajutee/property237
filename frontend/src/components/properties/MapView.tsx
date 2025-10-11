@@ -1,19 +1,9 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { MapPin, X, Star, User } from 'lucide-react'
 
-// Fix Leaflet default icon issue with Next.js
-if (typeof window !== 'undefined') {
-  delete (L.Icon.Default.prototype as any)._getIconUrl
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  })
-}
+// Leaflet will be dynamically imported in useEffect to avoid SSR issues
 
 interface PropertyAgent {
   id: number
@@ -130,8 +120,8 @@ async function geocodeAddress(city: string, area: string): Promise<[number, numb
 
 export default function MapView({ show, height = 'h-96', properties = [] }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<L.Map | null>(null)
-  const markersRef = useRef<L.Marker[]>([])
+  const mapInstanceRef = useRef<any>(null)
+  const markersRef = useRef<any[]>([])
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [mounted, setMounted] = useState(false)
   const [propertyCoordinates, setPropertyCoordinates] = useState<Map<number, [number, number]>>(new Map())
@@ -169,77 +159,98 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
   useEffect(() => {
     if (!show || !mounted || loading || !mapRef.current || typeof window === 'undefined') return
 
-    // Initialize map only once
-    if (!mapInstanceRef.current) {
-      // Default to Cameroon center (between Douala and Yaoundé)
-      const defaultCenter: [number, number] = [4.0511, 9.7679]
-      const defaultZoom = 8
+    // Dynamically import Leaflet to avoid SSR issues
+    let isMounted = true
 
-      const map = L.map(mapRef.current, {
-        center: defaultCenter,
-        zoom: defaultZoom,
-        scrollWheelZoom: true,
+    async function initializeMap() {
+      const L = (await import('leaflet')).default
+      await import('leaflet/dist/leaflet.css')
+
+      if (!isMounted || !mapRef.current) return
+
+      // Fix Leaflet default icon issue with Next.js
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
       })
 
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-      }).addTo(map)
+      // Initialize map only once
+      if (!mapInstanceRef.current) {
+        // Default to Cameroon center (between Douala and Yaoundé)
+        const defaultCenter: [number, number] = [4.0511, 9.7679]
+        const defaultZoom = 8
 
-      mapInstanceRef.current = map
-    }
+        const map = L.map(mapRef.current, {
+          center: defaultCenter,
+          zoom: defaultZoom,
+          scrollWheelZoom: true,
+        })
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove())
-    markersRef.current = []
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19,
+        }).addTo(map)
 
-    // Add property markers
-    if (properties.length > 0) {
-      const bounds: [number, number][] = []
+        mapInstanceRef.current = map
+      }
 
-      properties.forEach(property => {
-        const coords = propertyCoordinates.get(property.id)
+      // Clear existing markers
+      markersRef.current.forEach(marker => marker.remove())
+      markersRef.current = []
 
-        if (coords) {
-          bounds.push(coords)
+      // Add property markers
+      if (properties.length > 0) {
+        const bounds: [number, number][] = []
 
-          // Create custom icon with price
-          const priceIconHtml = `
-            <div class="price-marker">
-              <div class="price-tag">
-                ${parseFloat(property.price).toLocaleString()} ${property.currency}
+        properties.forEach(property => {
+          const coords = propertyCoordinates.get(property.id)
+
+          if (coords) {
+            bounds.push(coords)
+
+            // Create custom icon with price
+            const priceIconHtml = `
+              <div class="price-marker">
+                <div class="price-tag">
+                  ${parseFloat(property.price).toLocaleString()} ${property.currency}
+                </div>
+                <div class="price-arrow"></div>
               </div>
-              <div class="price-arrow"></div>
-            </div>
-          `
+            `
 
-          const customIcon = L.divIcon({
-            html: priceIconHtml,
-            className: 'custom-price-marker',
-            iconSize: [120, 40],
-            iconAnchor: [60, 40],
-          })
+            const customIcon = L.divIcon({
+              html: priceIconHtml,
+              className: 'custom-price-marker',
+              iconSize: [120, 40],
+              iconAnchor: [60, 40],
+            })
 
-          const marker = L.marker(coords, { icon: customIcon })
-            .addTo(mapInstanceRef.current!)
+            const marker = L.marker(coords, { icon: customIcon })
+              .addTo(mapInstanceRef.current!)
 
-          // Handle marker click
-          marker.on('click', () => {
-            setSelectedProperty(property)
-          })
+            // Handle marker click
+            marker.on('click', () => {
+              setSelectedProperty(property)
+            })
 
-          markersRef.current.push(marker)
+            markersRef.current.push(marker)
+          }
+        })
+
+        // Fit map to show all markers
+        if (bounds.length > 0 && mapInstanceRef.current) {
+          mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 })
         }
-      })
-
-      // Fit map to show all markers
-      if (bounds.length > 0 && mapInstanceRef.current) {
-        mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 })
       }
     }
 
+    initializeMap()
+
     return () => {
+      isMounted = false
       // Cleanup markers only, not the map instance
       markersRef.current.forEach(marker => marker.remove())
       markersRef.current = []

@@ -22,8 +22,10 @@ module.exports = {
         error: colors.colors.error,
         cameroon: colors.cameroon,
 
-        // Property237 brand colors
-        'property237-primary': '#1ed266',
+        // Property237 brand colors (inspired by modern real estate design)
+        'property237-primary': '#ff291b',    // Red accent from design
+        'property237-dark': '#171717',       // Dark background
+        'property237-light': '#f9f9fa',      // Light background
         'background-light': '#f6f8f7',
         'background-dark': '#112117',
 
@@ -46,10 +48,13 @@ module.exports = {
       },
       fontFamily: {
         ...typography.fontFamily,
-        'display': ['Manrope', 'system-ui', 'sans-serif'],
-        'sans': ['Manrope', 'system-ui', 'sans-serif'],
-        'heading': ['Manrope', 'system-ui', 'sans-serif'],
-        'body': ['Manrope', 'system-ui', 'sans-serif'],
+        // Craftwork Grotesk - For headings, titles, buttons (geometric, bold)
+        'display': ['var(--font-craftwork-grotesk)', 'Craftwork Grotesk', 'system-ui', 'sans-serif'],
+        'heading': ['var(--font-craftwork-grotesk)', 'Craftwork Grotesk', 'system-ui', 'sans-serif'],
+        
+        // DM Sans - For body text, descriptions (humanist, readable)
+        'sans': ['var(--font-body)', 'DM Sans', 'system-ui', 'sans-serif'],
+        'body': ['var(--font-body)', 'DM Sans', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem', fontWeight: '500' }],

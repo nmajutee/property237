@@ -1,9 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from . import views, views_admin
 
 app_name = 'properties'
 
 urlpatterns = [
+    # Category API endpoints (NEW - Cameroon-specific categories)
+    path('', include('properties.category_urls')),
+    
     # Property CRUD
     path('', views.PropertyListCreateAPIView.as_view(), name='property-list-create'),
 

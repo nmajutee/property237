@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
+import { getApiBaseUrl } from '@/services/api'
 import {
   HomeIcon,
   EyeIcon,
@@ -63,7 +64,7 @@ export default function AnalyticsPage() {
 
   const fetchAnalytics = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/analytics/agent/dashboard/', {
+      const response = await fetch(`${getApiBaseUrl()}/analytics/agent/dashboard/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

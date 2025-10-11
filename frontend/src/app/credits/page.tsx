@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { Button } from '../../components/ui/Button'
+import { getApiBaseUrl } from '@/services/api'
 import {
   CreditCardIcon,
   BanknotesIcon,
@@ -47,19 +48,19 @@ export default function CreditsPage() {
       }
 
       // Fetch balance
-      const balanceRes = await fetch('http://localhost:8000/api/credits/balance/', {
+      const balanceRes = await fetch(`${getApiBaseUrl()}/credits/balance/`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const balanceData = await balanceRes.json()
       setBalance(parseFloat(balanceData.balance))
 
       // Fetch packages
-      const packagesRes = await fetch('http://localhost:8000/api/credits/packages/')
+      const packagesRes = await fetch(`${getApiBaseUrl()}/credits/packages/`)
       const packagesData = await packagesRes.json()
       setPackages(packagesData.results || [])
 
       // Fetch transactions
-      const transactionsRes = await fetch('http://localhost:8000/api/credits/transactions/', {
+      const transactionsRes = await fetch(`${getApiBaseUrl()}/credits/transactions/`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const transactionsData = await transactionsRes.json()
@@ -74,7 +75,7 @@ export default function CreditsPage() {
   const handlePurchase = async (packageId: number) => {
     try {
       const token = localStorage.getItem('property237_access_token')
-      const response = await fetch('http://localhost:8000/api/credits/purchase/', {
+      const response = await fetch(`${getApiBaseUrl()}/credits/purchase/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

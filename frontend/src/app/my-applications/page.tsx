@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
+import { getApiBaseUrl } from '@/services/api'
 import {
   ClockIcon,
   CheckCircleIcon,
@@ -48,7 +49,7 @@ export default function MyApplicationsPage() {
 
   const fetchApplications = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/applications/', {
+      const response = await fetch(`${getApiBaseUrl()}/applications/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ export default function MyApplicationsPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/applications/${applicationId}/withdraw/`,
+        `${getApiBaseUrl()}/applications/${applicationId}/withdraw/`,
         {
           method: 'POST',
           headers: {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import { getApiBaseUrl } from '@/services/api';
 
 interface ContractData {
   application_id: number;
@@ -48,7 +49,7 @@ export default function ContractViewPage() {
       }
 
       const response = await fetch(
-        `http://localhost:8000/api/applications/${applicationId}/contract/`,
+        `${getApiBaseUrl()}/applications/${applicationId}/contract/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -84,7 +85,7 @@ export default function ContractViewPage() {
       }
 
       const response = await fetch(
-        `http://localhost:8000/api/applications/${applicationId}/sign-contract/`,
+        `${getApiBaseUrl()}/applications/${applicationId}/sign-contract/`,
         {
           method: 'POST',
           headers: {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '../ui/Button'
+import { getApiBaseUrl } from '@/services/api'
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -64,7 +65,7 @@ export default function Navbar() {
 
   const fetchUserProfile = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/profile/', {
+      const response = await fetch(`${getApiBaseUrl()}/auth/profile/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

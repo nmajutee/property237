@@ -3,7 +3,9 @@
  * Handles user registration, login, and authentication state
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+import { getApiBaseUrl } from './api'
+
+const getAuthApiUrl = () => getApiBaseUrl().replace('/api', '')
 
 export interface RegisterData {
   email: string
@@ -49,7 +51,7 @@ class AuthService {
   }
 
   private async makeRequest(endpoint: string, options: RequestInit = {}): Promise<any> {
-    const url = `${API_BASE_URL}${endpoint}`
+    const url = `${getAuthApiUrl()}${endpoint}`
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

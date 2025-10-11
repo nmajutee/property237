@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
+import { getApiBaseUrl } from '@/services/api'
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid, MapPinIcon, HomeIcon } from '@heroicons/react/24/solid'
 
@@ -42,7 +43,7 @@ export default function MyFavoritesPage() {
 
   const fetchFavorites = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/properties/favorites/', {
+      const response = await fetch(`${getApiBaseUrl()}/properties/favorites/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ export default function MyFavoritesPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/properties/${propertySlug}/favorite/`,
+        `${getApiBaseUrl()}/properties/${propertySlug}/favorite/`,
         {
           method: 'DELETE',
           headers: {

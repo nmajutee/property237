@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { Button } from '../../components/ui/Button'
+import { getApiBaseUrl } from '@/services/api'
 import {
   UserCircleIcon,
   EnvelopeIcon,
@@ -49,7 +50,7 @@ export default function ProfilePage() {
         return
       }
 
-      const response = await fetch('http://localhost:8000/api/auth/profile/', {
+      const response = await fetch(`${getApiBaseUrl()}/auth/profile/`, {
         headers: { Authorization: `Bearer ${token}` }
       })
 
@@ -76,7 +77,7 @@ export default function ProfilePage() {
 
     try {
       const token = localStorage.getItem('property237_access_token')
-      const response = await fetch('http://localhost:8000/api/auth/profile/', {
+      const response = await fetch(`${getApiBaseUrl()}/auth/profile/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

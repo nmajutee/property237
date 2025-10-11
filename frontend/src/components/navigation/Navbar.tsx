@@ -33,10 +33,12 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
+    setMounted(true)
     // Check if user is logged in and fetch fresh data
     const token = localStorage.getItem('property237_access_token')
     const userData = localStorage.getItem('property237_user')

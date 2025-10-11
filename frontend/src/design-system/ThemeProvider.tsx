@@ -34,8 +34,11 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme)
   const [actualTheme, setActualTheme] = useState<'dark' | 'light'>('light')
+  const [mounted, setMounted] = useState(false)
 
+  // Prevent hydration mismatch by only accessing localStorage after mount
   useEffect(() => {
+    setMounted(true)
     // Load theme from localStorage
     const stored = localStorage.getItem(storageKey) as Theme
     if (stored && ['dark', 'light', 'system'].includes(stored)) {
@@ -106,6 +109,11 @@ export function ThemeProvider({
     }),
     [theme, handleThemeChange, actualTheme]
   )
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return <>{children}</>
+  }
 
   return (
     <ThemeProviderContext.Provider value={value}>

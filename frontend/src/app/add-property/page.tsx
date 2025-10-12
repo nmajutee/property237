@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Navbar from '../../components/navigation/Navbar'
 import { Image, X } from 'lucide-react'
 import { getApiBaseUrl } from '@/services/api'
 import PropertyCategorySelector from '@/components/properties/PropertyCategorySelector'
+import DashboardLayout from '../../components/layouts/DashboardLayout'
 
 // Interfaces matching backend models
 interface Category {
@@ -522,32 +522,26 @@ export default function AddPropertyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="flex items-center justify-center h-96">
+      <DashboardLayout
+        pageTitle="Add New Property"
+        pageDescription="Complete all fields to list your property"
+      >
+        <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-property237-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading form...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading form...</p>
           </div>
         </div>
-      </div>
+      </DashboardLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Add New Property
-          </h1>
-          <p className="text-gray-600">
-            Complete all fields to list your property
-          </p>
-        </div>
+    <DashboardLayout
+      pageTitle="Add New Property"
+      pageDescription="Complete all fields to list your property"
+    >
+      <div className="max-w-5xl mx-auto">
 
         {/* Progress Steps */}
         <div className="mb-8">
@@ -1337,7 +1331,7 @@ export default function AddPropertyPage() {
           </div>
         </form>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }
 

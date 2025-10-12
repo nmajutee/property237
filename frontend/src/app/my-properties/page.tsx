@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 
 /**
  * Legacy My Properties Page - Redirects to Dashboard
- * 
+ *
  * This page has been replaced by the new dashboard properties page
  * which uses the consistent DashboardLayout component with sidebar navigation.
- * 
+ *
  * Old route: /my-properties
  * New route: /dashboard/agent/properties
  */

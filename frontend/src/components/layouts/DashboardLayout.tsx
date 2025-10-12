@@ -18,9 +18,11 @@ import { authAPI } from '../../services/api'
 
 interface DashboardLayoutProps {
   children: ReactNode
+  pageTitle?: string
+  pageDescription?: ReactNode
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, pageTitle, pageDescription }: DashboardLayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
@@ -74,13 +76,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-40">
-        <div className="p-6">
+      <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-40 flex flex-col">
+        <div className="p-6 flex-shrink-0">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Property237</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Agent Portal</p>
         </div>
 
-        <nav className="mt-6 px-3 space-y-1">
+        <nav className="flex-1 mt-6 px-3 space-y-1 overflow-y-auto">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -100,9 +102,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <Link href={"/dashboard/agent/settings" as any} className="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors">
-            <div className="h-10 w-10 rounded-full bg-property237-primary/10 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-full bg-property237-primary/10 flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-semibold text-property237-primary">
                 {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
               </span>
@@ -124,10 +126,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="px-8 py-4 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {getGreeting()}, {user?.first_name}!
+                {pageTitle || `${getGreeting()}, ${user?.first_name}!`}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
-                Here's what's happening with your properties today
+                {pageDescription || "Here's what's happening with your properties today"}
               </p>
             </div>
 

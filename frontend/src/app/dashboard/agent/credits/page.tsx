@@ -220,8 +220,8 @@ export default function CreditsPage() {
               <div
                 key={pkg.id}
                 className={`bg-white dark:bg-gray-800 rounded-xl p-6 border-2 transition-all hover:shadow-lg ${
-                  pkg.popular 
-                    ? 'border-property237-primary' 
+                  pkg.popular
+                    ? 'border-property237-primary'
                     : 'border-gray-200 dark:border-gray-700'
                 }`}
               >
@@ -355,7 +355,7 @@ export default function CreditsPage() {
                       </td>
                       <td className="py-4 px-6">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          transaction.status === 'completed' 
+                          transaction.status === 'completed'
                             ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                             : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                         }`}>

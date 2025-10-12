@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Navbar from '../../components/navigation/Navbar'
+import DashboardLayout from '../../components/layouts/DashboardLayout'
 import { getApiBaseUrl } from '@/services/api'
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid, MapPinIcon, HomeIcon } from '@heroicons/react/24/solid'
@@ -88,36 +88,27 @@ export default function MyFavoritesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white dark:bg-gray-800 rounded-lg h-96"></div>
-              ))}
-            </div>
+      <DashboardLayout
+        pageTitle="My Favorite Properties"
+        pageDescription="Properties you've saved for later"
+      >
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-lg h-96"></div>
+            ))}
           </div>
-        </div>
-      </div>
+          </div>
+      </DashboardLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            My Favorite Properties
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Properties you've saved for later
-          </p>
-        </div>
+    <DashboardLayout
+      pageTitle="My Favorite Properties"
+      pageDescription="Properties you've saved for later"
+    >
 
         {/* Favorites Grid */}
         {favorites.length === 0 ? (
@@ -213,7 +204,6 @@ export default function MyFavoritesPage() {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </DashboardLayout>
   )
 }

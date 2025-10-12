@@ -22,15 +22,19 @@ module.exports = {
         error: colors.colors.error,
         cameroon: colors.cameroon,
 
-        // Property237 brand colors (Trust & Professionalism - Most Popular)
-        'property237-primary': '#2563EB',    // Deep Blue - Trust, Stability, Professionalism
-        'property237-primary-dark': '#1E3A8A', // Darker Blue for hover states
-        'property237-secondary': '#6B7280',  // Neutral Gray - Modern, Clean
-        'property237-accent': '#F59E0B',     // Gold/Orange - Warmth, Luxury, CTAs
-        'property237-accent-dark': '#D97706', // Darker Gold for hover
-        'property237-dark': '#111827',       // Dark background
-        'property237-light': '#F3F4F6',      // Neutral Light Gray background
-        'background-light': '#F3F4F6',
+        // Property237 brand colors (Professional Green Scheme - Growth & Trust)
+        'property237-primary': '#059669',    // Emerald 600 - Growth, Trust, Professionalism
+        'property237-primary-light': '#10B981', // Emerald 500 - Bright, energetic
+        'property237-primary-dark': '#047857',  // Emerald 700 - Deep, stable hover
+        'property237-primary-darker': '#065F46', // Emerald 800 - Rich, premium
+        'property237-secondary': '#14B8A6',  // Teal 500 - Fresh, modern complement
+        'property237-secondary-light': '#2DD4BF', // Teal 400 - Vibrant
+        'property237-secondary-dark': '#0D9488',  // Teal 600 - Sophisticated
+        'property237-accent': '#F59E0B',     // Amber 500 - Warmth, Luxury, CTAs
+        'property237-accent-dark': '#D97706', // Amber 600 - Rich hover
+        'property237-dark': '#111827',       // Gray 900 - Dark background
+        'property237-light': '#F9FAFB',      // Gray 50 - Light background
+        'background-light': '#F9FAFB',
         'background-dark': '#111827',
 
         // Theme-aware colors (CSS variables)
@@ -45,12 +49,39 @@ module.exports = {
         ring: 'var(--color-ring)',
 
         // Property-specific colors
-        'property-featured': '#F59E0B',      // Gold - Featured listings
-        'property-premium': '#D97706',       // Darker Gold - Premium properties
-        'property-success': '#10B981',       // Green - Available, Success states
-        'property-urgent': '#DC2626',        // Red - Urgent CTAs only
-        'visitation-pass': '#14B8A6',        // Teal - Visitation features
-        'escrow': '#6366f1',                 // Indigo - Escrow/financial
+        'property-featured': '#F59E0B',      // Amber 500 - Featured listings
+        'property-premium': '#14B8A6',       // Teal 500 - Premium properties
+        'property-available': '#10B981',     // Emerald 500 - Available status
+        'property-success': '#10B981',       // Emerald 500 - Success states
+        'property-urgent': '#DC2626',        // Red 600 - Urgent CTAs only
+        'visitation-pass': '#14B8A6',        // Teal 500 - Visitation features
+        'escrow': '#6366f1',                 // Indigo 500 - Escrow/financial
+
+        // Semantic colors (keeping existing + adding green variants)
+        'emerald': {
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
+        },
+        'teal': {
+          50: '#F0FDFA',
+          100: '#CCFBF1',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0D9488',
+          700: '#0F766E',
+          800: '#115E59',
+          900: '#134E4A',
+        },
       },
       fontFamily: {
         ...typography.fontFamily,

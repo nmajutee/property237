@@ -70,19 +70,40 @@ export default function AgentDashboard() {
     try {
       const profileData = await authAPI.getProfile()
       setUser((profileData as any).user)
-      
-      // TODO: Fetch real stats and properties from API
-      // For now using mock data
-      setStats({
-        totalProperties: 12,
-        activeProperties: 8,
-        totalViews: 2847,
-        totalFavorites: 156,
-        totalApplications: 34,
-        avgRating: 4.8,
-        totalEarnings: 15650000,
-        monthlyEarnings: 2850000,
-      })
+
+      const token = localStorage.getItem('property237_access_token')
+      if (token) {
+        // Fetch agent's properties
+        const propertiesResponse = await fetch('https://property237.onrender.com/api/properties/my-properties/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (propertiesResponse.ok) {
+          const propertiesData = await propertiesResponse.json()
+          const properties = propertiesData.results || propertiesData
+
+          // Set recent properties (limit to 3)
+          setRecentProperties(properties.slice(0, 3))
+
+          // Calculate stats from properties
+          const totalViews = properties.reduce((sum: number, p: any) => sum + (p.views_count || 0), 0)
+          const activeCount = properties.filter((p: any) => p.is_active).length
+
+          setStats({
+            totalProperties: properties.length,
+            activeProperties: activeCount,
+            totalViews: totalViews,
+            totalFavorites: 156, // TODO: Add favorites endpoint
+            totalApplications: 34, // TODO: Add applications endpoint
+            avgRating: 4.8,
+            totalEarnings: 15650000,
+            monthlyEarnings: 2850000,
+          })
+        }
+      }
     } catch (err: any) {
       if (err.response?.status === 401) {
         router.push('/sign-in')
@@ -334,48 +355,60 @@ export default function AgentDashboard() {
           </div>
 
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="h-24 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="text-base font-semibold text-gray-900 dark:text-white">
-                          Modern 3BR Apartment in Douala
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          Bonamoussadi, Douala • 3 beds • 2 baths
+            {recentProperties.length > 0 ? (
+              recentProperties.map((property: any) => (
+                <div key={property.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div className="flex gap-4">
+                    <div className="flex-shrink-0">
+                      <img
+                        src={property.primary_image || property.images?.[0]?.image_url || '/placeholder-property.jpg'}
+                        alt={property.title}
+                        className="h-24 w-32 object-cover rounded-lg bg-gray-200 dark:bg-gray-700"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+                            {property.title}
+                          </h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {property.area?.name}, {property.area?.city?.name} • {property.no_of_bedrooms} beds • {property.no_of_bathrooms} baths
+                          </p>
+                        </div>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          property.is_active
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                        }`}>
+                          {property.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-6 mt-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <EyeIcon className="h-4 w-4" />
+                          <span>{property.views_count || 0} views</span>
+                        </div>
+                        <div className="flex-1"></div>
+                        <p className="text-lg font-bold text-property237-primary">
+                          {parseFloat(property.price).toLocaleString()} {property.currency}
                         </p>
                       </div>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                        Active
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-6 mt-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <EyeIcon className="h-4 w-4" />
-                        <span>245 views</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <HeartIcon className="h-4 w-4" />
-                        <span>12 saves</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <UsersIcon className="h-4 w-4" />
-                        <span>5 applications</span>
-                      </div>
-                      <div className="flex-1"></div>
-                      <p className="text-lg font-bold text-property237-primary">
-                        150,000 XAF
-                      </p>
                     </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="p-12 text-center">
+                <HomeIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-600 dark:text-gray-400">No properties yet</p>
+                <Link href="/add-property">
+                  <button className="mt-4 px-4 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-primary-dark">
+                    Add Your First Property
+                  </button>
+                </Link>
               </div>
-            ))}
+            )}
           </div>
         </div>
 

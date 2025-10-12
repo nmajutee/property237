@@ -21,7 +21,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [profileImage, setProfileImage] = useState<string>('')
-  
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -161,15 +161,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <DashboardLayout>
-      {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Manage your account settings and preferences
-        </p>
-      </div>
-
+    <DashboardLayout
+      pageTitle="Settings"
+      pageDescription="Manage your account settings and preferences"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Settings */}
         <div className="lg:col-span-2 space-y-6">

@@ -97,33 +97,28 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <DashboardLayout>
-      {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Track your property performance and metrics
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <select 
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as any)}
-            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-property237-primary"
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="1y">Last year</option>
-          </select>
-          <button 
-            onClick={loadAnalytics}
-            className="p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <ArrowPathIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          </button>
-        </div>
+    <DashboardLayout
+      pageTitle="Analytics Dashboard"
+      pageDescription="Track your property performance and metrics"
+    >
+      {/* Time Range Filter */}
+      <div className="flex items-center justify-end gap-3 mb-8">
+        <select
+          value={timeRange}
+          onChange={(e) => setTimeRange(e.target.value as any)}
+          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-property237-primary"
+        >
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+          <option value="1y">Last year</option>
+        </select>
+        <button
+          onClick={loadAnalytics}
+          className="p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+        >
+          <ArrowPathIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+        </button>
       </div>
 
       {stats && (
@@ -225,7 +220,7 @@ export default function AnalyticsPage() {
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-green-600 h-2 rounded-full"
                       style={{ width: `${(stats.active_properties / stats.total_properties) * 100}%` }}
                     ></div>
@@ -239,7 +234,7 @@ export default function AnalyticsPage() {
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${(stats.rented_properties / stats.total_properties) * 100}%` }}
                     ></div>
@@ -253,7 +248,7 @@ export default function AnalyticsPage() {
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-property237-accent h-2 rounded-full"
                       style={{ width: `${(stats.available_properties / stats.total_properties) * 100}%` }}
                     ></div>
@@ -277,7 +272,7 @@ export default function AnalyticsPage() {
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-property237-primary h-2 rounded-full"
                         style={{ width: `${(type.count / stats.total_properties) * 100}%` }}
                       ></div>

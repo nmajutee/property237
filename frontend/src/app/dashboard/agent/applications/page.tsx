@@ -295,7 +295,7 @@ export default function ApplicationsPage() {
               No Applications Found
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {filter === 'all' 
+              {filter === 'all'
                 ? "You don't have any applications yet"
                 : `No ${filter} applications`}
             </p>

@@ -44,10 +44,10 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [deleteModal, setDeleteModal] = useState<{ show: boolean; slug: string; title: string }>({ 
-    show: false, 
-    slug: '', 
-    title: '' 
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; slug: string; title: string }>({
+    show: false,
+    slug: '',
+    title: ''
   })
   const [deleting, setDeleting] = useState(false)
 
@@ -109,14 +109,14 @@ export default function PropertiesPage() {
   }
 
   const filteredProperties = properties.filter(property => {
-    const matchesFilter = filter === 'all' || 
+    const matchesFilter = filter === 'all' ||
       (filter === 'active' && property.is_active) ||
       (filter === 'inactive' && !property.is_active) ||
       (filter === 'featured' && property.featured)
-    
+
     const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     return matchesFilter && matchesSearch
   })
 
@@ -138,24 +138,14 @@ export default function PropertiesPage() {
   }
 
   return (
-    <DashboardLayout>
-      {/* Page Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Properties</h1>
-          <Link href="/properties">
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium text-sm transition-colors">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              View Public Properties Page
-            </button>
-          </Link>
-        </div>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage your property listings • <Link href="/properties" className="text-property237-primary hover:underline text-sm">Preview how your properties appear to the public</Link>
-        </p>
-      </div>
+    <DashboardLayout
+      pageTitle="My Properties"
+      pageDescription={
+        <>
+          Manage your property listings • <Link href="/properties" className="text-property237-primary hover:underline">Preview how your properties appear to the public</Link>
+        </>
+      }
+    >
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -260,8 +250,8 @@ export default function PropertiesPage() {
                     </span>
                   )}
                   <span className={`absolute top-2 left-2 px-2 py-1 text-xs font-semibold rounded ${
-                    property.is_active 
-                      ? 'bg-green-500 text-white' 
+                    property.is_active
+                      ? 'bg-green-500 text-white'
                       : 'bg-gray-500 text-white'
                   }`}>
                     {property.is_active ? 'Active' : 'Inactive'}

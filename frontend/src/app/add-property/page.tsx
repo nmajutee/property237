@@ -476,9 +476,9 @@ export default function AddPropertyPage() {
         const imageText = images.length > 0 ? ` with ${images.length} image${images.length > 1 ? 's' : ''}` : ''
         setSuccessMessage(`Property "${data.title}" has been successfully published${imageText}!`)
 
-        // Redirect to my properties page after 2 seconds
+        // Redirect to dashboard properties page after 2 seconds
         setTimeout(() => {
-          router.push('/my-properties')
+          router.push('/dashboard/agent/properties' as any)
         }, 2500)
       } else {
         // Check if response is JSON before parsing

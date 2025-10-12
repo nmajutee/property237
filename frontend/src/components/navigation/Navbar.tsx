@@ -117,10 +117,10 @@ export default function Navbar() {
   // Agent navbar
   const agentLinks = [
     { href: '/dashboard/agent', label: 'Dashboard' },
-    { href: '/my-properties', label: 'My Listings' },
-    { href: '/properties', label: 'Properties' },
+    { href: '/dashboard/agent/properties', label: 'My Listings' },
+    { href: '/properties', label: 'Browse Properties' },
     { href: '/my-clients', label: 'Clients' },
-    { href: '/analytics', label: 'Analytics' }
+    { href: '/dashboard/agent/analytics', label: 'Analytics' }
   ]
 
   // Admin navbar

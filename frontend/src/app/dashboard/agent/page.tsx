@@ -153,7 +153,7 @@ export default function AgentDashboard() {
             <ChartBarIcon className="h-5 w-5" />
             Dashboard
           </Link>
-          <Link href="/my-properties" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href={"/dashboard/agent/properties" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <HomeIcon className="h-5 w-5" />
             My Properties
           </Link>
@@ -327,7 +327,7 @@ export default function AgentDashboard() {
                   Your most recent listings
                 </p>
               </div>
-              <Link href="/my-properties" className="text-sm font-medium text-property237-primary hover:underline">
+              <Link href={"/dashboard/agent/properties" as any} className="text-sm font-medium text-property237-primary hover:underline">
                 View all
               </Link>
             </div>

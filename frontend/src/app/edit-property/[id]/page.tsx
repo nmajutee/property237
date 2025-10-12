@@ -644,9 +644,9 @@ export default function EditPropertyPage() {
         const imageText = images.length > 0 ? ` with ${images.length} new image${images.length > 1 ? 's' : ''}` : ''
         setSuccessMessage(`Property "${data.title}" has been successfully updated${imageText}!`)
 
-        // Redirect to my properties page after 2 seconds
+        // Redirect to dashboard properties page after 2 seconds
         setTimeout(() => {
-          router.push('/my-properties')
+          router.push('/dashboard/agent/properties' as any)
         }, 2500)
       } else {
         // Check if response is JSON before parsing
@@ -710,7 +710,7 @@ export default function EditPropertyPage() {
         {/* Header */}
         <div className="mb-8">
           <Link
-            href="/my-properties"
+            href={"/dashboard/agent/properties" as any}
             className="inline-flex items-center text-green-600 hover:text-green-700 mb-4 font-medium"
           >
             <ArrowLeftIcon className="h-5 w-5 mr-2" />

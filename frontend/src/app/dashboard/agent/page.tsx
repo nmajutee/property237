@@ -180,7 +180,7 @@ export default function AgentDashboard() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
+          <Link href={"/dashboard/agent/settings" as any} className="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors">
             <div className="h-10 w-10 rounded-full bg-property237-primary/10 flex items-center justify-center">
               <span className="text-sm font-semibold text-property237-primary">
                 {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
@@ -192,7 +192,7 @@ export default function AgentDashboard() {
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
             </div>
-          </div>
+          </Link>
         </div>
       </aside>
 
@@ -411,11 +411,15 @@ export default function AgentDashboard() {
                 <PlusCircleIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">Add New Property</span>
               </Link>
-              <Link href="/my-applications" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Link href="/properties" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                <HomeIcon className="h-5 w-5 text-property237-primary" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">Browse All Properties</span>
+              </Link>
+              <Link href={"/dashboard/agent/applications" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <UsersIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">View Applications</span>
               </Link>
-              <Link href="/analytics" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Link href={"/dashboard/agent/analytics" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <ChartBarIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">View Analytics</span>
               </Link>

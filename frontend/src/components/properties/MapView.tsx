@@ -406,7 +406,7 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
 
       <div className="relative">
         <div ref={mapRef} className={`${height} w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg`} />
-        
+
         {/* Map Info Badge */}
         {!loading && properties.length > 0 && (
           <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[500]">

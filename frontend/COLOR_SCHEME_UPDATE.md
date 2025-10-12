@@ -14,7 +14,7 @@
   - Used for: Secondary text, borders, subtle backgrounds
   - Light variant: `#F3F4F6` for backgrounds
 
-- **Accent Gold/Orange**: `#F59E0B` 
+- **Accent Gold/Orange**: `#F59E0B`
   - Purpose: Warmth, luxury, call-to-action emphasis
   - Used for: Featured properties, highlights, important CTAs
   - Hover: `#D97706` (Darker gold)

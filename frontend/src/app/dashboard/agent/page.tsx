@@ -411,9 +411,9 @@ export default function AgentDashboard() {
                 <PlusCircleIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">Add New Property</span>
               </Link>
-              <Link href="/properties" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Link href={"/dashboard/agent/properties" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <HomeIcon className="h-5 w-5 text-property237-primary" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Browse All Properties</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">View All Properties</span>
               </Link>
               <Link href={"/dashboard/agent/applications" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <UsersIcon className="h-5 w-5 text-property237-primary" />

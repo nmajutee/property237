@@ -5,13 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   HomeIcon,
-  ChartBarIcon,
-  UsersIcon,
-  CreditCardIcon,
-  Cog6ToothIcon,
-  ArrowTrendingUpIcon,
-  ChatBubbleLeftIcon,
-  PlusCircleIcon,
   MagnifyingGlassIcon,
   EyeIcon,
   HeartIcon,
@@ -20,6 +13,7 @@ import {
   FunnelIcon,
 } from '@heroicons/react/24/outline'
 import { authAPI, getApiBaseUrl } from '../../../../services/api'
+import DashboardLayout from '../../../../components/layouts/DashboardLayout'
 
 interface Property {
   id: number
@@ -46,7 +40,6 @@ interface Property {
 
 export default function PropertiesPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
@@ -64,9 +57,6 @@ export default function PropertiesPage() {
 
   const loadProperties = async () => {
     try {
-      const profileData = await authAPI.getProfile()
-      setUser((profileData as any).user)
-
       const token = localStorage.getItem('property237_access_token')
       if (token) {
         const response = await fetch(`${getApiBaseUrl()}/properties/my-properties/`, {
@@ -139,86 +129,33 @@ export default function PropertiesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-property237-primary"></div>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-property237-primary"></div>
+        </div>
+      </DashboardLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-40">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Property237</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Agent Portal</p>
-        </div>
-
-        <nav className="mt-6 px-3 space-y-1">
-          <Link href="/dashboard/agent" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <ChartBarIcon className="h-5 w-5" />
-            Dashboard
-          </Link>
-          <Link href={"/dashboard/agent/properties" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-property237-primary/10 text-property237-primary font-medium">
-            <HomeIcon className="h-5 w-5" />
-            My Properties
-          </Link>
-          <Link href={"/dashboard/agent/applications" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <UsersIcon className="h-5 w-5" />
-            Applications
-          </Link>
-          <Link href={"/dashboard/agent/analytics" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <ArrowTrendingUpIcon className="h-5 w-5" />
-            Analytics
-          </Link>
-          <Link href={"/dashboard/agent/credits" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <CreditCardIcon className="h-5 w-5" />
-            Credits
-          </Link>
-          <Link href={"/dashboard/agent/messages" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <ChatBubbleLeftIcon className="h-5 w-5" />
-            Messages
-          </Link>
-          <Link href={"/dashboard/agent/settings" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <Cog6ToothIcon className="h-5 w-5" />
-            Settings
-          </Link>
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
-          <Link href={"/dashboard/agent/settings" as any} className="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors">
-            <div className="h-10 w-10 rounded-full bg-property237-primary/10 flex items-center justify-center">
-              <span className="text-sm font-semibold text-property237-primary">
-                {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                {user?.first_name} {user?.last_name}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
-            </div>
-          </Link>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="ml-64 p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Properties</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Manage your property listings
-            </p>
-          </div>
-          <Link href="/add-property">
-            <button className="flex items-center gap-2 px-6 py-3 bg-property237-primary text-white rounded-lg hover:bg-property237-primary-dark font-medium transition-colors">
-              <PlusCircleIcon className="h-5 w-5" />
-              Add Property
+    <DashboardLayout>
+      {/* Page Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Properties</h1>
+          <Link href="/properties">
+            <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium text-sm transition-colors">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              View Public Properties Page
             </button>
           </Link>
         </div>
+        <p className="text-gray-600 dark:text-gray-400">
+          Manage your property listings • <Link href="/properties" className="text-property237-primary hover:underline text-sm">Preview how your properties appear to the public</Link>
+        </p>
+      </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -389,7 +326,6 @@ export default function PropertiesPage() {
             ))}
           </div>
         )}
-      </main>
 
       {/* Delete Modal */}
       {deleteModal.show && (
@@ -418,7 +354,7 @@ export default function PropertiesPage() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   )
 }
 

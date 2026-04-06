@@ -88,16 +88,12 @@ class APIClient {
     const baseUrl = getApiBaseUrl();
     const url = `${baseUrl}${endpoint}`;
 
-    // Debug logging
-    console.log('[API Debug] Base URL:', baseUrl);
-    console.log('[API Debug] Full URL:', url);
-    console.log('[API Debug] Endpoint:', endpoint);
-    console.log('[API Debug] Window location:', typeof window !== 'undefined' ? window.location.hostname : 'server-side');
-
     const accessToken = tokenService.getAccessToken();
 
+    const isFormData = options.body instanceof FormData;
+
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(options.headers as Record<string, string>),
     };
 
@@ -243,6 +239,20 @@ class APIClient {
 
   delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: 'DELETE' });
+  }
+
+  upload<T>(endpoint: string, formData: FormData): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  uploadPatch<T>(endpoint: string, formData: FormData): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: formData,
+    });
   }
 }
 

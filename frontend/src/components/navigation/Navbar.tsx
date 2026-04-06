@@ -111,7 +111,10 @@ export default function Navbar() {
     { href: '/properties', label: 'Buy' },
     { href: '/properties?type=rent', label: 'Rent' },
     { href: '/my-favorites', label: 'Favorites' },
-    { href: '/my-applications', label: 'Applications' }
+    { href: '/my-applications', label: 'Applications' },
+    { href: '/chat', label: 'Messages' },
+    { href: '/payments', label: 'Payments' },
+    { href: '/notifications', label: 'Notifications' }
   ]
 
   // Agent navbar
@@ -119,18 +122,20 @@ export default function Navbar() {
     { href: '/dashboard/agent', label: 'Dashboard' },
     { href: '/dashboard/agent/properties', label: 'My Listings' },
     { href: '/properties', label: 'Browse Properties' },
-    { href: '/my-clients', label: 'Clients' },
-    { href: '/dashboard/agent/analytics', label: 'Analytics' }
+    { href: '/chat', label: 'Messages' },
+    { href: '/dashboard/agent/analytics', label: 'Analytics' },
+    { href: '/payments', label: 'Payments' },
+    { href: '/notifications', label: 'Notifications' }
   ]
 
   // Admin navbar
   const adminLinks = [
-    { href: '/admin/dashboard', label: 'Dashboard' },
-    { href: '/admin/users', label: 'Users' },
-    { href: '/admin/properties', label: 'Properties' },
-    { href: '/admin/agents', label: 'Agents' },
-    { href: '/admin/transactions', label: 'Transactions' },
-    { href: '/admin/analytics', label: 'Analytics' }
+    { href: '/dashboard/admin', label: 'Dashboard' },
+    { href: '/properties', label: 'Properties' },
+    { href: '/agents', label: 'Agents' },
+    { href: '/payments', label: 'Payments' },
+    { href: '/analytics', label: 'Analytics' },
+    { href: '/notifications', label: 'Notifications' }
   ]
 
   const getNavLinks = () => {

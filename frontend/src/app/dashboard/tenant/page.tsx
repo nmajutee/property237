@@ -15,51 +15,50 @@ import {
   CheckCircleIcon,
   CalendarIcon,
   ChatBubbleLeftIcon,
+  WrenchScrewdriverIcon,
+  CreditCardIcon,
+  DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline'
 import { authAPI } from '../../../services/api'
-
-interface TenantStats {
-  savedProperties: number
-  activeApplications: number
-  scheduledViewings: number
-  messagesUnread: number
-}
+import { useTenantDashboard } from '@/hooks/useAnalytics'
+import { useTenantApplications } from '@/hooks/useTenants'
+import { useFavorites } from '@/hooks/useProperties'
+import { useChatUnreadCount } from '@/hooks/useChat'
+import { useUnreadNotificationCount } from '@/hooks/useNotifications'
 
 export default function TenantDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [stats, setStats] = useState<TenantStats>({
-    savedProperties: 0,
-    activeApplications: 0,
-    scheduledViewings: 0,
-    messagesUnread: 0,
-  })
-  const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(true)
+
+  const { data: dashboardStats, isLoading: statsLoading } = useTenantDashboard()
+  const { data: applicationsData, isLoading: appsLoading } = useTenantApplications()
+  const { data: favoritesData, isLoading: favsLoading } = useFavorites()
+  const { data: chatUnread } = useChatUnreadCount()
+  const { data: notifUnread } = useUnreadNotificationCount()
+
+  const applications = (applicationsData as any)?.results ?? (applicationsData as any) ?? []
+  const favorites = (favoritesData as any)?.results ?? (favoritesData as any) ?? []
+  const unreadMessages = (chatUnread as any)?.unread_count ?? 0
+  const unreadNotifications = (notifUnread as any)?.unread_count ?? 0
 
   useEffect(() => {
-    loadDashboardData()
-  }, [])
-
-  const loadDashboardData = async () => {
-    try {
-      const profileData = await authAPI.getProfile()
-      setUser((profileData as any).user)
-      
-      // TODO: Fetch real data from API
-      setStats({
-        savedProperties: 8,
-        activeApplications: 3,
-        scheduledViewings: 2,
-        messagesUnread: 5,
-      })
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        router.push('/sign-in')
+    const loadProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile()
+        setUser((profileData as any).user || profileData)
+      } catch (err: any) {
+        if (err.response?.status === 401) {
+          router.push('/sign-in')
+        }
+      } finally {
+        setProfileLoading(false)
       }
-    } finally {
-      setLoading(false)
     }
-  }
+    loadProfile()
+  }, [router])
+
+  const loading = profileLoading || statsLoading
 
   if (loading) {
     return (
@@ -69,10 +68,15 @@ export default function TenantDashboard() {
     )
   }
 
+  const stats = dashboardStats as any
+  const favoriteCount = stats?.favorite_properties ?? favorites.length
+  const totalApplications = stats?.total_applications ?? applications.length
+  const pendingApplications = stats?.pending_applications ?? 0
+
   const statCards = [
     {
       label: 'Saved Properties',
-      value: stats.savedProperties.toString(),
+      value: favoriteCount.toString(),
       subtext: 'Favorites',
       icon: HeartIcon,
       color: 'bg-red-50 dark:bg-red-900/20 text-red-600',
@@ -80,29 +84,41 @@ export default function TenantDashboard() {
     },
     {
       label: 'Applications',
-      value: stats.activeApplications.toString(),
-      subtext: 'In progress',
+      value: totalApplications.toString(),
+      subtext: `${pendingApplications} pending`,
       icon: DocumentTextIcon,
       color: 'bg-blue-50 dark:bg-blue-900/20 text-property237-primary',
       link: '/my-applications',
     },
     {
-      label: 'Scheduled Visits',
-      value: stats.scheduledViewings.toString(),
-      subtext: 'Upcoming',
-      icon: CalendarIcon,
+      label: 'Approved',
+      value: (stats?.approved_applications ?? 0).toString(),
+      subtext: `${stats?.rejected_applications ?? 0} rejected`,
+      icon: CheckCircleIcon,
       color: 'bg-green-50 dark:bg-green-900/20 text-green-600',
       link: '/my-applications',
     },
     {
       label: 'Messages',
-      value: stats.messagesUnread.toString(),
+      value: unreadMessages.toString(),
       subtext: 'Unread',
       icon: ChatBubbleLeftIcon,
       color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600',
       link: '/chat',
     },
   ]
+
+  const recentApplications = stats?.recent_applications ?? applications.slice(0, 5)
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'submitted': return { color: 'yellow', label: 'Under Review', Icon: ClockIcon }
+      case 'approved': return { color: 'green', label: 'Approved', Icon: CheckCircleIcon }
+      case 'rejected': return { color: 'red', label: 'Rejected', Icon: DocumentTextIcon }
+      case 'withdrawn': return { color: 'gray', label: 'Withdrawn', Icon: DocumentDuplicateIcon }
+      default: return { color: 'blue', label: status, Icon: ClockIcon }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark">
@@ -125,31 +141,52 @@ export default function TenantDashboard() {
           <Link href="/my-favorites" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <HeartIcon className="h-5 w-5" />
             My Favorites
-            {stats.savedProperties > 0 && (
+            {favoriteCount > 0 && (
               <span className="ml-auto bg-red-100 text-red-600 text-xs font-medium px-2 py-0.5 rounded-full">
-                {stats.savedProperties}
+                {favoriteCount}
               </span>
             )}
           </Link>
           <Link href="/my-applications" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <DocumentTextIcon className="h-5 w-5" />
             My Applications
-            {stats.activeApplications > 0 && (
+            {pendingApplications > 0 && (
               <span className="ml-auto bg-blue-100 text-blue-600 text-xs font-medium px-2 py-0.5 rounded-full">
-                {stats.activeApplications}
+                {pendingApplications}
               </span>
             )}
           </Link>
-          <Link href={"/chat" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href="/chat" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <ChatBubbleLeftIcon className="h-5 w-5" />
             Messages
-            {stats.messagesUnread > 0 && (
+            {unreadMessages > 0 && (
               <span className="ml-auto bg-purple-100 text-purple-600 text-xs font-medium px-2 py-0.5 rounded-full">
-                {stats.messagesUnread}
+                {unreadMessages}
               </span>
             )}
           </Link>
-          <Link href={"/settings" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Link href="/leases" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <DocumentDuplicateIcon className="h-5 w-5" />
+            Leases
+          </Link>
+          <Link href="/maintenance" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <WrenchScrewdriverIcon className="h-5 w-5" />
+            Maintenance
+          </Link>
+          <Link href="/payments" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <CreditCardIcon className="h-5 w-5" />
+            Payments
+          </Link>
+          <Link href="/notifications" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <BellIcon className="h-5 w-5" />
+            Notifications
+            {unreadNotifications > 0 && (
+              <span className="ml-auto bg-red-100 text-red-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                {unreadNotifications}
+              </span>
+            )}
+          </Link>
+          <Link href="/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <Cog6ToothIcon className="h-5 w-5" />
             Settings
           </Link>
@@ -178,19 +215,19 @@ export default function TenantDashboard() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Hi {user?.first_name}, find your dream home! 🏡
+              Hi {user?.first_name}, find your dream home!
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               Track your applications and discover new properties
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
+            <Link href="/notifications" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
               <BellIcon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              {stats.messagesUnread > 0 && (
+              {unreadNotifications > 0 && (
                 <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
               )}
-            </button>
+            </Link>
             <Link href="/properties">
               <button className="flex items-center gap-2 px-4 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-primary-dark font-medium">
                 <MagnifyingGlassIcon className="h-5 w-5" />
@@ -228,33 +265,42 @@ export default function TenantDashboard() {
 
         {/* Application Status */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Active Applications */}
+          {/* Recent Applications */}
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Active Applications</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Applications</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Track your application progress</p>
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {[
-                { property: '3BR Apartment, Bonamoussadi', status: 'Under Review', color: 'yellow', icon: ClockIcon },
-                { property: '2BR House, Akwa', status: 'Approved', color: 'green', icon: CheckCircleIcon },
-                { property: 'Studio, Bonapriso', status: 'Interview Scheduled', color: 'blue', icon: CalendarIcon },
-              ].map((app, i) => (
-                <div key={i} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">{app.property}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <app.icon className={`h-4 w-4 text-${app.color}-500`} />
-                        <span className={`text-xs font-medium text-${app.color}-600 dark:text-${app.color}-400`}>
-                          {app.status}
-                        </span>
+              {appsLoading ? (
+                <div className="p-8 text-center text-gray-500">Loading...</div>
+              ) : recentApplications.length === 0 ? (
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  No applications yet. Start browsing properties!
+                </div>
+              ) : (
+                recentApplications.slice(0, 5).map((app: any, i: number) => {
+                  const { color, label, Icon } = getStatusStyle(app.status)
+                  return (
+                    <div key={app.id ?? i} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                            {app.property__title || app.property?.title || 'Property Application'}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Icon className={`h-4 w-4 text-${color}-500`} />
+                            <span className={`text-xs font-medium text-${color}-600 dark:text-${color}-400`}>
+                              {label}
+                            </span>
+                          </div>
+                        </div>
+                        <Link href="/my-applications" className="text-sm text-property237-primary hover:underline">View</Link>
                       </div>
                     </div>
-                    <button className="text-sm text-property237-primary hover:underline">View</button>
-                  </div>
-                </div>
-              ))}
+                  )
+                })
+              )}
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700/50">
               <Link href="/my-applications" className="text-sm font-medium text-property237-primary hover:underline">
@@ -263,86 +309,49 @@ export default function TenantDashboard() {
             </div>
           </div>
 
-          {/* Upcoming Viewings */}
+          {/* Saved Properties Preview */}
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Upcoming Viewings</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your scheduled property visits</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Saved Properties</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your favorite listings</p>
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {[
-                { property: 'Luxury Villa, Bastos', date: 'Tomorrow', time: '10:00 AM', agent: 'John Doe' },
-                { property: 'Modern Apartment, Bonapriso', date: 'Oct 15', time: '2:00 PM', agent: 'Jane Smith' },
-              ].map((viewing, i) => (
-                <div key={i} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">{viewing.property}</h4>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <CalendarIcon className="h-4 w-4" />
-                          <span>{viewing.date}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <ClockIcon className="h-4 w-4" />
-                          <span>{viewing.time}</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Agent: {viewing.agent}</p>
-                    </div>
-                    <button className="text-sm text-property237-primary hover:underline">Details</button>
-                  </div>
+              {favsLoading ? (
+                <div className="p-8 text-center text-gray-500">Loading...</div>
+              ) : favorites.length === 0 ? (
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  No favorites yet. Browse properties and save your picks!
                 </div>
-              ))}
+              ) : (
+                favorites.slice(0, 4).map((prop: any, i: number) => (
+                  <div key={prop.id ?? prop.slug ?? i} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white">{prop.title}</h4>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          <MapPinIcon className="h-3 w-3" />
+                          <span>{prop.location || prop.city || prop.area || 'Cameroon'}</span>
+                        </div>
+                        <p className="text-sm font-bold text-property237-primary mt-1">
+                          {Number(prop.price).toLocaleString()} XAF
+                        </p>
+                      </div>
+                      <HeartIcon className="h-5 w-5 text-red-500 fill-red-500 flex-shrink-0" />
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700/50">
-              <button className="text-sm font-medium text-property237-primary hover:underline">
-                View calendar →
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Saved Properties */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Saved Properties</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your favorite listings</p>
-              </div>
               <Link href="/my-favorites" className="text-sm font-medium text-property237-primary hover:underline">
-                View all
+                View all favorites →
               </Link>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="group cursor-pointer">
-                <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 group-hover:scale-105 transition-transform"></div>
-                </div>
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-property237-primary">
-                    Modern 3BR Apartment
-                  </h4>
-                  <HeartIcon className="h-5 w-5 text-red-500 fill-red-500 flex-shrink-0" />
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  <MapPinIcon className="h-4 w-4" />
-                  <span>Bonamoussadi, Douala</span>
-                </div>
-                <p className="text-lg font-bold text-property237-primary">
-                  150,000 XAF<span className="text-sm font-normal text-gray-500">/month</span>
-                </p>
-              </div>
-            ))}
           </div>
         </div>
 
         {/* Recommendations */}
-        <div className="mt-8 bg-gradient-to-r from-property237-primary to-property237-primary-dark rounded-xl p-8 text-white">
+        <div className="bg-gradient-to-r from-property237-primary to-property237-primary-dark rounded-xl p-8 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-2xl font-bold mb-2">Discover Your Perfect Home</h3>

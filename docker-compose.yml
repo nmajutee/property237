@@ -12,19 +12,55 @@ services:
     ports:
       - "5433:5432"
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   web:
     build: ./backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
-      - ./backend/media:/app/media  # Local media storage
+      - ./backend/media:/app/media
     ports:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     environment:
       - DEBUG=1
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/property237_db
+      - REDIS_URL=redis://redis:6379/0
+
+  celery_worker:
+    build: ./backend
+    command: celery -A config worker -l info --concurrency=2
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/property237_db
+      - REDIS_URL=redis://redis:6379/0
+
+  celery_beat:
+    build: ./backend
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/property237_db
+      - REDIS_URL=redis://redis:6379/0
 
 volumes:
   postgres_data:
+  redis_data:

@@ -55,6 +55,8 @@ export default function DashboardLayout({ children, pageTitle, pageDescription }
     { name: 'Analytics', href: '/dashboard/agent/analytics', icon: ArrowTrendingUpIcon },
     { name: 'Credits', href: '/dashboard/agent/credits', icon: CreditCardIcon },
     { name: 'Messages', href: '/dashboard/agent/messages', icon: ChatBubbleLeftIcon },
+    { name: 'Payments', href: '/payments', icon: CreditCardIcon },
+    { name: 'Notifications', href: '/notifications', icon: BellIcon },
     { name: 'Settings', href: '/dashboard/agent/settings', icon: Cog6ToothIcon },
   ]
 

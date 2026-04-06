@@ -20,6 +20,10 @@ import {
   ChatBubbleLeftIcon,
 } from '@heroicons/react/24/outline'
 import { authAPI } from '../../../services/api'
+import { useAgentDashboard } from '@/hooks/useAnalytics'
+import { useMyProperties } from '@/hooks/useProperties'
+import { useChatUnreadCount } from '@/hooks/useChat'
+import { useUnreadNotificationCount } from '@/hooks/useNotifications'
 
 interface DashboardStats {
   totalProperties: number
@@ -49,69 +53,47 @@ interface Property {
 export default function AgentDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [stats, setStats] = useState<DashboardStats>({
-    totalProperties: 0,
-    activeProperties: 0,
-    totalViews: 0,
+  const [profileLoading, setProfileLoading] = useState(true)
+
+  const { data: dashboardData, isLoading: statsLoading } = useAgentDashboard()
+  const { data: propertiesData } = useMyProperties()
+  const { data: chatUnread } = useChatUnreadCount()
+  const { data: notifUnread } = useUnreadNotificationCount()
+
+  const apiStats = dashboardData as any
+  const allProperties = (propertiesData as any)?.results ?? (propertiesData as any) ?? []
+  const recentProperties = apiStats?.recent_properties ?? allProperties.slice(0, 3)
+  const unreadMessages = (chatUnread as any)?.unread_count ?? 0
+  const unreadNotifications = (notifUnread as any)?.unread_count ?? 0
+
+  const stats: DashboardStats = {
+    totalProperties: apiStats?.total_properties ?? allProperties.length,
+    activeProperties: apiStats?.active_properties ?? allProperties.filter((p: any) => p.is_active).length,
+    totalViews: apiStats?.total_views ?? 0,
     totalFavorites: 0,
-    totalApplications: 0,
-    avgRating: 4.8,
+    totalApplications: apiStats?.total_applications ?? 0,
+    avgRating: 0,
     totalEarnings: 0,
     monthlyEarnings: 0,
-  })
-  const [recentProperties, setRecentProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
+  }
 
   useEffect(() => {
-    loadDashboardData()
-  }, [])
-
-  const loadDashboardData = async () => {
-    try {
-      const profileData = await authAPI.getProfile()
-      setUser((profileData as any).user)
-
-      const token = localStorage.getItem('property237_access_token')
-      if (token) {
-        // Fetch agent's properties
-        const propertiesResponse = await fetch('https://property237.onrender.com/api/properties/my-properties/', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (propertiesResponse.ok) {
-          const propertiesData = await propertiesResponse.json()
-          const properties = propertiesData.results || propertiesData
-
-          // Set recent properties (limit to 3)
-          setRecentProperties(properties.slice(0, 3))
-
-          // Calculate stats from properties
-          const totalViews = properties.reduce((sum: number, p: any) => sum + (p.views_count || 0), 0)
-          const activeCount = properties.filter((p: any) => p.is_active).length
-
-          setStats({
-            totalProperties: properties.length,
-            activeProperties: activeCount,
-            totalViews: totalViews,
-            totalFavorites: 156, // TODO: Add favorites endpoint
-            totalApplications: 34, // TODO: Add applications endpoint
-            avgRating: 4.8,
-            totalEarnings: 15650000,
-            monthlyEarnings: 2850000,
-          })
+    const loadProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile()
+        setUser((profileData as any).user || profileData)
+      } catch (err: any) {
+        if (err.response?.status === 401) {
+          router.push('/sign-in')
         }
+      } finally {
+        setProfileLoading(false)
       }
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        router.push('/sign-in')
-      }
-    } finally {
-      setLoading(false)
     }
-  }
+    loadProfile()
+  }, [router])
+
+  const loading = profileLoading || statsLoading
 
   if (loading) {
     return (
@@ -127,35 +109,31 @@ export default function AgentDashboard() {
       value: stats.totalProperties.toString(),
       subtext: `${stats.activeProperties} active`,
       icon: HomeIcon,
-      change: '+12%',
-      trend: 'up',
+      change: `+${apiStats?.new_properties_30d ?? 0} this month`,
       color: 'bg-blue-50 dark:bg-blue-900/20 text-property237-primary',
     },
     {
       label: 'Total Views',
       value: stats.totalViews.toLocaleString(),
-      subtext: 'Last 30 days',
+      subtext: 'All time',
       icon: EyeIcon,
-      change: '+23%',
-      trend: 'up',
+      change: '',
       color: 'bg-green-50 dark:bg-green-900/20 text-green-600',
     },
     {
       label: 'Applications',
       value: stats.totalApplications.toString(),
-      subtext: `${stats.totalFavorites} favorites`,
+      subtext: `${apiStats?.pending_applications ?? 0} pending`,
       icon: UsersIcon,
-      change: '+8%',
-      trend: 'up',
+      change: `+${apiStats?.new_applications_30d ?? 0} this month`,
       color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600',
     },
     {
-      label: 'Monthly Earnings',
-      value: `${(stats.monthlyEarnings / 1000).toFixed(0)}K`,
-      subtext: 'XAF',
-      icon: CurrencyDollarIcon,
-      change: '+15%',
-      trend: 'up',
+      label: 'Messages',
+      value: unreadMessages.toString(),
+      subtext: 'Unread',
+      icon: ChatBubbleLeftIcon,
+      change: '',
       color: 'bg-amber-50 dark:bg-amber-900/20 text-property237-accent',
     },
   ]
@@ -194,6 +172,14 @@ export default function AgentDashboard() {
             <ChatBubbleLeftIcon className="h-5 w-5" />
             Messages
           </Link>
+          <Link href={"/payments" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <CreditCardIcon className="h-5 w-5" />
+            Payments
+          </Link>
+          <Link href={"/notifications" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <BellIcon className="h-5 w-5" />
+            Notifications
+          </Link>
           <Link href={"/settings" as any} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <Cog6ToothIcon className="h-5 w-5" />
             Settings
@@ -230,10 +216,12 @@ export default function AgentDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
+            <Link href="/notifications" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
               <BellIcon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-            </button>
+              {unreadNotifications > 0 && (
+                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              )}
+            </Link>
             <Link href="/add-property">
               <button className="flex items-center gap-2 px-4 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-primary-dark font-medium">
                 <PlusCircleIcon className="h-5 w-5" />
@@ -258,17 +246,14 @@ export default function AgentDashboard() {
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {stat.subtext}
                   </p>
-                  <div className="flex items-center gap-1 mt-2">
-                    {stat.trend === 'up' ? (
+                  {stat.change && (
+                    <div className="flex items-center gap-1 mt-2">
                       <ArrowTrendingUpIcon className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <ArrowTrendingDownIcon className="h-4 w-4 text-red-500" />
-                    )}
-                    <span className={`text-xs font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                      {stat.change}
-                    </span>
-                    <span className="text-xs text-gray-500">vs last month</span>
-                  </div>
+                      <span className="text-xs font-medium text-green-600">
+                        {stat.change}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className={`p-3 rounded-lg ${stat.color}`}>
                   <stat.icon className="h-6 w-6" />
@@ -278,62 +263,57 @@ export default function AgentDashboard() {
           ))}
         </div>
 
-        {/* Charts Row */}
+        {/* Property Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Views Chart */}
+          {/* Properties by Type */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Property Views</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
-              </div>
-              <select className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm">
-                <option>Last 30 days</option>
-                <option>Last 7 days</option>
-                <option>Last year</option>
-              </select>
-            </div>
-            <div className="h-64 flex items-end justify-between gap-2">
-              {[...Array(30)].map((_, i) => {
-                const height = Math.random() * 100
-                return (
-                  <div
-                    key={i}
-                    className="flex-1 bg-property237-primary/20 hover:bg-property237-primary/40 rounded-t transition-all cursor-pointer"
-                    style={{ height: `${height}%` }}
-                    title={`Day ${i + 1}: ${Math.floor(height * 10)} views`}
-                  />
-                )
-              })}
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Properties by Type</h3>
+            <div className="space-y-4">
+              {(apiStats?.properties_by_type ?? []).length === 0 ? (
+                <p className="text-sm text-gray-500">No property data yet</p>
+              ) : (
+                (apiStats?.properties_by_type ?? []).map((item: any, index: number) => {
+                  const total = stats.totalProperties || 1
+                  const pct = Math.round((item.count / total) * 100)
+                  return (
+                    <div key={index}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.property_type__name || 'Unknown'}</span>
+                        <span className="text-sm text-gray-500">{item.count} ({pct}%)</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-property237-primary rounded-full h-2 transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             </div>
           </div>
 
-          {/* Revenue Chart */}
+          {/* Application Summary */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Monthly Revenue</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">XAF</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Applications Overview</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Total</p>
+                <p className="text-2xl font-bold text-blue-600">{apiStats?.total_applications ?? 0}</p>
               </div>
-              <select className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm">
-                <option>2024</option>
-                <option>2023</option>
-              </select>
-            </div>
-            <div className="h-64 flex items-end justify-between gap-3">
-              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, i) => {
-                const height = Math.random() * 100
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                    <div
-                      className="w-full bg-property237-accent/80 hover:bg-property237-accent rounded-t transition-all cursor-pointer"
-                      style={{ height: `${height}%` }}
-                      title={`${month}: ${Math.floor(height * 50000)} XAF`}
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{month}</span>
-                  </div>
-                )
-              })}
+              <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Pending</p>
+                <p className="text-2xl font-bold text-amber-600">{apiStats?.pending_applications ?? 0}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Approved</p>
+                <p className="text-2xl font-bold text-green-600">{apiStats?.approved_applications ?? 0}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">This Month</p>
+                <p className="text-2xl font-bold text-purple-600">{apiStats?.new_applications_30d ?? 0}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -412,31 +392,8 @@ export default function AgentDashboard() {
           </div>
         </div>
 
-        {/* Performance Section */}
+        {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-          {/* Rating */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Rating</h3>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="text-4xl font-bold text-gray-900 dark:text-white">{stats.avgRating}</div>
-              <div>
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={`h-5 w-5 ${i < Math.floor(stats.avgRating) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`}
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Based on 47 reviews</p>
-              </div>
-            </div>
-            <Link href="/profile" className="text-sm font-medium text-property237-primary hover:underline">
-              View all reviews →
-            </Link>
-          </div>
-
-          {/* Quick Actions */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
             <div className="space-y-3">
@@ -444,40 +401,18 @@ export default function AgentDashboard() {
                 <PlusCircleIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">Add New Property</span>
               </Link>
-              <Link href={"/dashboard/agent/properties" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Link href="/dashboard/agent/properties" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <HomeIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">View All Properties</span>
               </Link>
-              <Link href={"/dashboard/agent/applications" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Link href="/dashboard/agent/applications" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <UsersIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">View Applications</span>
               </Link>
-              <Link href={"/dashboard/agent/analytics" as any} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+              <Link href="/dashboard/agent/analytics" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
                 <ChartBarIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">View Analytics</span>
               </Link>
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
-            <div className="space-y-4">
-              {[
-                { text: 'New application received', time: '2 hours ago', icon: UsersIcon, color: 'text-blue-500' },
-                { text: 'Property view milestone', time: '5 hours ago', icon: EyeIcon, color: 'text-green-500' },
-                { text: 'New message from tenant', time: '1 day ago', icon: ChatBubbleLeftIcon, color: 'text-purple-500' },
-              ].map((activity, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-700 ${activity.color}`}>
-                    <activity.icon className="h-4 w-4" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.text}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>

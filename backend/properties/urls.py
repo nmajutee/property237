@@ -20,6 +20,7 @@ urlpatterns = [
 
     # Property metadata and search BEFORE slug route
     path('search/', views.property_search, name='property-search'),
+    path('nearby/', views.proximity_search, name='proximity-search'),
     path('types/', views.PropertyTypeListAPIView.as_view(), name='property-types'),
     path('statuses/', views.PropertyStatusListAPIView.as_view(), name='property-statuses'),
 
@@ -30,6 +31,12 @@ urlpatterns = [
     path('favorites/', views.favorites_list, name='favorites-list'),
     path('<slug:slug>/favorite/', views.toggle_favorite, name='toggle-favorite'),
 
+    # Moderation (admin)
+    path('moderation/pending/', views.pending_properties, name='pending-properties'),
+    path('moderation/<int:pk>/approve/', views.approve_property, name='approve-property'),
+    path('moderation/<int:pk>/reject/', views.reject_property, name='reject-property'),
+
     # Slug catch-all LAST
+    path('<slug:slug>/similar/', views.similar_properties, name='similar-properties'),
     path('<slug:slug>/', views.PropertyDetailAPIView.as_view(), name='property-detail'),
 ]

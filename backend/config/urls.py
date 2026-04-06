@@ -6,6 +6,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_GET
 
 # API Version 1 - Enterprise Architecture
 api_v1_patterns = [
@@ -31,7 +33,26 @@ api_v1_patterns = [
     path('notifications/', include('notifications.urls')),
     path('ads/', include('ad.urls')),
     path('tariffs/', include('tariffplans.urls')),
+    path('moderation/', include('moderation.urls')),
 ]
+
+
+@require_GET
+def celery_health_check(request):
+    """Check Celery worker availability."""
+    try:
+        from config.celery import app
+        inspector = app.control.inspect(timeout=2.0)
+        active = inspector.active()
+        if active is None:
+            return JsonResponse({'status': 'error', 'detail': 'No workers responding'}, status=503)
+        return JsonResponse({
+            'status': 'ok',
+            'workers': list(active.keys()),
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'detail': str(e)}, status=503)
+
 
 urlpatterns = [
     # Admin interface
@@ -42,10 +63,9 @@ urlpatterns = [
 
     # Health check endpoint
     path('health/', lambda request: HttpResponse('OK')),
+    path('health/celery/', celery_health_check),
 ]
 
-# Import HttpResponse for health check
-from django.http import HttpResponse
 from django.views.static import serve
 import re
 

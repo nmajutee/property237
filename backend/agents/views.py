@@ -340,3 +340,54 @@ class AgentVerificationStatusAPIView(APIView):
             return Response({
                 'error': 'Agent profile not found'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def pending_agents(request):
+    """List agents pending verification (admin only)"""
+    if request.user.user_type != 'admin':
+        return Response({'error': 'Admin only'}, status=status.HTTP_403_FORBIDDEN)
+    agents = AgentProfile.objects.filter(is_verified=False).select_related('user').order_by('-created_at')
+    serializer = EnhancedAgentProfileSerializer(agents, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_agent(request, pk):
+    """Verify an agent (admin only)"""
+    if request.user.user_type != 'admin':
+        return Response({'error': 'Admin only'}, status=status.HTTP_403_FORBIDDEN)
+    from django.shortcuts import get_object_or_404
+    agent = get_object_or_404(AgentProfile, pk=pk)
+    agent.is_verified = True
+    agent.save()
+
+    from moderation.views import log_moderation_action
+    log_moderation_action(
+        request.user, 'agent_verified', agent,
+        reason=request.data.get('reason', 'Verification approved'),
+    )
+
+    return Response({'message': 'Agent verified', 'id': agent.id})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reject_agent(request, pk):
+    """Reject agent verification (admin only)"""
+    if request.user.user_type != 'admin':
+        return Response({'error': 'Admin only'}, status=status.HTTP_403_FORBIDDEN)
+    from django.shortcuts import get_object_or_404
+    agent = get_object_or_404(AgentProfile, pk=pk)
+    agent.is_verified = False
+    agent.save()
+
+    from moderation.views import log_moderation_action
+    log_moderation_action(
+        request.user, 'agent_rejected', agent,
+        reason=request.data.get('reason', 'Verification rejected'),
+    )
+
+    return Response({'message': 'Agent verification rejected'})

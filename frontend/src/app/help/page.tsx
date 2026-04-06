@@ -86,7 +86,7 @@ export default function HelpPage() {
       category: 'payment',
       question: 'What payment methods do you accept?',
       answer:
-        'We accept Mobile Money (MTN Mobile Money, Orange Money), bank cards, and bank transfers for credit purchases and premium features.',
+        'We accept Mobile Money (MTN Mobile Money, Orange Money) and Flutterwave for credit purchases and premium features.',
     },
     {
       category: 'payment',

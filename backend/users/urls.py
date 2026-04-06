@@ -20,4 +20,8 @@ urlpatterns = [
     # Profile management
     path('profile/', views.UserProfileAPIView.as_view(), name='user-profile'),
     path('preferences/', views.UserPreferencesAPIView.as_view(), name='user-preferences'),
+
+    # Admin user management
+    path('admin/list/', views.admin_user_list, name='admin-user-list'),
+    path('admin/<int:pk>/toggle-status/', views.admin_toggle_user_status, name='admin-toggle-user-status'),
 ]

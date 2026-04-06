@@ -15,6 +15,7 @@ class PropertyFilter(django_filters.FilterSet):
     city = django_filters.CharFilter(field_name='area__city__name', lookup_expr='icontains')
     region = django_filters.CharFilter(field_name='area__city__region__name', lookup_expr='icontains')
     area = django_filters.CharFilter(field_name='area__name', lookup_expr='icontains')
+    area_id = django_filters.NumberFilter(field_name='area__id')
 
     # Property characteristics — use .none() to avoid DB access at import time
     property_type = django_filters.ModelChoiceFilter(queryset=PropertyType.objects.none())

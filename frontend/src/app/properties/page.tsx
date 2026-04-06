@@ -11,6 +11,7 @@ import {
   PriceFilterBar
 } from '@/components/properties'
 import { Button } from '@/components/ui/Button'
+import { PromotedPropertyCards, AdBanner } from '@/components/ads/AdPlacements'
 import Link from 'next/link'
 
 // Dynamically import MapView to prevent SSR issues with Leaflet
@@ -97,12 +98,21 @@ export default function PropertiesPage() {
   const [selectedBathrooms, setSelectedBathrooms] = useState<string>('any')
   const [rentalPeriod, setRentalPeriod] = useState<'long-term' | 'short-term'>('long-term')
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [nextPage, setNextPage] = useState<string | null>(null)
+  const [prevPage, setPrevPage] = useState<string | null>(null)
+  const pageSize = 20
 
   useEffect(() => {
     setMounted(true)
     fetchPropertyTypes()
     fetchProperties()
   }, [])
+
+  useEffect(() => {
+    fetchProperties({ searchTerm, selectedType, priceRange, page: currentPage })
+  }, [currentPage])
 
   const fetchPropertyTypes = async () => {
     try {
@@ -168,6 +178,14 @@ export default function PropertiesPage() {
         params.append('price_max', filters.priceRange.max)
       }
 
+      if (filters?.page && filters.page > 1) {
+        params.append('page', filters.page.toString())
+      }
+
+      if (filters?.bedrooms) {
+        params.append('bedrooms', filters.bedrooms)
+      }
+
       const queryString = params.toString()
       const url = queryString
         ? `${apiBaseUrl}/properties/?${queryString}`
@@ -186,6 +204,9 @@ export default function PropertiesPage() {
       console.log('Properties data:', data)
       console.log('Number of properties:', data.results?.length || 0)
       setProperties(data.results || [])
+      setTotalCount(data.count || 0)
+      setNextPage(data.next)
+      setPrevPage(data.previous)
     } catch (error) {
       console.error('Error fetching properties:', error)
       setProperties([])
@@ -195,10 +216,12 @@ export default function PropertiesPage() {
   }
 
   const handleSearch = () => {
+    setCurrentPage(1)
     fetchProperties({
       searchTerm,
       selectedType,
-      priceRange
+      priceRange,
+      page: 1
     })
   }
 
@@ -208,8 +231,11 @@ export default function PropertiesPage() {
     setPriceRange({ min: '', max: '' })
     setSelectedBedrooms([])
     setSelectedBathrooms('any')
-    fetchProperties()
+    setCurrentPage(1)
+    fetchProperties({ page: 1 })
   }
+
+  const totalPages = Math.ceil(totalCount / pageSize)
 
   const toggleBedroom = (value: string) => {
     setSelectedBedrooms(prev =>
@@ -263,12 +289,66 @@ export default function PropertiesPage() {
 
           {/* Property Grid */}
           <div className="p-4 sm:p-6">
+            {currentPage === 1 && (
+              <PromotedPropertyCards type="featured" limit={4} />
+            )}
+
             <PropertyGrid
               properties={properties}
               loading={loading}
               viewMode={viewMode}
               onClearFilters={handleClearFilters}
             />
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} properties
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={!prevPage}
+                    className="px-3 py-1.5 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let page: number
+                    if (totalPages <= 5) {
+                      page = i + 1
+                    } else if (currentPage <= 3) {
+                      page = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      page = totalPages - 4 + i
+                    } else {
+                      page = currentPage - 2 + i
+                    }
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-3 py-1.5 text-sm rounded ${
+                          page === currentPage
+                            ? 'bg-property237-primary text-white'
+                            : 'border hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  })}
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={!nextPage}
+                    className="px-3 py-1.5 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>

@@ -192,4 +192,60 @@ class MarketAnalytics(models.Model):
     def __str__(self):
         return f"Market Analytics - {self.area.name} - {self.date}"
 
-# Create your models here.
+
+class PropertyViewEvent(models.Model):
+    """Individual property view events for deduplication and analytics."""
+    property = models.ForeignKey(
+        'properties.Property', on_delete=models.CASCADE,
+        related_name='view_events',
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        null=True, blank=True,
+    )
+    session_key = models.CharField(max_length=64, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    referrer = models.URLField(blank=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-viewed_at']
+        indexes = [
+            models.Index(fields=['property', 'viewed_at']),
+            models.Index(fields=['property', 'user']),
+        ]
+
+    def __str__(self):
+        return f"View on {self.property.title} at {self.viewed_at}"
+
+
+class PropertyInquiry(models.Model):
+    """Tracks inquiries made on properties."""
+    INQUIRY_TYPES = (
+        ('message', 'Direct Message'),
+        ('phone', 'Phone Call Request'),
+        ('viewing', 'Viewing Request'),
+        ('application', 'Rental Application'),
+    )
+
+    property = models.ForeignKey(
+        'properties.Property', on_delete=models.CASCADE,
+        related_name='inquiries',
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='property_inquiries',
+    )
+    inquiry_type = models.CharField(max_length=20, choices=INQUIRY_TYPES, default='message')
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['property', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f"Inquiry on {self.property.title} by {self.user}"

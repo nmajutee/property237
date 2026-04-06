@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import Navbar from '../components/navigation/Navbar'
 import { Button } from '../components/ui/Button'
+import { PromotedPropertyCards, AdBanner } from '@/components/ads/AdPlacements'
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -175,6 +176,15 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
+      <section className="py-12 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PromotedPropertyCards type="featured" limit={4} />
+          <PromotedPropertyCards type="hot_deal" limit={4} />
+          <AdBanner placement="homepage" className="mt-6" />
+        </div>
+      </section>
+
+      {/* How It Works */}
       <section className="py-20 bg-gradient-to-br from-property237-primary to-property237-dark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

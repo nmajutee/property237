@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { ClientThemeProvider } from "../design-system/ClientThemeProvider"
+import { QueryProvider } from "../providers/QueryProvider"
 import localFont from 'next/font/local'
 import { DM_Sans } from 'next/font/google'
 import "./globals.css"
@@ -59,9 +60,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${craftworkGrotesk.variable} ${dmSans.variable}`}>
       <body className={dmSans.className}>
-        <ClientThemeProvider>
-          {children}
-        </ClientThemeProvider>
+        <QueryProvider>
+          <ClientThemeProvider>
+            {children}
+          </ClientThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   )

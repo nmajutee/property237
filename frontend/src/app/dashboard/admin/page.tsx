@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authAPI } from '../../../services/api'
+import { useAdminDashboard } from '@/hooks/useAnalytics'
+import { useUnreadNotificationCount } from '@/hooks/useNotifications'
 import {
   HomeIcon,
   UsersIcon,
@@ -15,16 +17,15 @@ import {
   Cog6ToothIcon,
   ClipboardDocumentListIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
   UserPlusIcon,
   BellIcon,
   MagnifyingGlassIcon,
   EllipsisVerticalIcon,
   ShieldCheckIcon,
-  ServerIcon,
   BanknotesIcon,
   UserGroupIcon,
   ClockIcon,
+  WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline'
 
 interface User {
@@ -34,60 +35,34 @@ interface User {
   userRole: string
 }
 
-interface SystemStat {
-  label: string
-  value: string
-  change: string
-  trend: 'up' | 'down'
-  icon: any
-  color: string
-}
-
-interface RecentUser {
-  id: number
-  name: string
-  email: string
-  role: string
-  joined: string
-  status: 'active' | 'pending' | 'suspended'
-}
-
-interface PendingProperty {
-  id: number
-  title: string
-  agent: string
-  location: string
-  price: string
-  submitted: string
-  status: 'pending' | 'approved' | 'rejected'
-}
-
-interface SystemMetric {
-  name: string
-  value: string
-  status: 'healthy' | 'warning' | 'critical'
-}
-
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedPeriod, setSelectedPeriod] = useState('30')
-  const [selectedRevenuePeriod, setSelectedRevenuePeriod] = useState('12')
   const router = useRouter()
+
+  const { data: adminStats, isLoading: statsLoading } = useAdminDashboard()
+  const { data: notifUnread } = useUnreadNotificationCount()
+  const unreadNotifications = (notifUnread as any)?.unread_count ?? 0
+  const stats = adminStats as any
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await authAPI.getProfile() as User
-        setUser(userData)
-        
-        // Redirect if not admin
-        if (userData.userRole !== 'admin') {
+        const userData = await authAPI.getProfile() as any
+        const u = userData.user || userData
+        setUser({
+          firstName: u.first_name || u.firstName || '',
+          lastName: u.last_name || u.lastName || '',
+          email: u.email || '',
+          userRole: u.user_type || u.userRole || '',
+        })
+
+        if ((u.user_type || u.userRole) !== 'admin' && !u.is_staff) {
           router.push('/dashboard')
         }
       } catch (error) {
         console.error('Error fetching user:', error)
-        router.push('/login')
+        router.push('/sign-in')
       } finally {
         setIsLoading(false)
       }
@@ -96,154 +71,56 @@ export default function AdminDashboard() {
     fetchUser()
   }, [router])
 
-  // Mock data - replace with real API calls
-  const systemStats: SystemStat[] = [
+  const systemStats = [
     {
       label: 'Total Users',
-      value: '1,247',
-      change: '+18%',
-      trend: 'up',
+      value: stats?.total_users?.toLocaleString() ?? '—',
+      change: `+${stats?.new_users_30d ?? 0} this month`,
       icon: UsersIcon,
       color: 'blue'
     },
     {
       label: 'Total Properties',
-      value: '342',
-      change: '+23%',
-      trend: 'up',
+      value: stats?.total_properties?.toLocaleString() ?? '—',
+      change: `+${stats?.new_properties_30d ?? 0} this month`,
       icon: BuildingOfficeIcon,
       color: 'green'
     },
     {
-      label: 'Platform Revenue',
-      value: '48.5M XAF',
-      change: '+15%',
-      trend: 'up',
+      label: 'Revenue',
+      value: stats ? `${(stats.total_revenue / 1000000).toFixed(1)}M XAF` : '—',
+      change: `${(stats?.revenue_30d / 1000000)?.toFixed(1) ?? 0}M this month`,
       icon: CurrencyDollarIcon,
       color: 'amber'
     },
     {
-      label: 'Active Transactions',
-      value: '89',
-      change: '-5%',
-      trend: 'down',
+      label: 'Applications',
+      value: stats?.total_applications?.toLocaleString() ?? '—',
+      change: `${stats?.pending_applications ?? 0} pending`,
       icon: ChartBarIcon,
       color: 'purple'
     }
   ]
 
-  const recentUsers: RecentUser[] = [
-    {
-      id: 1,
-      name: 'Jean Kamdem',
-      email: 'jean.kamdem@email.com',
-      role: 'Tenant',
-      joined: '2 hours ago',
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'Marie Ngoue',
-      email: 'marie.ngoue@email.com',
-      role: 'Agent',
-      joined: '4 hours ago',
-      status: 'pending'
-    },
-    {
-      id: 3,
-      name: 'Paul Etonde',
-      email: 'paul.etonde@email.com',
-      role: 'Tenant',
-      joined: '6 hours ago',
-      status: 'active'
-    },
-    {
-      id: 4,
-      name: 'Sophie Mballa',
-      email: 'sophie.mballa@email.com',
-      role: 'Agent',
-      joined: '1 day ago',
-      status: 'active'
-    }
-  ]
-
-  const pendingProperties: PendingProperty[] = [
-    {
-      id: 1,
-      title: 'Modern 3BR Apartment',
-      agent: 'Marie Ngoue',
-      location: 'Bonapriso, Douala',
-      price: '180,000 XAF/month',
-      submitted: '1 hour ago',
-      status: 'pending'
-    },
-    {
-      id: 2,
-      title: 'Luxury Villa with Pool',
-      agent: 'Sophie Mballa',
-      location: 'Bastos, Yaoundé',
-      price: '450,000 XAF/month',
-      submitted: '3 hours ago',
-      status: 'pending'
-    },
-    {
-      id: 3,
-      title: 'Cozy Studio Near University',
-      agent: 'Jacques Biya',
-      location: 'Ngoa-Ekelle, Yaoundé',
-      price: '75,000 XAF/month',
-      submitted: '5 hours ago',
-      status: 'pending'
-    }
-  ]
-
-  const systemMetrics: SystemMetric[] = [
-    { name: 'Server Uptime', value: '99.9%', status: 'healthy' },
-    { name: 'API Response Time', value: '124ms', status: 'healthy' },
-    { name: 'Database Load', value: '67%', status: 'warning' },
-    { name: 'Storage Used', value: '43%', status: 'healthy' },
-    { name: 'Active Sessions', value: '1,247', status: 'healthy' },
-    { name: 'Error Rate', value: '0.2%', status: 'healthy' }
-  ]
-
-  // Monthly user growth data (mock)
-  const userGrowthData = [
-    { month: 'Jan', users: 820 },
-    { month: 'Feb', users: 890 },
-    { month: 'Mar', users: 950 },
-    { month: 'Apr', users: 1020 },
-    { month: 'May', users: 1100 },
-    { month: 'Jun', users: 1180 },
-    { month: 'Jul', users: 1247 }
-  ]
-
-  // Monthly revenue data (mock)
-  const revenueData = [
-    { month: 'Jan', revenue: 35.2 },
-    { month: 'Feb', revenue: 38.5 },
-    { month: 'Mar', revenue: 41.0 },
-    { month: 'Apr', revenue: 43.5 },
-    { month: 'May', revenue: 45.0 },
-    { month: 'Jun', revenue: 46.8 },
-    { month: 'Jul', revenue: 48.5 }
-  ]
-
-  const maxUserGrowth = Math.max(...userGrowthData.map(d => d.users))
-  const maxRevenue = Math.max(...revenueData.map(d => d.revenue))
+  const recentUsers = stats?.recent_users ?? []
+  const pendingProperties = stats?.pending_properties ?? []
 
   const navigationItems = [
     { name: 'Dashboard', href: '/dashboard/admin', icon: HomeIcon, active: true },
-    { name: 'Users Management', href: '/dashboard/admin/users', icon: UsersIcon, badge: '12' },
-    { name: 'Properties', href: '/dashboard/admin/properties', icon: BuildingOfficeIcon, badge: '5' },
-    { name: 'Analytics', href: '/dashboard/admin/analytics', icon: ChartBarIcon },
-    { name: 'Financials', href: '/dashboard/admin/financials', icon: BanknotesIcon },
-    { name: 'Support Tickets', href: '/dashboard/admin/support', icon: ChatBubbleLeftRightIcon, badge: '8' },
-    { name: 'Reports', href: '/dashboard/admin/reports', icon: DocumentTextIcon },
-    { name: 'Settings', href: '/dashboard/admin/settings', icon: Cog6ToothIcon },
-    { name: 'System Logs', href: '/dashboard/admin/logs', icon: ClipboardDocumentListIcon }
+    { name: 'Users', href: '/admin/users', icon: UserGroupIcon },
+    { name: 'Properties', href: '/properties', icon: BuildingOfficeIcon },
+    { name: 'Agents', href: '/agents', icon: UsersIcon },
+    { name: 'Moderation', href: '/moderation', icon: ShieldCheckIcon },
+    { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
+    { name: 'Payments', href: '/payments', icon: BanknotesIcon },
+    { name: 'Leases', href: '/leases', icon: DocumentTextIcon },
+    { name: 'Maintenance', href: '/maintenance', icon: WrenchScrewdriverIcon },
+    { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
+    { name: 'Notifications', href: '/notifications', icon: BellIcon, badge: unreadNotifications > 0 ? unreadNotifications.toString() : undefined },
+    { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
   ]
 
-  if (isLoading) {
+  if (isLoading || statsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-property237-primary"></div>
@@ -259,7 +136,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-property237-primary">Property237</h1>
           <p className="text-sm text-gray-500 mt-1">Admin Dashboard</p>
         </div>
-        
+
         <nav className="px-3 pb-6">
           {navigationItems.map((item) => (
             <Link
@@ -330,14 +207,8 @@ export default function AdminDashboard() {
                     {stat.value}
                   </h3>
                   <div className="flex items-center gap-1 mt-3">
-                    {stat.trend === 'up' ? (
-                      <ArrowTrendingUpIcon className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <ArrowTrendingDownIcon className="h-4 w-4 text-red-500" />
-                    )}
-                    <span className={`text-xs font-medium ${
-                      stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <ArrowTrendingUpIcon className="h-4 w-4 text-green-500" />
+                    <span className="text-xs font-medium text-green-600">
                       {stat.change}
                     </span>
                     <span className="text-xs text-gray-500 ml-1">vs last month</span>
@@ -356,88 +227,57 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Charts Row */}
+        {/* Overview Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* User Growth Chart */}
+          {/* Users by Type */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  User Growth
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Total users over time
-                </p>
-              </div>
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-property237-primary"
-              >
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 3 months</option>
-              </select>
-            </div>
-            <div className="h-64 flex items-end justify-between gap-2">
-              {userGrowthData.map((data, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full relative group">
-                    <div
-                      className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all duration-300 hover:from-blue-600 hover:to-blue-500 cursor-pointer"
-                      style={{ height: `${(data.users / maxUserGrowth) * 200}px` }}
-                    >
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        {data.users} users
-                      </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+              Users by Type
+            </h3>
+            <div className="space-y-4">
+              {(stats?.users_by_type ?? []).map((item: any, index: number) => {
+                const total = stats?.total_users || 1
+                const pct = Math.round((item.count / total) * 100)
+                return (
+                  <div key={index}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{item.user_type}</span>
+                      <span className="text-sm text-gray-500">{item.count} ({pct}%)</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div
+                        className="bg-property237-primary rounded-full h-2 transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
                   </div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    {data.month}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
-          {/* Revenue Chart */}
+          {/* Platform Summary */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Platform Revenue
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Revenue in millions (XAF)
-                </p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+              Platform Summary
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Total Agents</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats?.total_agents ?? 0}</p>
               </div>
-              <select
-                value={selectedRevenuePeriod}
-                onChange={(e) => setSelectedRevenuePeriod(e.target.value)}
-                className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-property237-primary"
-              >
-                <option value="6">Last 6 months</option>
-                <option value="12">Last 12 months</option>
-              </select>
-            </div>
-            <div className="h-64 flex items-end justify-between gap-2">
-              {revenueData.map((data, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full relative group">
-                    <div
-                      className="w-full bg-gradient-to-t from-amber-500 to-amber-400 rounded-t-lg transition-all duration-300 hover:from-amber-600 hover:to-amber-500 cursor-pointer"
-                      style={{ height: `${(data.revenue / maxRevenue) * 200}px` }}
-                    >
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        {data.revenue}M XAF
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    {data.month}
-                  </span>
-                </div>
-              ))}
+              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Active Properties</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats?.total_properties ?? 0}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Total Revenue</p>
+                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats ? `${(stats.total_revenue / 1000000).toFixed(1)}M` : '0'}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Pending Apps</p>
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats?.pending_applications ?? 0}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -463,44 +303,41 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {recentUsers.map((user) => (
-                <div key={user.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              {recentUsers.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">No recent users</div>
+              ) : recentUsers.map((u: any) => (
+                <div key={u.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold">
-                        {user.name.charAt(0)}
+                        {(u.first_name || 'U').charAt(0)}
                       </div>
                       <div>
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {user.name}
+                          {u.first_name} {u.last_name}
                         </h4>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {user.email}
+                          {u.email}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.status === 'active'
+                        u.is_active
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                          : user.status === 'pending'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
                       }`}>
-                        {user.status}
+                        {u.is_active ? 'active' : 'inactive'}
                       </span>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {user.joined}
+                        {new Date(u.date_joined).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mt-3">
-                    <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-700 dark:text-gray-300">
-                      {user.role}
+                    <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-700 dark:text-gray-300 capitalize">
+                      {u.user_type}
                     </span>
-                    <button className="ml-auto text-xs text-property237-primary hover:text-property237-primary-dark font-medium">
-                      Review
-                    </button>
                   </div>
                 </div>
               ))}
@@ -514,11 +351,11 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3">
                   <ClockIcon className="h-5 w-5 text-amber-500" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Property Approvals
+                    Pending Properties
                   </h3>
                 </div>
                 <Link
-                  href={"/dashboard/admin/properties" as any}
+                  href="/properties"
                   className="text-sm font-medium text-property237-primary hover:text-property237-primary-dark"
                 >
                   View all
@@ -526,7 +363,9 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {pendingProperties.map((property) => (
+              {pendingProperties.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">No pending properties</div>
+              ) : pendingProperties.map((property: any) => (
                 <div key={property.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <div className="flex items-start justify-between mb-2">
                     <div>
@@ -534,30 +373,12 @@ export default function AdminDashboard() {
                         {property.title}
                       </h4>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        by {property.agent} • {property.location}
+                        {new Date(property.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                      <EllipsisVerticalIcon className="h-5 w-5" />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-property237-primary">
-                        {property.price}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        • {property.submitted}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button className="px-3 py-1.5 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-xs font-medium hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-                        Approve
-                      </button>
-                      <button className="px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
-                        Reject
-                      </button>
-                    </div>
+                    <span className="text-sm font-bold text-property237-primary">
+                      {Number(property.price).toLocaleString()} XAF
+                    </span>
                   </div>
                 </div>
               ))}
@@ -565,41 +386,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* System Health & Quick Actions */}
+        {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* System Health - Takes 2 columns */}
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3 mb-6">
-              <ServerIcon className="h-5 w-5 text-property237-primary" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                System Health
-              </h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {systemMetrics.map((metric, index) => (
-                <div
-                  key={index}
-                  className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                      {metric.name}
-                    </p>
-                    <div className={`h-2 w-2 rounded-full ${
-                      metric.status === 'healthy' ? 'bg-green-500' :
-                      metric.status === 'warning' ? 'bg-amber-500' :
-                      'bg-red-500'
-                    }`} />
-                  </div>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">
-                    {metric.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-6">
               <ShieldCheckIcon className="h-5 w-5 text-property237-primary" />
@@ -609,34 +397,34 @@ export default function AdminDashboard() {
             </div>
             <div className="space-y-3">
               <Link
-                href={"/dashboard/admin/users/new" as any}
-                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <UserGroupIcon className="h-5 w-5 text-property237-primary" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Add New User
-                </span>
-              </Link>
-              <Link
-                href={"/dashboard/admin/properties" as any}
+                href="/properties"
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <BuildingOfficeIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Moderate Properties
+                  Manage Properties
                 </span>
               </Link>
               <Link
-                href={"/dashboard/admin/reports" as any}
+                href="/notifications"
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                <DocumentTextIcon className="h-5 w-5 text-property237-primary" />
+                <BellIcon className="h-5 w-5 text-property237-primary" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Generate Report
+                  Notifications
                 </span>
               </Link>
               <Link
-                href={"/dashboard/admin/settings" as any}
+                href="/payments"
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <BanknotesIcon className="h-5 w-5 text-property237-primary" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  View Payments
+                </span>
+              </Link>
+              <Link
+                href="/settings"
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <Cog6ToothIcon className="h-5 w-5 text-property237-primary" />

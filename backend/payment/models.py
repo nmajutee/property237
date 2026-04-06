@@ -13,17 +13,12 @@ class PaymentMethod(models.Model):
     GATEWAY_TYPES = (
         ('mtn_momo', 'MTN Mobile Money'),
         ('orange_money', 'Orange Money'),
-        ('stripe', 'Stripe (Cards)'),
-        ('paypal', 'PayPal'),
-        ('bank_transfer', 'Bank Transfer'),
-        ('cash', 'Cash'),
         ('flutterwave', 'Flutterwave'),
-        ('korapay', 'KoraPay'),
     )
 
     name = models.CharField(max_length=50, unique=True)
     code = models.CharField(max_length=20, unique=True)
-    gateway_type = models.CharField(max_length=20, choices=GATEWAY_TYPES, default='cash')
+    gateway_type = models.CharField(max_length=20, choices=GATEWAY_TYPES, default='mtn_momo')
     description = models.TextField(blank=True)
 
     # Availability
@@ -246,11 +241,8 @@ class PaymentAccount(models.Model):
     User payment accounts for receiving money
     """
     ACCOUNT_TYPES = (
-        ('bank_account', 'Bank Account'),
         ('momo_account', 'Mobile Money'),
-        ('paypal', 'PayPal'),
-        ('stripe', 'Stripe'),
-        ('wallet', 'Digital Wallet'),
+        ('flutterwave', 'Flutterwave'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payment_accounts')

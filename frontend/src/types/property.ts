@@ -63,6 +63,8 @@ export interface Property {
 
   // Location
   area: Area
+  latitude?: number
+  longitude?: number
   google_pin_location?: string
   distance_from_main_road?: number
   road_is_tarred: boolean
@@ -145,6 +147,19 @@ export interface PropertyListing {
   featured: boolean
 }
 
+// Property image
+export interface PropertyImage {
+  id: string | number
+  image: string
+  image_url: string
+  thumbnail_url?: string
+  image_type: 'exterior' | 'interior' | 'bedroom' | 'bathroom' | 'kitchen' | 'living_room' | 'balcony' | 'garden' | 'parking' | 'amenities' | 'floor_plan' | 'other'
+  title?: string
+  is_primary: boolean
+  order: number
+  created_at: string
+}
+
 // Property card view modes
 export type PropertyViewMode = 'grid' | 'list'
 
@@ -163,4 +178,62 @@ export interface PropertyFilters {
   has_security?: boolean
   has_pool?: boolean
   features?: string[]
+  ordering?: string
+  page?: number
+  agent?: string | number
+  city?: string | number
+  search?: string
+  area_id?: string | number
+  lat?: number
+  lng?: number
+  radius_km?: number
+}
+
+// Category system
+export interface Category {
+  id: string | number
+  name: string
+  slug: string
+  code: string
+  description?: string
+  icon?: string
+  parent: string | number | null
+  is_parent: boolean
+  is_active: boolean
+  order: number
+  subcategories?: Category[]
+}
+
+export interface PropertyTag {
+  id: string | number
+  name: string
+  slug: string
+  description?: string
+  color?: string
+  icon?: string
+  applies_to_categories?: (string | number)[]
+  is_active: boolean
+  order: number
+}
+
+export interface PropertyState {
+  id: string | number
+  code: string
+  name: string
+  display_name: string
+  description?: string
+  color?: string
+  allows_inquiries: boolean
+  is_publicly_visible: boolean
+  applies_to_categories?: (string | number)[]
+  is_active: boolean
+  order: number
+}
+
+// Paginated response
+export interface PaginatedResponse<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
 }

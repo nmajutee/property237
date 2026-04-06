@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import Navbar from '../../../components/navigation/Navbar'
 import { getApiBaseUrl } from '@/services/api'
 import {
@@ -31,7 +33,10 @@ import {
   Dumbbell,
   Snowflake,
 } from 'lucide-react'
-
+const DetailMapView = dynamic(
+  () => import('@/components/properties/MapView'),
+  { ssr: false, loading: () => <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"><p className="text-sm text-gray-500">Loading map...</p></div> }
+)
 interface PropertyImage {
   id: number
   image: string
@@ -140,6 +145,7 @@ export default function PropertyDetailPage() {
   const [moveInDate, setMoveInDate] = useState('')
   const [notes, setNotes] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [similarProperties, setSimilarProperties] = useState<any[]>([])
 
   useEffect(() => {
     if (params.id) {
@@ -155,6 +161,7 @@ export default function PropertyDetailPage() {
         const data = await response.json()
         setProperty(data)
         checkFavoriteStatus(id)
+        fetchSimilarProperties(data)
       } else {
         router.push('/properties')
       }
@@ -185,6 +192,23 @@ export default function PropertyDetailPage() {
       }
     } catch (error) {
       console.error('Error checking favorite status:', error)
+    }
+  }
+
+  const fetchSimilarProperties = async (prop: Property) => {
+    try {
+      const apiBaseUrl = getApiBaseUrl()
+      const params = new URLSearchParams()
+      if (prop.property_type?.id) params.append('property_type', prop.property_type.id.toString())
+      if (prop.area?.city?.id) params.append('city', prop.area.city.id.toString())
+      const response = await fetch(`${apiBaseUrl}/properties/?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        const results = (data.results || []).filter((p: any) => p.id !== prop.id).slice(0, 4)
+        setSimilarProperties(results)
+      }
+    } catch (error) {
+      console.error('Error fetching similar properties:', error)
     }
   }
 
@@ -650,6 +674,65 @@ export default function PropertyDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Location Map */}
+        {property.area && (
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <MapPin className="w-5 h-5" /> Location
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              {property.address && `${property.address}, `}{property.area.name}, {property.area.city.name}, {property.area.city.region?.name}
+            </p>
+            <div className="h-64 rounded-lg overflow-hidden">
+              <DetailMapView show={true} properties={[property as any]} />
+            </div>
+          </div>
+        )}
+
+        {/* Similar Listings */}
+        {similarProperties.length > 0 && (
+          <div className="mt-8 mb-8">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Similar Properties</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {similarProperties.map((sp: any) => (
+                <Link
+                  key={sp.id}
+                  href={`/properties/${sp.id}`}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden"
+                >
+                  <div className="h-40 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                    {sp.primary_image || sp.images?.[0]?.image_url ? (
+                      <img
+                        src={sp.primary_image || sp.images[0].image_url}
+                        alt={sp.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Home className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="font-medium text-gray-900 dark:text-white text-sm truncate">{sp.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      {sp.area?.name}, {sp.area?.city?.name}
+                    </p>
+                    <p className="text-property237-primary font-semibold text-sm mt-1">
+                      {parseInt(sp.price).toLocaleString()} {sp.currency || 'XAF'}
+                    </p>
+                    <div className="flex gap-2 text-xs text-gray-500 mt-1">
+                      {sp.no_of_bedrooms > 0 && <span>{sp.no_of_bedrooms} bed</span>}
+                      {sp.no_of_bathrooms > 0 && <span>{sp.no_of_bathrooms} bath</span>}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Application Modal */}

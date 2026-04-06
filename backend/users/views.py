@@ -87,3 +87,72 @@ class UserPreferencesAPIView(generics.RetrieveUpdateAPIView):
             user=self.request.user
         )
         return preferences
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_user_list(request):
+    """List all users with search/filter (admin only)"""
+    if request.user.user_type != 'admin':
+        return Response({'error': 'Admin only'}, status=status.HTTP_403_FORBIDDEN)
+
+    users = CustomUser.objects.all().order_by('-date_joined')
+
+    search = request.query_params.get('search', '')
+    if search:
+        from django.db.models import Q
+        users = users.filter(
+            Q(email__icontains=search) |
+            Q(first_name__icontains=search) |
+            Q(last_name__icontains=search) |
+            Q(phone_number__icontains=search)
+        )
+
+    user_type = request.query_params.get('user_type', '')
+    if user_type:
+        users = users.filter(user_type=user_type)
+
+    is_active = request.query_params.get('is_active', '')
+    if is_active:
+        users = users.filter(is_active=is_active.lower() == 'true')
+
+    # Manual pagination
+    page = int(request.query_params.get('page', 1))
+    page_size = 20
+    start = (page - 1) * page_size
+    total = users.count()
+
+    user_list = users[start:start + page_size]
+    data = [{
+        'id': u.id,
+        'email': u.email,
+        'first_name': u.first_name,
+        'last_name': u.last_name,
+        'phone_number': u.phone_number,
+        'user_type': u.user_type,
+        'is_active': u.is_active,
+        'date_joined': u.date_joined,
+        'last_login': u.last_login,
+    } for u in user_list]
+
+    return Response({
+        'count': total,
+        'results': data,
+        'page': page,
+        'pages': (total + page_size - 1) // page_size,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_toggle_user_status(request, pk):
+    """Activate/deactivate a user (admin only)"""
+    if request.user.user_type != 'admin':
+        return Response({'error': 'Admin only'}, status=status.HTTP_403_FORBIDDEN)
+    from django.shortcuts import get_object_or_404
+    user = get_object_or_404(CustomUser, pk=pk)
+    if user == request.user:
+        return Response({'error': 'Cannot deactivate yourself'}, status=status.HTTP_400_BAD_REQUEST)
+    user.is_active = not user.is_active
+    user.save()
+    return Response({'message': f'User {"activated" if user.is_active else "deactivated"}', 'is_active': user.is_active})

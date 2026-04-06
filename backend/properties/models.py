@@ -135,6 +135,14 @@ class Property(models.Model):
 
     # Location
     area = models.ForeignKey('locations.Area', on_delete=models.PROTECT)
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True,
+        help_text="Property latitude (falls back to area latitude if not set)"
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True,
+        help_text="Property longitude (falls back to area longitude if not set)"
+    )
     distance_from_main_road = models.PositiveIntegerField(
         null=True, blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(50000)],
@@ -338,6 +346,28 @@ class Property(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.get_listing_type_display()}"
+
+    @property
+    def effective_latitude(self):
+        """Return property lat, falling back to area lat."""
+        if self.latitude:
+            return self.latitude
+        if self.area and self.area.latitude:
+            return self.area.latitude
+        if self.area and self.area.city and self.area.city.latitude:
+            return self.area.city.latitude
+        return None
+
+    @property
+    def effective_longitude(self):
+        """Return property lng, falling back to area lng."""
+        if self.longitude:
+            return self.longitude
+        if self.area and self.area.longitude:
+            return self.area.longitude
+        if self.area and self.area.city and self.area.city.longitude:
+            return self.area.city.longitude
+        return None
 
     def save(self, *args, **kwargs):
         if not self.slug:

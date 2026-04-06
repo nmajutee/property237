@@ -29,4 +29,9 @@ urlpatterns = [
 
     # Agent reviews
     path('<int:agent_id>/reviews/', views.AgentReviewListCreateAPIView.as_view(), name='agent-reviews'),
+
+    # Moderation (admin)
+    path('moderation/pending/', views.pending_agents, name='pending-agents'),
+    path('moderation/<int:pk>/verify/', views.verify_agent, name='verify-agent'),
+    path('moderation/<int:pk>/reject/', views.reject_agent, name='reject-agent'),
 ]

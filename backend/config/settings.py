@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',  # JWT token blacklist
     'django_filters',
     'corsheaders',
+    'django_celery_beat',
+    'django_celery_results',
     # Custom apps (microservice-ready)
     'users',
     'authentication',  # New simplified authentication system
@@ -66,6 +68,7 @@ INSTALLED_APPS = [
     'ad',
     'payment',
     'tariffplans',
+    'moderation',
     'media',
     'locations',
 ]
@@ -202,8 +205,18 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Email settings (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email settings
+if os.getenv('SENDGRID_API_KEY'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'apikey'
+    EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@property237.com')
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@property237.com'
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
@@ -396,6 +409,20 @@ else:
             'LOCATION': 'property237-cache',
         }
     }
+
+# ==============================
+# Celery Configuration
+# ==============================
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 300  # 5 min hard limit
+CELERY_TASK_SOFT_TIME_LIMIT = 240  # 4 min soft limit
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # ==============================
 # File Storage & Media

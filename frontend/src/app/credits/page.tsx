@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { Button } from '../../components/ui/Button'
-import { getApiBaseUrl } from '@/services/api'
+import { creditsAPI } from '@/services/api'
 import {
   CreditCardIcon,
   BanknotesIcon,
@@ -47,24 +47,14 @@ export default function CreditsPage() {
         return
       }
 
-      // Fetch balance
-      const balanceRes = await fetch(`${getApiBaseUrl()}/credits/balance/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const balanceData = await balanceRes.json()
+      const balanceData = await creditsAPI.getBalance()
       setBalance(parseFloat(balanceData.balance))
 
-      // Fetch packages
-      const packagesRes = await fetch(`${getApiBaseUrl()}/credits/packages/`)
-      const packagesData = await packagesRes.json()
-      setPackages(packagesData.results || [])
+      const packagesData = await creditsAPI.getPackages() as any
+      setPackages(packagesData.results || packagesData || [])
 
-      // Fetch transactions
-      const transactionsRes = await fetch(`${getApiBaseUrl()}/credits/transactions/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const transactionsData = await transactionsRes.json()
-      setTransactions(transactionsData.results || [])
+      const transactionsData = await creditsAPI.getTransactions() as any
+      setTransactions(transactionsData.results || transactionsData || [])
     } catch (error) {
       console.error('Error fetching credits data:', error)
     } finally {
@@ -74,25 +64,15 @@ export default function CreditsPage() {
 
   const handlePurchase = async (packageId: number) => {
     try {
-      const token = localStorage.getItem('property237_access_token')
-      const response = await fetch(`${getApiBaseUrl()}/credits/purchase/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ package_id: packageId })
+      await creditsAPI.purchaseCredits({
+        package_id: packageId.toString(),
+        payment_method: 'momo',
       })
-
-      if (response.ok) {
-        alert('Purchase successful!')
-        fetchCreditsData()
-      } else {
-        alert('Purchase failed. Please try again.')
-      }
+      alert('Purchase successful!')
+      fetchCreditsData()
     } catch (error) {
       console.error('Error purchasing credits:', error)
-      alert('An error occurred. Please try again.')
+      alert('Purchase failed. Please try again.')
     }
   }
 

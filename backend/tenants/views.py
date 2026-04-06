@@ -46,15 +46,84 @@ class TenantApplicationViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        # Users only see their own applications
         user = self.request.user
+        qs = TenantApplication.objects.select_related(
+            'property', 'property__area__city', 'property__agent__user', 'tenant__user'
+        ).prefetch_related('property__media_files')
+
+        # Staff see all
+        if user.is_staff:
+            return qs.all()
+
+        # Agents see applications for their properties
+        if user.user_type == 'agent' and hasattr(user, 'agents_profile'):
+            return qs.filter(property__agent=user.agents_profile)
+
+        # Tenants see their own applications
         if hasattr(user, 'tenant_profile'):
-            return TenantApplication.objects.filter(
-                tenant=user.tenant_profile
-            ).select_related(
-                'property', 'property__area__city', 'property__agent__user', 'tenant__user'
-            ).prefetch_related('property__media_files')
-        return TenantApplication.objects.none()
+            return qs.filter(tenant=user.tenant_profile)
+
+        return qs.none()
+
+    @action(detail=False, methods=['get'])
+    def agent(self, request):
+        """List applications for the agent's properties"""
+        user = request.user
+        if user.user_type != 'agent' or not hasattr(user, 'agents_profile'):
+            return Response(
+                {'detail': 'Only agents can access this endpoint.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        qs = TenantApplication.objects.filter(
+            property__agent=user.agents_profile
+        ).select_related(
+            'property', 'property__area__city', 'tenant__user'
+        ).prefetch_related('property__media_files').order_by('-created_at')
+
+        status_filter = request.query_params.get('status')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], url_path='update-status')
+    def update_status(self, request, pk=None):
+        """Update application status (agent only)"""
+        application = self.get_object()
+        user = request.user
+
+        # Only the property's agent or staff can update status
+        if not user.is_staff and (
+            user.user_type != 'agent' or
+            not hasattr(user, 'agents_profile') or
+            application.property.agent != user.agents_profile
+        ):
+            return Response(
+                {'detail': 'You do not have permission to update this application.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        new_status = request.data.get('status')
+        review_notes = request.data.get('review_notes', '')
+        valid_statuses = ['pending', 'under_review', 'approved', 'rejected']
+
+        if new_status not in valid_statuses:
+            return Response(
+                {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        application.status = new_status
+        application.review_notes = review_notes
+        if new_status in ['approved', 'rejected']:
+            from django.utils import timezone
+            application.review_date = timezone.now()
+        application.save()
+
+        serializer = self.get_serializer(application)
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def withdraw(self, request, pk=None):

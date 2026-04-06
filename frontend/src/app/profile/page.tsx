@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '../../components/navigation/Navbar'
 import { Button } from '../../components/ui/Button'
-import { getApiBaseUrl } from '@/services/api'
+import { authAPI } from '@/services/api'
 import {
   UserCircleIcon,
   EnvelopeIcon,
@@ -50,23 +50,16 @@ export default function ProfilePage() {
         return
       }
 
-      const response = await fetch(`${getApiBaseUrl()}/auth/profile/`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const data = await authAPI.getProfile() as any
+      setUser(data)
+      setFormData({
+        full_name: data.full_name,
+        email: data.email,
+        phone_number: data.phone_number
       })
-
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data)
-        setFormData({
-          full_name: data.full_name,
-          email: data.email,
-          phone_number: data.phone_number
-        })
-      } else {
-        router.push('/sign-in')
-      }
     } catch (error) {
       console.error('Error fetching profile:', error)
+      router.push('/sign-in')
     } finally {
       setLoading(false)
     }
@@ -76,27 +69,13 @@ export default function ProfilePage() {
     e.preventDefault()
 
     try {
-      const token = localStorage.getItem('property237_access_token')
-      const response = await fetch(`${getApiBaseUrl()}/auth/profile/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data)
-        setIsEditing(false)
-        alert('Profile updated successfully!')
-      } else {
-        alert('Failed to update profile')
-      }
+      const data = await authAPI.updateProfile(formData) as any
+      setUser(data.user || data)
+      setIsEditing(false)
+      alert('Profile updated successfully!')
     } catch (error) {
       console.error('Error updating profile:', error)
-      alert('An error occurred. Please try again.')
+      alert('Failed to update profile')
     }
   }
 

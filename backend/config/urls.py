@@ -21,7 +21,6 @@ api_v1_patterns = [
     path('users/', include('users.urls')),
     path('properties/', include('properties.urls')),
     path('tenants/', include('tenants.urls')),
-    path('applications/', include('tenants.urls')),  # Alias for tenant applications
     path('leases/', include('leases.urls')),
     path('maintenance/', include('maintenance.urls')),
     path('payments/', include('payment.urls')),

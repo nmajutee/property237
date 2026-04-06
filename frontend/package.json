@@ -37,6 +37,7 @@
     "react-dom": "^18.3.0",
     "react-hook-form": "^7.52.0",
     "react-hot-toast": "^2.4.0",
+    "react-is": "^19.2.4",
     "react-leaflet": "^4.2.1",
     "recharts": "^3.8.1",
     "socket.io-client": "^4.7.0",

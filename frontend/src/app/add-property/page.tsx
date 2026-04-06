@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Image, X } from 'lucide-react'
-import { getApiBaseUrl } from '@/services/api'
+import apiClient from '@/services/api'
 import PropertyCategorySelector from '@/components/properties/PropertyCategorySelector'
 import DashboardLayout from '../../components/layouts/DashboardLayout'
 
@@ -161,39 +161,9 @@ export default function AddPropertyPage() {
         return
       }
 
-      // Get the correct API base URL (works in both dev and production)
-      const apiBaseUrl = getApiBaseUrl()
-
-      // Fetch all metadata in parallel (these endpoints are public - no auth needed)
-      const [regionsRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/locations/regions/`)
-      ])
-
-      // Check if all responses are OK
-      if (!regionsRes.ok) {
-        console.error('API Error:', {
-          regions: regionsRes.status
-        })
-
-        // Check for authentication issues
-        if (regionsRes.status === 401) {
-          setError('Session expired. Please sign in again.')
-          setTimeout(() => router.push('/sign-in'), 2000)
-          return
-        }
-
-        setError('⚠️ Warning: Could not load location metadata. Some dropdowns may be empty.')
-        setLoading(false)
-        return
-      }
-
-      // Only parse JSON if responses are OK
-      const regionsData = await regionsRes.json()
-
+      const regionsData = await apiClient.get<any>('/locations/regions/')
       const regionsList = regionsData.results || regionsData
-
       setRegions(regionsList)
-
       setLoading(false)
     } catch (err) {
       console.error('Error fetching metadata:', err)
@@ -211,20 +181,9 @@ export default function AddPropertyPage() {
     setAreas([])
 
     if (regionId) {
-      const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`)
-        if (response.ok) {
-          const contentType = response.headers.get('content-type')
-          if (contentType && contentType.includes('application/json')) {
-            const data = await response.json()
-            setCities(data.results || data)
-          } else {
-            console.error('Received non-JSON response for cities')
-          }
-        } else {
-          console.error('Failed to fetch cities:', response.status)
-        }
+        const data = await apiClient.get<any>(`/locations/cities/?region=${regionId}`)
+        setCities(data.results || data)
       } catch (err) {
         console.error('Error fetching cities:', err)
       }
@@ -238,20 +197,9 @@ export default function AddPropertyPage() {
     setAreas([])
 
     if (cityId) {
-      const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`)
-        if (response.ok) {
-          const contentType = response.headers.get('content-type')
-          if (contentType && contentType.includes('application/json')) {
-            const data = await response.json()
-            setAreas(data.results || data)
-          } else {
-            console.error('Received non-JSON response for areas')
-          }
-        } else {
-          console.error('Failed to fetch areas:', response.status)
-        }
+        const data = await apiClient.get<any>(`/locations/areas/?city=${cityId}`)
+        setAreas(data.results || data)
       } catch (err) {
         console.error('Error fetching areas:', err)
       }
@@ -350,7 +298,7 @@ export default function AddPropertyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    let token = localStorage.getItem('property237_access_token')
+    const token = localStorage.getItem('property237_access_token')
     if (!token) {
       router.push('/sign-in')
       return
@@ -406,110 +354,15 @@ export default function AddPropertyPage() {
 
       console.log('Submitting property...')
 
-      const apiBaseUrl = getApiBaseUrl()
-      let response = await fetch(`${apiBaseUrl}/properties/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formDataToSend,
-      })
+      const data = await apiClient.upload<any>('/properties/', formDataToSend)
+      console.log('Success! Property created:', data)
 
-      // Handle token expiration - try to refresh
-      if (response.status === 401) {
-        console.log('Token expired, attempting refresh...')
-        const refreshToken = localStorage.getItem('property237_refresh_token')
+      const imageText = images.length > 0 ? ` with ${images.length} image${images.length > 1 ? 's' : ''}` : ''
+      setSuccessMessage(`Property "${data.title}" has been successfully published${imageText}!`)
 
-        if (refreshToken) {
-          try {
-            const refreshResponse = await fetch(`${apiBaseUrl}/auth/token/refresh/`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ refresh: refreshToken })
-            })
-
-            if (refreshResponse.ok) {
-              const refreshData = await refreshResponse.json()
-              localStorage.setItem('property237_access_token', refreshData.access)
-              token = refreshData.access
-
-              console.log('Token refreshed, retrying submission...')
-
-              // Retry with new token
-              response = await fetch(`${apiBaseUrl}/properties/`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
-                body: formDataToSend,
-              })
-            } else {
-              // Refresh failed, redirect to login
-              setError('Your session has expired. Please sign in again.')
-              setTimeout(() => router.push('/sign-in'), 2000)
-              return
-            }
-          } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError)
-            setError('Your session has expired. Please sign in again.')
-            setTimeout(() => router.push('/sign-in'), 2000)
-            return
-          }
-        } else {
-          setError('Your session has expired. Please sign in again.')
-          setTimeout(() => router.push('/sign-in'), 2000)
-          return
-        }
-      }
-
-      console.log('Response status:', response.status)
-      console.log('Response ok:', response.ok)
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Success! Property created:', data)
-        console.log('Property ID:', data.id)
-        console.log('Property Slug:', data.slug)
-        console.log('Images uploaded:', images.length)
-
-        // Show success message
-        const imageText = images.length > 0 ? ` with ${images.length} image${images.length > 1 ? 's' : ''}` : ''
-        setSuccessMessage(`Property "${data.title}" has been successfully published${imageText}!`)
-
-        // Redirect to dashboard properties page after 2 seconds
-        setTimeout(() => {
-          router.push('/dashboard/agent/properties' as any)
-        }, 2500)
-      } else {
-        // Check if response is JSON before parsing
-        const contentType = response.headers.get('content-type')
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json()
-          console.error('Error response:', data)
-
-          // Better error message formatting
-          let errorMsg = 'Failed to add property. '
-          if (data.detail) {
-            errorMsg += data.detail
-          } else if (typeof data === 'object') {
-            const errors = Object.entries(data)
-              .map(([field, messages]) => {
-                const msgArray = Array.isArray(messages) ? messages : [messages]
-                return `${field}: ${msgArray.join(', ')}`
-              })
-              .join('; ')
-            errorMsg += errors
-          } else {
-            errorMsg += 'Please check all fields and try again.'
-          }
-          setError(errorMsg)
-        } else {
-          // Non-JSON error response
-          const text = await response.text()
-          console.error('Non-JSON error response:', text)
-          setError(`Server error (${response.status}): ${text.substring(0, 200)}`)
-        }
-      }
+      setTimeout(() => {
+        router.push('/dashboard/agent/properties' as any)
+      }, 2500)
     } catch (err: any) {
       console.error('Error adding property:', err)
       console.error('Error name:', err.name)

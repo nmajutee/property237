@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { getApiBaseUrl } from '@/services/api'
+import apiClient from '@/services/api'
 import DashboardLayout from '../../../components/layouts/DashboardLayout'
 
 // Interfaces matching backend models
@@ -185,40 +185,12 @@ export default function EditPropertyPage() {
         return
       }
 
-      // Get the correct API base URL (works in both dev and production)
-      const apiBaseUrl = getApiBaseUrl()
-
-      // Fetch all metadata in parallel (these endpoints are public - no auth needed)
-      const [typesRes, statusesRes, regionsRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/properties/types/`),
-        fetch(`${apiBaseUrl}/properties/statuses/`),
-        fetch(`${apiBaseUrl}/locations/regions/`)
+      // Fetch all metadata in parallel
+      const [typesData, statusesData, regionsData] = await Promise.all([
+        apiClient.get<any>('/properties/types/'),
+        apiClient.get<any>('/properties/statuses/'),
+        apiClient.get<any>('/locations/regions/')
       ])
-
-      // Check if all responses are OK
-      if (!typesRes.ok || !statusesRes.ok || !regionsRes.ok) {
-        console.error('API Error:', {
-          types: typesRes.status,
-          statuses: statusesRes.status,
-          regions: regionsRes.status
-        })
-
-        // Check for authentication issues
-        if (typesRes.status === 401 || statusesRes.status === 401 || regionsRes.status === 401) {
-          setError('Session expired. Please sign in again.')
-          setTimeout(() => router.push('/sign-in'), 2000)
-          return
-        }
-
-        setError('⚠️ Warning: Could not load all property metadata. Some dropdowns may be empty. Please ensure the database is seeded.')
-        setLoading(false)
-        return
-      }
-
-      // Only parse JSON if responses are OK
-      const typesData = await typesRes.json()
-      const statusesData = await statusesRes.json()
-      const regionsData = await regionsRes.json()
 
       const types = typesData.results || typesData
       const statuses = statusesData.results || statusesData
@@ -255,22 +227,11 @@ export default function EditPropertyPage() {
       const token = localStorage.getItem('property237_access_token')
 
       if (!token) {
-        router.push('/signin')
+        router.push('/sign-in')
         return
       }
 
-      const apiBaseUrl = getApiBaseUrl()
-      const response = await fetch(`${apiBaseUrl}/properties/${propertySlug}/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch property data')
-      }
-
-      const data = await response.json()
+      const data = await apiClient.get<any>(`/properties/${propertySlug}/`)
       console.log('Loaded property data:', data)
 
       // Map all backend fields to form state
@@ -364,24 +325,16 @@ export default function EditPropertyPage() {
         const regionId = data.area.city.region.id.toString()
         setSelectedRegion(regionId)
 
-        // Fetch cities for this region
-        const citiesResponse = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`)
-        if (citiesResponse.ok) {
-          const citiesData = await citiesResponse.json()
-          setCities(citiesData.results || citiesData)
-        }
+        const citiesData = await apiClient.get<any>(`/locations/cities/?region=${regionId}`)
+        setCities(citiesData.results || citiesData)
       }
 
       if (data.area?.city?.id) {
         const cityId = data.area.city.id.toString()
         setSelectedCity(cityId)
 
-        // Fetch areas for this city
-        const areasResponse = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`)
-        if (areasResponse.ok) {
-          const areasData = await areasResponse.json()
-          setAreas(areasData.results || areasData)
-        }
+        const areasData = await apiClient.get<any>(`/locations/areas/?city=${cityId}`)
+        setAreas(areasData.results || areasData)
       }
 
       // Set existing images as previews
@@ -407,20 +360,9 @@ export default function EditPropertyPage() {
     setAreas([])
 
     if (regionId) {
-      const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`${apiBaseUrl}/locations/cities/?region=${regionId}`)
-        if (response.ok) {
-          const contentType = response.headers.get('content-type')
-          if (contentType && contentType.includes('application/json')) {
-            const data = await response.json()
-            setCities(data.results || data)
-          } else {
-            console.error('Received non-JSON response for cities')
-          }
-        } else {
-          console.error('Failed to fetch cities:', response.status)
-        }
+        const data = await apiClient.get<any>(`/locations/cities/?region=${regionId}`)
+        setCities(data.results || data)
       } catch (err) {
         console.error('Error fetching cities:', err)
       }
@@ -434,20 +376,9 @@ export default function EditPropertyPage() {
     setAreas([])
 
     if (cityId) {
-      const apiBaseUrl = getApiBaseUrl()
       try {
-        const response = await fetch(`${apiBaseUrl}/locations/areas/?city=${cityId}`)
-        if (response.ok) {
-          const contentType = response.headers.get('content-type')
-          if (contentType && contentType.includes('application/json')) {
-            const data = await response.json()
-            setAreas(data.results || data)
-          } else {
-            console.error('Received non-JSON response for areas')
-          }
-        } else {
-          console.error('Failed to fetch areas:', response.status)
-        }
+        const data = await apiClient.get<any>(`/locations/areas/?city=${cityId}`)
+        setAreas(data.results || data)
       } catch (err) {
         console.error('Error fetching areas:', err)
       }
@@ -542,12 +473,6 @@ export default function EditPropertyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    let token = localStorage.getItem('property237_access_token')
-    if (!token) {
-      router.push('/sign-in')
-      return
-    }
-
     setSubmitting(true)
     setError(null)
 
@@ -574,110 +499,15 @@ export default function EditPropertyPage() {
 
       console.log('Updating property...')
 
-      const apiBaseUrl = getApiBaseUrl()
-      let response = await fetch(`${apiBaseUrl}/properties/${propertySlug}/`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formDataToSend,
-      })
+      const data = await apiClient.uploadPatch<any>(`/properties/${propertySlug}/`, formDataToSend)
+      console.log('Success! Property updated:', data)
 
-      // Handle token expiration - try to refresh
-      if (response.status === 401) {
-        console.log('Token expired, attempting refresh...')
-        const refreshToken = localStorage.getItem('property237_refresh_token')
+      const imageText = images.length > 0 ? ` with ${images.length} new image${images.length > 1 ? 's' : ''}` : ''
+      setSuccessMessage(`Property "${data.title}" has been successfully updated${imageText}!`)
 
-        if (refreshToken) {
-          try {
-            const refreshResponse = await fetch(`${apiBaseUrl}/auth/token/refresh/`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ refresh: refreshToken })
-            })
-
-            if (refreshResponse.ok) {
-              const refreshData = await refreshResponse.json()
-              localStorage.setItem('property237_access_token', refreshData.access)
-              token = refreshData.access
-
-              console.log('Token refreshed, retrying update...')
-
-              // Retry with new token
-              response = await fetch(`${apiBaseUrl}/properties/${propertySlug}/`, {
-                method: 'PATCH',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
-                body: formDataToSend,
-              })
-            } else {
-              // Refresh failed, redirect to login
-              setError('Your session has expired. Please sign in again.')
-              setTimeout(() => router.push('/sign-in'), 2000)
-              return
-            }
-          } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError)
-            setError('Your session has expired. Please sign in again.')
-            setTimeout(() => router.push('/sign-in'), 2000)
-            return
-          }
-        } else {
-          setError('Your session has expired. Please sign in again.')
-          setTimeout(() => router.push('/sign-in'), 2000)
-          return
-        }
-      }
-
-      console.log('Response status:', response.status)
-      console.log('Response ok:', response.ok)
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Success! Property updated:', data)
-        console.log('Property ID:', data.id)
-        console.log('Property Slug:', data.slug)
-        console.log('Images uploaded:', images.length)
-
-        // Show success message
-        const imageText = images.length > 0 ? ` with ${images.length} new image${images.length > 1 ? 's' : ''}` : ''
-        setSuccessMessage(`Property "${data.title}" has been successfully updated${imageText}!`)
-
-        // Redirect to dashboard properties page after 2 seconds
-        setTimeout(() => {
-          router.push('/dashboard/agent/properties' as any)
-        }, 2500)
-      } else {
-        // Check if response is JSON before parsing
-        const contentType = response.headers.get('content-type')
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json()
-          console.error('Error response:', data)
-
-          // Better error message formatting
-          let errorMsg = 'Failed to update property. '
-          if (data.detail) {
-            errorMsg += data.detail
-          } else if (typeof data === 'object') {
-            const errors = Object.entries(data)
-              .map(([field, messages]) => {
-                const msgArray = Array.isArray(messages) ? messages : [messages]
-                return `${field}: ${msgArray.join(', ')}`
-              })
-              .join('; ')
-            errorMsg += errors
-          } else {
-            errorMsg += 'Please check all fields and try again.'
-          }
-          setError(errorMsg)
-        } else {
-          // Non-JSON error response
-          const text = await response.text()
-          console.error('Non-JSON error response:', text)
-          setError(`Server error (${response.status}): ${text.substring(0, 200)}`)
-        }
-      }
+      setTimeout(() => {
+        router.push('/dashboard/agent/properties' as any)
+      }, 2500)
     } catch (err: any) {
       console.error('Error updating property:', err)
       console.error('Error name:', err.name)

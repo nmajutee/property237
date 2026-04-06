@@ -20,6 +20,7 @@ urlpatterns = [
     # Profile
     path('profile/', views.get_profile, name='get-profile'),
     path('profile/update/', views.update_profile, name='update-profile'),
+    path('profile/update-picture/', views.update_profile_picture, name='update-profile-picture'),
 
     # Token
     path('token/refresh/', views.refresh_token, name='refresh-token'),

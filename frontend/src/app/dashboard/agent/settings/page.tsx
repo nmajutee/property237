@@ -11,7 +11,8 @@ import {
   CameraIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline'
-import { authAPI, getApiBaseUrl } from '../../../../services/api'
+import { authAPI } from '../../../../services/api'
+import apiClient from '../../../../services/api'
 import DashboardLayout from '../../../../components/layouts/DashboardLayout'
 
 export default function SettingsPage() {
@@ -84,29 +85,16 @@ export default function SettingsPage() {
     }
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('profile_picture', file)
+    const uploadData = new FormData()
+    uploadData.append('profile_picture', file)
 
     try {
-      const token = localStorage.getItem('property237_access_token')
-      const response = await fetch(`${getApiBaseUrl()}/auth/profile/update-picture/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setProfileImage(data.profile_picture)
-        alert('Profile picture updated successfully')
-      } else {
-        alert('Failed to upload image')
-      }
+      const data = await apiClient.upload<any>('/auth/profile/update-picture/', uploadData)
+      setProfileImage(data.profile_picture_url)
+      alert('Profile picture updated successfully')
     } catch (error) {
       console.error('Upload error:', error)
-      alert('An error occurred while uploading')
+      alert('Failed to upload image')
     } finally {
       setUploading(false)
     }
@@ -114,22 +102,9 @@ export default function SettingsPage() {
 
   const handleSaveProfile = async () => {
     try {
-      const token = localStorage.getItem('property237_access_token')
-      const response = await fetch(`${getApiBaseUrl()}/auth/profile/`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (response.ok) {
-        alert('Profile updated successfully')
-        loadSettings()
-      } else {
-        alert('Failed to update profile')
-      }
+      await authAPI.updateProfile(formData)
+      alert('Profile updated successfully')
+      loadSettings()
     } catch (error) {
       console.error('Save error:', error)
       alert('An error occurred')

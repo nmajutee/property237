@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '../../components/layouts/DashboardLayout'
-import { getApiBaseUrl } from '@/services/api'
+import { tenantService } from '@/services/tenantService'
 import {
   ClockIcon,
   CheckCircleIcon,
@@ -44,22 +44,13 @@ export default function MyApplicationsPage() {
       return
     }
 
-    fetchApplications(token)
+    fetchApplications()
   }, [router])
 
-  const fetchApplications = async (token: string) => {
+  const fetchApplications = async () => {
     try {
-      const response = await fetch(`${getApiBaseUrl()}/applications/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setApplications(data.results || data)
-      }
+      const data = await tenantService.listApplications()
+      setApplications((data as any).results || data as any)
     } catch (error) {
       console.error('Error fetching applications:', error)
     } finally {
@@ -68,30 +59,15 @@ export default function MyApplicationsPage() {
   }
 
   const withdrawApplication = async (applicationId: number) => {
-    const token = localStorage.getItem('property237_access_token')
-    if (!token) return
-
     if (!confirm('Are you sure you want to withdraw this application?')) return
 
     try {
-      const response = await fetch(
-        `${getApiBaseUrl()}/applications/${applicationId}/withdraw/`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.ok) {
-        setApplications(
-          applications.map((app) =>
-            app.id === applicationId ? { ...app, status: 'withdrawn' } : app
-          )
+      await tenantService.withdrawApplication(applicationId)
+      setApplications(
+        applications.map((app) =>
+          app.id === applicationId ? { ...app, status: 'withdrawn' } : app
         )
-      }
+      )
     } catch (error) {
       console.error('Error withdrawing application:', error)
     }

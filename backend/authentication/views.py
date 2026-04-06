@@ -406,6 +406,36 @@ def update_profile(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def update_profile_picture(request):
+    """
+    Update user profile picture
+    POST /api/auth/profile/update-picture/
+    """
+    from rest_framework.parsers import MultiPartParser, FormParser
+
+    if 'profile_picture' not in request.FILES:
+        return Response(
+            {'error': 'No profile_picture file provided'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user = request.user
+    # Delete old picture if exists
+    if user.profile_picture:
+        user.profile_picture.delete(save=False)
+
+    user.profile_picture = request.FILES['profile_picture']
+    user.save(update_fields=['profile_picture'])
+
+    return Response({
+        'success': True,
+        'message': 'Profile picture updated successfully',
+        'profile_picture_url': user.profile_picture.url if user.profile_picture else None,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def refresh_token(request):
     """
     Refresh access token

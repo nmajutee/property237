@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Navbar from '../../components/navigation/Navbar'
-import { getApiBaseUrl } from '@/services/api'
+import { propertyService } from '@/services/propertyService'
 import {
   FilterSidebar,
   PropertyGrid,
@@ -116,34 +116,8 @@ export default function PropertiesPage() {
 
   const fetchPropertyTypes = async () => {
     try {
-      const apiBaseUrl = getApiBaseUrl()
-      console.log('Fetching property types from:', `${apiBaseUrl}/properties/types/`)
-      const response = await fetch(`${apiBaseUrl}/properties/types/`)
-
-      if (!response.ok) {
-        console.error('Property types API error:', response.status, response.statusText)
-        setPropertyTypes([{ id: 'all', name: 'All Types' }])
-        return
-      }
-
-      const data = await response.json()
-      console.log('Property types response:', data)
-      console.log('Property types data type:', typeof data, 'Is array:', Array.isArray(data))
-
-      // Handle both array response and paginated response
-      let typesArray = []
-
-      if (Array.isArray(data)) {
-        typesArray = data
-      } else if (data && data.results && Array.isArray(data.results)) {
-        // Paginated response
-        typesArray = data.results
-      } else if (data && typeof data === 'object') {
-        // Single object or unexpected format
-        console.error('Unexpected property types format:', data)
-        typesArray = []
-      }
-
+      const data = await propertyService.getTypes() as any
+      const typesArray = Array.isArray(data) ? data : (data?.results || [])
       setPropertyTypes([
         { id: 'all', name: 'All Types' },
         ...typesArray
@@ -157,52 +131,16 @@ export default function PropertiesPage() {
   const fetchProperties = async (filters?: any) => {
     setLoading(true)
     try {
-      const apiBaseUrl = getApiBaseUrl()
+      const params: Record<string, any> = {}
 
-      // Build query parameters
-      const params = new URLSearchParams()
+      if (filters?.searchTerm) params.search = filters.searchTerm
+      if (filters?.selectedType && filters.selectedType !== 'all') params.property_type = filters.selectedType
+      if (filters?.priceRange?.min) params.price_min = filters.priceRange.min
+      if (filters?.priceRange?.max) params.price_max = filters.priceRange.max
+      if (filters?.page && filters.page > 1) params.page = filters.page
+      if (filters?.bedrooms) params.bedrooms = filters.bedrooms
 
-      if (filters?.searchTerm) {
-        params.append('search', filters.searchTerm)
-      }
-
-      if (filters?.selectedType && filters.selectedType !== 'all') {
-        params.append('property_type', filters.selectedType)
-      }
-
-      if (filters?.priceRange?.min) {
-        params.append('price_min', filters.priceRange.min)
-      }
-
-      if (filters?.priceRange?.max) {
-        params.append('price_max', filters.priceRange.max)
-      }
-
-      if (filters?.page && filters.page > 1) {
-        params.append('page', filters.page.toString())
-      }
-
-      if (filters?.bedrooms) {
-        params.append('bedrooms', filters.bedrooms)
-      }
-
-      const queryString = params.toString()
-      const url = queryString
-        ? `${apiBaseUrl}/properties/?${queryString}`
-        : `${apiBaseUrl}/properties/`
-
-      console.log('Fetching properties from:', url)
-      const response = await fetch(url)
-
-      if (!response.ok) {
-        console.error('Properties API error:', response.status, response.statusText)
-        setProperties([])
-        return
-      }
-
-      const data = await response.json()
-      console.log('Properties data:', data)
-      console.log('Number of properties:', data.results?.length || 0)
+      const data = await propertyService.list(params as any) as any
       setProperties(data.results || [])
       setTotalCount(data.count || 0)
       setNextPage(data.next)

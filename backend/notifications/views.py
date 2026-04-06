@@ -43,6 +43,17 @@ class NotificationCreateAPIView(generics.CreateAPIView):
         dispatch_notification.delay(notification.id)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def notification_detail(request, pk):
+    """Get a single notification"""
+    try:
+        notif = Notification.objects.get(pk=pk, recipient=request.user)
+    except Notification.DoesNotExist:
+        return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
+    return Response(NotificationSerializer(notif).data)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_notification_read(request, pk):

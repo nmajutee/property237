@@ -11,7 +11,8 @@ import {
   DocumentTextIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline'
-import { authAPI, getApiBaseUrl } from '../../../../services/api'
+import { authAPI } from '../../../../services/api'
+import apiClient from '../../../../services/api'
 import DashboardLayout from '../../../../components/layouts/DashboardLayout'
 
 interface AgentStats {
@@ -48,20 +49,8 @@ export default function AnalyticsPage() {
 
   const loadAnalytics = async () => {
     try {
-      const token = localStorage.getItem('property237_access_token')
-      if (token) {
-        const response = await fetch(`${getApiBaseUrl()}/analytics/agent/dashboard/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          setStats(data)
-        }
-      }
+      const data = await apiClient.get<AgentStats>('/analytics/agent/dashboard/')
+      setStats(data)
     } catch (err: any) {
       if (err.response?.status === 401) {
         router.push('/sign-in')

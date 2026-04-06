@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
-import { getApiBaseUrl } from '@/services/api';
+import { tenantService } from '@/services/tenantService';
 
 interface ContractData {
   application_id: number;
@@ -48,28 +48,12 @@ export default function ContractViewPage() {
         return;
       }
 
-      const response = await fetch(
-        `${getApiBaseUrl()}/applications/${applicationId}/contract/`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Contract not found or application not approved');
-        }
-        throw new Error('Failed to fetch contract data');
-      }
-
-      const data = await response.json();
-      setContract(data);
+      const data = await tenantService.getContract(applicationId);
+      setContract(data as any);
       setLoading(false);
     } catch (err: any) {
       console.error('Error fetching contract:', err);
-      setError(err.message);
+      setError(err.message || 'Failed to fetch contract data');
       setLoading(false);
     }
   };
@@ -84,20 +68,7 @@ export default function ContractViewPage() {
         return;
       }
 
-      const response = await fetch(
-        `${getApiBaseUrl()}/applications/${applicationId}/sign-contract/`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to sign contract');
-      }
+      await tenantService.signContract(applicationId);
 
       // Refresh contract data
       await fetchContractData();

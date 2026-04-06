@@ -46,9 +46,22 @@ export const tenantService = {
     apiClient.patch<TenantApplication>(`/tenants/applications/${id}/`, data),
 
   withdrawApplication: (id: string | number) =>
-    apiClient.patch<TenantApplication>(`/tenants/applications/${id}/`, {
-      status: 'withdrawn',
-    }),
+    apiClient.post<TenantApplication>(`/tenants/applications/${id}/withdraw/`),
+
+  // Agent-specific application endpoints
+  agentApplications: (statusFilter?: string) => {
+    const query = statusFilter ? `?status=${statusFilter}` : ''
+    return apiClient.get<TenantApplication[]>(`/tenants/applications/agent/${query}`)
+  },
+
+  updateApplicationStatus: (id: string | number, data: { status: string; review_notes?: string }) =>
+    apiClient.post<TenantApplication>(`/tenants/applications/${id}/update-status/`, data),
+
+  getContract: (id: string | number) =>
+    apiClient.get<any>(`/tenants/applications/${id}/contract/`),
+
+  signContract: (id: string | number) =>
+    apiClient.post<any>(`/tenants/applications/${id}/sign-contract/`),
 
   // Credit Score
   getCreditScore: () =>

@@ -12,7 +12,8 @@ import {
   TrashIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline'
-import { authAPI, getApiBaseUrl } from '../../../../services/api'
+import { authAPI } from '../../../../services/api'
+import { propertyService } from '../../../../services/propertyService'
 import DashboardLayout from '../../../../components/layouts/DashboardLayout'
 
 interface Property {
@@ -57,20 +58,8 @@ export default function PropertiesPage() {
 
   const loadProperties = async () => {
     try {
-      const token = localStorage.getItem('property237_access_token')
-      if (token) {
-        const response = await fetch(`${getApiBaseUrl()}/properties/my-properties/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          setProperties(data.results || data)
-        }
-      }
+      const data = await propertyService.myProperties() as any
+      setProperties(data.results || data)
     } catch (err: any) {
       if (err.response?.status === 401) {
         router.push('/sign-in')
@@ -81,28 +70,15 @@ export default function PropertiesPage() {
   }
 
   const handleDelete = async () => {
-    const token = localStorage.getItem('property237_access_token')
-    if (!token) return
-
     setDeleting(true)
     try {
-      const response = await fetch(`${getApiBaseUrl()}/properties/${deleteModal.slug}/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok || response.status === 204) {
-        setProperties(prev => prev.filter(p => p.slug !== deleteModal.slug))
-        setDeleteModal({ show: false, slug: '', title: '' })
-        alert('Property deleted successfully')
-      } else {
-        alert('Failed to delete property')
-      }
+      await propertyService.delete(deleteModal.slug)
+      setProperties(prev => prev.filter(p => p.slug !== deleteModal.slug))
+      setDeleteModal({ show: false, slug: '', title: '' })
+      alert('Property deleted successfully')
     } catch (error) {
       console.error('Error deleting property:', error)
-      alert('An error occurred')
+      alert('Failed to delete property')
     } finally {
       setDeleting(false)
     }

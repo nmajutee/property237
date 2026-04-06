@@ -20,7 +20,8 @@ import {
   DocumentTextIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline'
-import { authAPI, getApiBaseUrl } from '../../../../services/api'
+import { authAPI } from '../../../../services/api'
+import { tenantService } from '../../../../services/tenantService'
 
 interface Application {
   id: number
@@ -60,20 +61,8 @@ export default function ApplicationsPage() {
       const profileData = await authAPI.getProfile()
       setUser((profileData as any).user)
 
-      const token = localStorage.getItem('property237_access_token')
-      if (token) {
-        const response = await fetch(`${getApiBaseUrl()}/applications/agent/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          setApplications(data.results || data)
-        }
-      }
+      const data = await tenantService.agentApplications()
+      setApplications((data as any).results || data as any)
     } catch (err: any) {
       if (err.response?.status === 401) {
         router.push('/sign-in')
@@ -84,29 +73,13 @@ export default function ApplicationsPage() {
   }
 
   const updateApplicationStatus = async (applicationId: number, status: 'approved' | 'rejected') => {
-    const token = localStorage.getItem('property237_access_token')
-    if (!token) return
-
     try {
-      const response = await fetch(
-        `${getApiBaseUrl()}/applications/${applicationId}/update-status/`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status }),
-        }
-      )
-
-      if (response.ok) {
-        setApplications(
-          applications.map((app) =>
-            app.id === applicationId ? { ...app, status } : app
-          )
+      await tenantService.updateApplicationStatus(applicationId, { status })
+      setApplications(
+        applications.map((app) =>
+          app.id === applicationId ? { ...app, status } : app
         )
-      }
+      )
     } catch (error) {
       console.error('Error updating application:', error)
       alert('Failed to update application status')

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '../../components/layouts/DashboardLayout'
-import { getApiBaseUrl } from '@/services/api'
+import { propertyService } from '@/services/propertyService'
+import apiClient from '@/services/api'
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolid, MapPinIcon, HomeIcon } from '@heroicons/react/24/solid'
 
@@ -38,22 +39,13 @@ export default function MyFavoritesPage() {
     }
 
     setUser(JSON.parse(userData))
-    fetchFavorites(token)
+    fetchFavorites()
   }, [router])
 
-  const fetchFavorites = async (token: string) => {
+  const fetchFavorites = async () => {
     try {
-      const response = await fetch(`${getApiBaseUrl()}/properties/favorites/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setFavorites(data.results || data)
-      }
+      const data = await propertyService.listFavorites() as any
+      setFavorites(data.results || data)
     } catch (error) {
       console.error('Error fetching favorites:', error)
     } finally {
@@ -62,25 +54,9 @@ export default function MyFavoritesPage() {
   }
 
   const removeFavorite = async (propertySlug: string) => {
-    const token = localStorage.getItem('property237_access_token')
-    if (!token) return
-
     try {
-      const response = await fetch(
-        `${getApiBaseUrl()}/properties/${propertySlug}/favorite/`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.ok) {
-        // Re-fetch favorites to update list
-        fetchFavorites(token)
-      }
+      await apiClient.delete(`/properties/${propertySlug}/favorite/`)
+      fetchFavorites()
     } catch (error) {
       console.error('Error removing favorite:', error)
     }

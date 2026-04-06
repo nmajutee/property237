@@ -5,7 +5,9 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import Navbar from '../../../components/navigation/Navbar'
-import { getApiBaseUrl } from '@/services/api'
+import { propertyService } from '@/services/propertyService'
+import { tenantService } from '@/services/tenantService'
+import apiClient from '@/services/api'
 import {
   Heart,
   MapPin,
@@ -155,18 +157,13 @@ export default function PropertyDetailPage() {
 
   const fetchProperty = async (id: string) => {
     try {
-      const apiBaseUrl = getApiBaseUrl()
-      const response = await fetch(`${apiBaseUrl}/properties/${id}/`)
-      if (response.ok) {
-        const data = await response.json()
-        setProperty(data)
-        checkFavoriteStatus(id)
-        fetchSimilarProperties(data)
-      } else {
-        router.push('/properties')
-      }
+      const data = await propertyService.getBySlug(id) as any
+      setProperty(data)
+      checkFavoriteStatus(id)
+      fetchSimilarProperties(data)
     } catch (error) {
       console.error('Error fetching property:', error)
+      router.push('/properties')
     } finally {
       setLoading(false)
     }
@@ -177,19 +174,8 @@ export default function PropertyDetailPage() {
     if (!token) return
 
     try {
-      const apiBaseUrl = getApiBaseUrl()
-      const response = await fetch(
-        `${apiBaseUrl}/properties/${id}/is_favorite/`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      )
-      if (response.ok) {
-        const data = await response.json()
-        setIsFavorite(data.is_favorite)
-      }
+      const data = await apiClient.get<any>(`/properties/${id}/is_favorite/`)
+      setIsFavorite(data.is_favorite)
     } catch (error) {
       console.error('Error checking favorite status:', error)
     }
@@ -197,16 +183,9 @@ export default function PropertyDetailPage() {
 
   const fetchSimilarProperties = async (prop: Property) => {
     try {
-      const apiBaseUrl = getApiBaseUrl()
-      const params = new URLSearchParams()
-      if (prop.property_type?.id) params.append('property_type', prop.property_type.id.toString())
-      if (prop.area?.city?.id) params.append('city', prop.area.city.id.toString())
-      const response = await fetch(`${apiBaseUrl}/properties/?${params.toString()}`)
-      if (response.ok) {
-        const data = await response.json()
-        const results = (data.results || []).filter((p: any) => p.id !== prop.id).slice(0, 4)
-        setSimilarProperties(results)
-      }
+      const data = await propertyService.similar(prop.slug || (prop.id?.toString() ?? '')) as any
+      const results = (data.results || data || []).filter((p: any) => p.id !== prop.id).slice(0, 4)
+      setSimilarProperties(results)
     } catch (error) {
       console.error('Error fetching similar properties:', error)
     }
@@ -220,21 +199,12 @@ export default function PropertyDetailPage() {
     }
 
     try {
-      const apiBaseUrl = getApiBaseUrl()
-      const response = await fetch(
-        `${apiBaseUrl}/properties/${property?.id}/favorite/`,
-        {
-          method: isFavorite ? 'DELETE' : 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.ok) {
-        setIsFavorite(!isFavorite)
+      if (isFavorite) {
+        await apiClient.delete(`/properties/${property?.slug || property?.id}/favorite/`)
+      } else {
+        await propertyService.toggleFavorite(property?.slug || property?.id?.toString() || '')
       }
+      setIsFavorite(!isFavorite)
     } catch (error) {
       console.error('Error toggling favorite:', error)
     }
@@ -252,31 +222,18 @@ export default function PropertyDetailPage() {
     setSubmitting(true)
 
     try {
-      const apiBaseUrl = getApiBaseUrl()
-      const response = await fetch(`${apiBaseUrl}/applications/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          property: property?.id,
-          move_in_date: moveInDate,
-          notes: notes,
-        }),
-      })
+      await tenantService.createApplication({
+        property_id: property?.id as number,
+        desired_move_in_date: moveInDate,
+        special_requests: notes,
+      } as any)
 
-      if (response.ok) {
-        alert('Application submitted successfully!')
-        setShowApplicationModal(false)
-        router.push('/my-applications')
-      } else {
-        const data = await response.json()
-        alert(data.error || 'Failed to submit application')
-      }
-    } catch (error) {
+      alert('Application submitted successfully!')
+      setShowApplicationModal(false)
+      router.push('/my-applications')
+    } catch (error: any) {
       console.error('Error submitting application:', error)
-      alert('An error occurred. Please try again.')
+      alert(error.response?.data?.error || 'Failed to submit application. Please try again.')
     } finally {
       setSubmitting(false)
     }

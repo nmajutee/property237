@@ -16,7 +16,7 @@ import {
   ClockIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline'
-import { authAPI, getApiBaseUrl } from '../../../../services/api'
+import { authAPI, creditsAPI } from '../../../../services/api'
 
 interface CreditPackage {
   id: number
@@ -51,27 +51,14 @@ export default function CreditsPage() {
       const profileData = await authAPI.getProfile()
       setUser((profileData as any).user)
 
-      const token = localStorage.getItem('property237_access_token')
-      if (token) {
-        // Fetch balance
-        const balanceRes = await fetch(`${getApiBaseUrl()}/credits/balance/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        const balanceData = await balanceRes.json()
-        setBalance(parseFloat(balanceData.balance))
+      const balanceData = await creditsAPI.getBalance()
+      setBalance(parseFloat(balanceData.balance))
 
-        // Fetch packages
-        const packagesRes = await fetch(`${getApiBaseUrl()}/credits/packages/`)
-        const packagesData = await packagesRes.json()
-        setPackages(packagesData.results || [])
+      const packagesData = await creditsAPI.getPackages() as any
+      setPackages(packagesData.results || packagesData || [])
 
-        // Fetch transactions
-        const transactionsRes = await fetch(`${getApiBaseUrl()}/credits/transactions/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        const transactionsData = await transactionsRes.json()
-        setTransactions(transactionsData.results || [])
-      }
+      const transactionsData = await creditsAPI.getTransactions() as any
+      setTransactions(transactionsData.results || transactionsData || [])
     } catch (err: any) {
       if (err.response?.status === 401) {
         router.push('/sign-in')
@@ -83,25 +70,15 @@ export default function CreditsPage() {
 
   const handlePurchase = async (packageId: number) => {
     try {
-      const token = localStorage.getItem('property237_access_token')
-      const response = await fetch(`${getApiBaseUrl()}/credits/purchase/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ package_id: packageId })
+      await creditsAPI.purchaseCredits({
+        package_id: packageId.toString(),
+        payment_method: 'momo',
       })
-
-      if (response.ok) {
-        alert('Purchase successful!')
-        loadCreditsData()
-      } else {
-        alert('Purchase failed. Please try again.')
-      }
+      alert('Purchase successful!')
+      loadCreditsData()
     } catch (error) {
       console.error('Error purchasing credits:', error)
-      alert('An error occurred. Please try again.')
+      alert('Purchase failed. Please try again.')
     }
   }
 

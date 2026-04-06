@@ -219,6 +219,8 @@ class Transaction(models.Model):
             models.Index(fields=['user', 'status']),
             models.Index(fields=['transaction_type', 'created_at']),
             models.Index(fields=['phone_number']),
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
         ]
 
     def __str__(self):
@@ -321,6 +323,10 @@ class Invoice(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['status', 'due_date']),
+        ]
 
     def __str__(self):
         return f"Invoice {self.invoice_number} - {self.user.email}"
@@ -488,6 +494,11 @@ class Escrow(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', 'expires_at']),
+            models.Index(fields=['buyer', 'status']),
+            models.Index(fields=['seller', 'status']),
+        ]
 
     def __str__(self):
         return f"Escrow {self.escrow_id} - {self.amount} {self.currency.code}"

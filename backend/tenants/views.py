@@ -1,26 +1,39 @@
 from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Q
 from .models import Tenant, TenantDocument, TenantApplication
 from .serializers import TenantSerializer, TenantDocumentSerializer, TenantApplicationSerializer
 
 
 class TenantViewSet(viewsets.ModelViewSet):
-    queryset = Tenant.objects.select_related('user').all()
     serializer_class = TenantSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['user__email', 'user__first_name', 'user__last_name', 'employer_name']
     ordering_fields = ['created_at', 'monthly_income']
 
+    def get_queryset(self):
+        user = self.request.user
+        qs = Tenant.objects.select_related('user')
+        if user.is_staff:
+            return qs.all()
+        return qs.filter(user=user)
+
 
 class TenantDocumentViewSet(viewsets.ModelViewSet):
-    queryset = TenantDocument.objects.select_related('tenant', 'tenant__user').all()
     serializer_class = TenantDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'tenant__user__email']
     ordering_fields = ['uploaded_at']
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = TenantDocument.objects.select_related('tenant', 'tenant__user')
+        if user.is_staff:
+            return qs.all()
+        return qs.filter(tenant__user=user)
 
 
 class TenantApplicationViewSet(viewsets.ModelViewSet):
@@ -38,7 +51,9 @@ class TenantApplicationViewSet(viewsets.ModelViewSet):
         if hasattr(user, 'tenant_profile'):
             return TenantApplication.objects.filter(
                 tenant=user.tenant_profile
-            ).select_related('property', 'property__area__city', 'tenant__user')
+            ).select_related(
+                'property', 'property__area__city', 'property__agent__user', 'tenant__user'
+            ).prefetch_related('property__media_files')
         return TenantApplication.objects.none()
 
     @action(detail=True, methods=['post'])

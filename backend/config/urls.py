@@ -38,6 +38,34 @@ api_v1_patterns = [
 
 
 @require_GET
+def health_check(request):
+    """Comprehensive health check: DB, Redis, Celery."""
+    checks = {}
+
+    # Database check
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+        checks['database'] = 'ok'
+    except Exception as e:
+        checks['database'] = f'error: {e}'
+
+    # Redis check
+    try:
+        from django.core.cache import cache
+        cache.set('_health', '1', 5)
+        val = cache.get('_health')
+        checks['cache'] = 'ok' if val == '1' else 'error: value mismatch'
+    except Exception:
+        checks['cache'] = 'unavailable'
+
+    overall = 'ok' if checks.get('database') == 'ok' else 'degraded'
+    status_code = 200 if overall == 'ok' else 503
+    return JsonResponse({'status': overall, 'checks': checks}, status=status_code)
+
+
+@require_GET
 def celery_health_check(request):
     """Check Celery worker availability."""
     try:
@@ -62,7 +90,7 @@ urlpatterns = [
     path('api/', include(api_v1_patterns)),
 
     # Health check endpoint
-    path('health/', lambda request: HttpResponse('OK')),
+    path('health/', health_check),
     path('health/celery/', celery_health_check),
 ]
 

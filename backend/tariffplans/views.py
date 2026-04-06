@@ -29,7 +29,9 @@ class TariffPlanListAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        qs = TariffPlan.objects.filter(is_active=True, is_public=True).order_by('display_order', 'price')
+        qs = TariffPlan.objects.filter(
+            is_active=True, is_public=True
+        ).select_related('category').order_by('display_order', 'price')
         category = self.request.query_params.get('category')
         if category:
             qs = qs.filter(category_id=category)
@@ -47,7 +49,9 @@ class TariffPlanDetailAPIView(generics.RetrieveAPIView):
     serializer_class = TariffPlanSerializer
     permission_classes = [AllowAny]
     lookup_field = 'slug'
-    queryset = TariffPlan.objects.filter(is_active=True)
+    queryset = TariffPlan.objects.filter(
+        is_active=True
+    ).select_related('category').prefetch_related('feature_values__feature')
 
 
 class PlanFeatureListAPIView(generics.ListAPIView):
@@ -64,7 +68,9 @@ class UserSubscriptionListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserSubscription.objects.filter(user=self.request.user).order_by('-created_at')
+        return UserSubscription.objects.filter(
+            user=self.request.user
+        ).select_related('plan', 'plan__category').order_by('-created_at')
 
 
 @api_view(['GET'])
@@ -73,7 +79,7 @@ def current_subscription(request):
     """Get current active subscription"""
     sub = UserSubscription.objects.filter(
         user=request.user, status__in=['active', 'trial']
-    ).order_by('-created_at').first()
+    ).select_related('plan', 'plan__category').order_by('-created_at').first()
     if not sub:
         return Response({'subscription': None, 'message': 'No active subscription'})
     return Response(UserSubscriptionSerializer(sub).data)
@@ -204,7 +210,9 @@ class PlanUpgradeHistoryAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return PlanUpgrade.objects.filter(user=self.request.user).order_by('-requested_at')
+        return PlanUpgrade.objects.filter(
+            user=self.request.user
+        ).select_related('from_plan', 'to_plan').order_by('-requested_at')
 
 
 @api_view(['GET'])

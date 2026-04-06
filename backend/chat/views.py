@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db import models
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -25,7 +26,13 @@ class ConversationListCreateAPIView(generics.ListAPIView):
     def get_queryset(self):
         qs = Conversation.objects.filter(
             participants=self.request.user, is_archived=False
-        ).prefetch_related('participants', 'messages').order_by('-last_message_at')
+        ).select_related('property').prefetch_related(
+            'participants',
+            models.Prefetch(
+                'messages',
+                queryset=Message.objects.select_related('sender').order_by('-sent_at'),
+            ),
+        ).order_by('-last_message_at')
 
         conv_type = self.request.query_params.get('type')
         if conv_type:

@@ -35,7 +35,9 @@ class TransactionListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = Transaction.objects.filter(user=self.request.user).order_by('-created_at')
+        qs = Transaction.objects.filter(
+            user=self.request.user
+        ).select_related('currency').order_by('-created_at')
         tx_type = self.request.query_params.get('type')
         if tx_type:
             qs = qs.filter(transaction_type=tx_type)
@@ -52,7 +54,7 @@ class TransactionDetailAPIView(generics.RetrieveAPIView):
     lookup_field = 'transaction_id'
 
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        return Transaction.objects.filter(user=self.request.user).select_related('currency')
 
 
 class TransactionCreateAPIView(generics.CreateAPIView):

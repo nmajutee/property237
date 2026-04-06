@@ -24,7 +24,9 @@ class ReportCreateAPIView(generics.CreateAPIView):
 @permission_classes([IsAuthenticated])
 def my_reports(request):
     """List reports filed by the current user."""
-    reports = Report.objects.filter(reporter=request.user)
+    reports = Report.objects.filter(
+        reporter=request.user
+    ).select_related('reporter', 'reviewed_by', 'content_type')
     serializer = ReportSerializer(reports, many=True)
     return Response(serializer.data)
 

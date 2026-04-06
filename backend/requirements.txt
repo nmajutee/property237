@@ -28,6 +28,7 @@ sqlparse==0.5.1
 typing_extensions==4.12.2
 urllib3==1.26.20
 whitenoise==6.8.2
+sentry-sdk==2.57.0
 africastalking==1.2.8
 celery[redis]==5.4.0
 django-celery-beat==2.7.0

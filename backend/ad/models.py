@@ -120,6 +120,11 @@ class Advertisement(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', 'start_date', 'end_date']),
+            models.Index(fields=['advertiser', 'status']),
+            models.Index(fields=['placement']),
+        ]
 
     def __str__(self):
         return f"{self.title} - {self.property_listing.title}"
@@ -268,6 +273,10 @@ class PromotedProperty(models.Model):
     class Meta:
         verbose_name_plural = "Promoted Properties"
         ordering = ['-priority_score', '-created_at']
+        indexes = [
+            models.Index(fields=['is_active', 'promotion_type', 'start_date', 'end_date']),
+            models.Index(fields=['is_active', 'start_date', 'end_date']),
+        ]
 
     def __str__(self):
         return f"{self.property_listing.title} - {self.get_promotion_type_display()}"

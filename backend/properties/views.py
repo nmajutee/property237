@@ -223,7 +223,9 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 @api_view(['GET'])
 def property_search(request):
     """Advanced property search with multiple filters"""
-    properties = Property.objects.filter(is_active=True)
+    properties = Property.objects.filter(is_active=True).select_related(
+        'property_type', 'status', 'area__city__region', 'agent__user'
+    ).prefetch_related('images')
 
     # Apply filters
     filterset = PropertyFilter(request.GET, queryset=properties)
@@ -326,11 +328,13 @@ def my_properties_list(request):
 @permission_classes([IsAuthenticated])
 def favorites_list(request):
     """Get user's favorite properties"""
-    favorites = PropertyFavorite.objects.filter(
+    fav_ids = PropertyFavorite.objects.filter(
         user=request.user
-    ).select_related('property', 'property__area__city')
+    ).values_list('property_id', flat=True)
 
-    properties = [fav.property for fav in favorites]
+    properties = Property.objects.filter(id__in=fav_ids).select_related(
+        'property_type', 'status', 'area__city__region', 'agent__user'
+    ).prefetch_related('images')
     serializer = PropertyListSerializer(properties, many=True)
     return Response(serializer.data)
 

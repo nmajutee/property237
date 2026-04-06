@@ -3,7 +3,7 @@ Authentication Views
 API endpoints for authentication
 """
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -18,6 +18,7 @@ from .serializers import (
     UserSerializer
 )
 from .services import AuthService, OTPService, PasswordResetService
+from utils.throttles import LoginThrottle, OTPThrottle, PasswordResetThrottle, SignupThrottle
 
 User = get_user_model()
 
@@ -46,6 +47,7 @@ def get_client_info(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([SignupThrottle])
 def signup(request):
     """
     User signup endpoint
@@ -115,6 +117,7 @@ def signup(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle])
 def login(request):
     """
     User login endpoint
@@ -193,6 +196,7 @@ def logout(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([OTPThrottle])
 def request_otp(request):
     """
     Request OTP for verification
@@ -293,6 +297,7 @@ def verify_otp(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([PasswordResetThrottle])
 def request_password_reset(request):
     """
     Request password reset

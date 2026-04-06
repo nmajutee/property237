@@ -46,6 +46,9 @@ class MediaFile(models.Model):
 
     class Meta:
         ordering = ['order', 'uploaded_at']
+        indexes = [
+            models.Index(fields=['property', 'file_type', 'is_active']),
+        ]
 
     def __str__(self):
         return f"{self.property.title} - {self.title or self.file.name}"
@@ -85,6 +88,9 @@ class PropertyImage(models.Model):
 
     class Meta:
         ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['property', 'is_primary']),
+        ]
 
     def __str__(self):
         return f"{self.property.title} - {self.get_image_type_display()}"

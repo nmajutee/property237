@@ -97,6 +97,10 @@ class ServiceProvider(models.Model):
 
     class Meta:
         ordering = ['-rating', 'name']
+        indexes = [
+            models.Index(fields=['provider_type', 'is_active', 'is_verified']),
+            models.Index(fields=['is_emergency_available']),
+        ]
 
     def __str__(self):
         return f"{self.name} - {self.get_provider_type_display()}"

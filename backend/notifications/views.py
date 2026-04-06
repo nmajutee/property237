@@ -16,7 +16,9 @@ class NotificationListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = Notification.objects.filter(recipient=self.request.user).order_by('-created_at')
+        qs = Notification.objects.filter(
+            recipient=self.request.user
+        ).select_related('sender', 'content_type').order_by('-created_at')
         status_filter = self.request.query_params.get('status')
         if status_filter:
             qs = qs.filter(status=status_filter)
@@ -27,11 +29,14 @@ class NotificationListAPIView(generics.ListAPIView):
 
 
 class NotificationCreateAPIView(generics.CreateAPIView):
-    """Send a notification"""
+    """Send a notification (admin/staff only)"""
     serializer_class = NotificationCreateSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        if not self.request.user.is_staff:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Only staff can create notifications for other users.')
         notification = serializer.save()
         # Dispatch asynchronously via Celery
         from .tasks import dispatch_notification
@@ -93,7 +98,12 @@ class NotificationPreferenceAPIView(generics.RetrieveUpdateAPIView):
 
 
 class NotificationTemplateListAPIView(generics.ListAPIView):
-    """List notification templates (admin use)"""
+    """List notification templates (admin only)"""
     serializer_class = NotificationTemplateSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return NotificationTemplate.objects.none()
+        return NotificationTemplate.objects.filter(is_active=True)
     queryset = NotificationTemplate.objects.filter(is_active=True)

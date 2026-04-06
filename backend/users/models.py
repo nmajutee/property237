@@ -119,6 +119,13 @@ class CustomUser(AbstractUser):
         """Check if user can list properties"""
         return self.user_type in ['agent', 'landlord'] and self.is_phone_verified
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['user_type', 'is_suspended']),
+            models.Index(fields=['user_type', 'is_phone_verified']),
+            models.Index(fields=['user_type']),
+        ]
+
 
 class UserPreferences(models.Model):
     """
@@ -207,6 +214,10 @@ class UserVerification(models.Model):
 
     class Meta:
         ordering = ['-submitted_at']
+        indexes = [
+            models.Index(fields=['user', 'verification_type', 'status']),
+            models.Index(fields=['status', 'expires_at']),
+        ]
 
     def __str__(self):
         return f"{self.user.email} - {self.get_verification_type_display()} - {self.status}"

@@ -80,7 +80,9 @@ class AgentListAPIView(generics.ListAPIView):
 
 class AgentDetailAPIView(generics.RetrieveAPIView):
     """Get agent details by ID"""
-    queryset = AgentProfile.objects.filter(is_verified=True)
+    queryset = AgentProfile.objects.filter(
+        is_verified=True
+    ).select_related('user').prefetch_related('service_areas__city__region')
     serializer_class = AgentProfileSerializer
     lookup_field = 'id'
 
@@ -106,7 +108,7 @@ class AgentReviewListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         agent_id = self.kwargs.get('agent_id')
-        return AgentReview.objects.filter(agent_id=agent_id)
+        return AgentReview.objects.filter(agent_id=agent_id).select_related('reviewer')
 
     def perform_create(self, serializer):
         agent_id = self.kwargs.get('agent_id')

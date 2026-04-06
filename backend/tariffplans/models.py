@@ -232,6 +232,10 @@ class UserSubscription(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['status', 'end_date']),
+        ]
 
     def __str__(self):
         return f"{self.user.email} - {self.plan.name} ({self.status})"

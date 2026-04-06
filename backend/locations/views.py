@@ -19,7 +19,7 @@ class CountryListAPIView(generics.ListAPIView):
 class RegionListAPIView(generics.ListAPIView):
     """List regions, optionally filtered by country"""
     permission_classes = [AllowAny]
-    queryset = Region.objects.all()
+    queryset = Region.objects.select_related('country').all()
     serializer_class = RegionSerializer
 
     def get_queryset(self):
@@ -33,7 +33,7 @@ class RegionListAPIView(generics.ListAPIView):
 class CityListAPIView(generics.ListAPIView):
     """List cities, optionally filtered by region"""
     permission_classes = [AllowAny]
-    queryset = City.objects.all()
+    queryset = City.objects.select_related('region__country').all()
     serializer_class = CitySerializer
 
     def get_queryset(self):
@@ -47,7 +47,7 @@ class CityListAPIView(generics.ListAPIView):
 class AreaListAPIView(generics.ListAPIView):
     """List areas, optionally filtered by city"""
     permission_classes = [AllowAny]
-    queryset = Area.objects.all()
+    queryset = Area.objects.select_related('city__region__country').all()
     serializer_class = AreaSerializer
 
     def get_queryset(self):

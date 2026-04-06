@@ -129,6 +129,10 @@ class AgentProfile(models.Model):
     class Meta:
         app_label = 'agents'
         ordering = ['-is_featured', '-client_rating']
+        indexes = [
+            models.Index(fields=['is_active', 'is_verified', 'is_featured']),
+            models.Index(fields=['is_active', 'specialization']),
+        ]
 
 
 class AgentCertification(models.Model):

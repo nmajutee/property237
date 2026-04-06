@@ -51,6 +51,9 @@ class Conversation(models.Model):
 
     class Meta:
         ordering = ['-last_message_at']
+        indexes = [
+            models.Index(fields=['is_active', 'last_message_at']),
+        ]
 
     def __str__(self):
         participant_names = ", ".join([user.username for user in self.participants.all()[:3]])
@@ -101,6 +104,10 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['sent_at']
+        indexes = [
+            models.Index(fields=['conversation', 'is_read']),
+            models.Index(fields=['conversation', 'sent_at']),
+        ]
 
     def __str__(self):
         return f"{self.sender.username} in {self.conversation.conversation_id} - {self.message_type}"

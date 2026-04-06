@@ -271,6 +271,10 @@ class TenantApplication(models.Model):
     class Meta:
         ordering = ['-created_at']
         unique_together = ['tenant', 'property']
+        indexes = [
+            models.Index(fields=['property', 'status']),
+            models.Index(fields=['status', 'submitted_at']),
+        ]
 
     def __str__(self):
         return f"{self.tenant.user.full_name} - {self.property.title}"

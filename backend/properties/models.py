@@ -45,6 +45,9 @@ class PropertyType(models.Model):
 
     class Meta:
         ordering = ['category', 'name']
+        indexes = [
+            models.Index(fields=['category', 'is_active']),
+        ]
 
     def __str__(self):
         return self.name
@@ -342,6 +345,8 @@ class Property(models.Model):
             models.Index(fields=['price']),
             models.Index(fields=['created_at']),
             models.Index(fields=['featured']),
+            models.Index(fields=['is_active', 'created_at']),
+            models.Index(fields=['agent', 'is_active']),
         ]
 
     def __str__(self):

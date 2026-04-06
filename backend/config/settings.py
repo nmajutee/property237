@@ -83,6 +83,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middleware.AuditLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -203,6 +204,18 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/hour',
+        'login': '10/minute',
+        'otp': '5/minute',
+        'password_reset': '5/hour',
+        'signup': '10/hour',
+    },
 }
 
 # Email settings
@@ -228,17 +241,20 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Security headers and HTTPS settings (set via environment for production)
-SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '0'))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'False').lower() in ['true', '1', 'yes']
-SECURE_HSTS_PRELOAD = os.getenv('SECURE_HSTS_PRELOAD', 'False').lower() in ['true', '1', 'yes']
+# In production (DEBUG=False), defaults are secure
+_prod = not DEBUG
+SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '31536000' if _prod else '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv('SECURE_HSTS_INCLUDE_SUBDOMAINS', str(_prod)).lower() in ['true', '1', 'yes']
+SECURE_HSTS_PRELOAD = os.getenv('SECURE_HSTS_PRELOAD', str(_prod)).lower() in ['true', '1', 'yes']
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False').lower() in ['true', '1', 'yes']
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() in ['true', '1', 'yes']
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False').lower() in ['true', '1', 'yes']
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', str(_prod)).lower() in ['true', '1', 'yes']
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', str(_prod)).lower() in ['true', '1', 'yes']
 SECURE_REFERRER_POLICY = os.getenv('SECURE_REFERRER_POLICY', 'same-origin')
 SECURE_CONTENT_TYPE_NOSNIFF = os.getenv('SECURE_CONTENT_TYPE_NOSNIFF', 'True').lower() in ['true','1','yes']
 SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
 CSRF_COOKIE_SAMESITE = os.getenv('CSRF_COOKIE_SAMESITE', 'Lax')
 X_FRAME_OPTIONS = os.getenv('X_FRAME_OPTIONS', 'DENY')
+SECURE_BROWSER_XSS_FILTER = True
 
 # If behind a proxy/ingress that terminates TLS
 if os.getenv('SECURE_PROXY_SSL_HEADER'):
@@ -483,6 +499,12 @@ LOGGING = {
             'filename': BASE_DIR / 'logs' / 'django.log',
             'formatter': 'verbose',
         },
+        'audit_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'audit.log',
+            'formatter': 'json',
+        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -504,12 +526,31 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'audit': {
+            'handlers': ['audit_file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
 
 # Create logs directory
 import pathlib
 (BASE_DIR / 'logs').mkdir(exist_ok=True)
+
+# ==============================
+# Sentry Error Tracking
+# ==============================
+SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+if SENTRY_DSN:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        traces_sample_rate=float(os.getenv('SENTRY_TRACES_SAMPLE_RATE', '0.1')),
+        profiles_sample_rate=float(os.getenv('SENTRY_PROFILES_SAMPLE_RATE', '0.1')),
+        environment=os.getenv('SENTRY_ENVIRONMENT', 'production'),
+        send_default_pii=False,
+    )
 
 # ==============================
 # SMS Configuration (Africa's Talking)

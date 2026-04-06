@@ -18,7 +18,8 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaintenanceRequest
         fields = [
-            'id', 'property', 'tenant', 'category', 'title', 'description', 'priority', 'status',
-            'requested_date', 'completed_date', 'estimated_cost', 'actual_cost', 'assigned_to'
+            'id', 'related_property', 'tenant', 'landlord', 'category', 'title', 'description',
+            'priority', 'status', 'requested_date', 'completed_date', 'estimated_cost',
+            'actual_cost', 'assigned_to'
         ]
         read_only_fields = ['id', 'requested_date']

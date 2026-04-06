@@ -143,6 +143,8 @@ class LeaseAgreement(models.Model):
             models.Index(fields=['status', 'start_date']),
             models.Index(fields=['tenant', 'status']),
             models.Index(fields=['rental_property', 'status']),
+            models.Index(fields=['landlord', 'status']),
+            models.Index(fields=['status', 'end_date']),
         ]
 
     def __str__(self):
@@ -237,6 +239,9 @@ class RentSchedule(models.Model):
     class Meta:
         ordering = ['due_date']
         unique_together = ['lease', 'due_date']
+        indexes = [
+            models.Index(fields=['is_paid', 'due_date']),
+        ]
 
     def __str__(self):
         lease_id = self.lease.lease_number or self.lease.id

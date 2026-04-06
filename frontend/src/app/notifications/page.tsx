@@ -164,7 +164,7 @@ export default function NotificationsPage() {
                       <span>From: {notif.sender_name || 'System'} •{' '}
                       {new Date(notif.created_at).toLocaleString()}</span>
                       {notifLink && (
-                        <Link href={notifLink} className="text-green-600 hover:underline">
+                        <Link href={notifLink as any} className="text-green-600 hover:underline">
                           View →
                         </Link>
                       )}

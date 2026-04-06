@@ -37,4 +37,14 @@ export const notificationService = {
 
   updatePreferences: (data: Partial<NotificationPreferences>) =>
     apiClient.patch<NotificationPreferences>('/notifications/preferences/', data),
+
+  // FCM Push Notifications
+  registerDevice: (token: string, deviceType: 'web' | 'android' | 'ios' = 'web') =>
+    apiClient.post<{ id: number; device_type: string; created: boolean }>(
+      '/notifications/fcm/register/',
+      { token, device_type: deviceType },
+    ),
+
+  unregisterDevice: (token: string) =>
+    apiClient.post('/notifications/fcm/unregister/', { token }),
 }

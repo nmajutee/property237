@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.utils import timezone
-from .models import Notification, NotificationPreference, NotificationTemplate
+from .models import Notification, NotificationPreference, NotificationTemplate, FCMDevice
 from .serializers import (
     NotificationSerializer, NotificationCreateSerializer,
     NotificationPreferenceSerializer, NotificationTemplateSerializer
@@ -107,3 +107,36 @@ class NotificationTemplateListAPIView(generics.ListAPIView):
             return NotificationTemplate.objects.none()
         return NotificationTemplate.objects.filter(is_active=True)
     queryset = NotificationTemplate.objects.filter(is_active=True)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def register_fcm_device(request):
+    """Register or update an FCM device token for push notifications."""
+    token = request.data.get('token', '').strip()
+    device_type = request.data.get('device_type', 'web')
+    if not token:
+        return Response({'error': 'token is required'}, status=status.HTTP_400_BAD_REQUEST)
+    if device_type not in ('web', 'android', 'ios'):
+        device_type = 'web'
+
+    device, created = FCMDevice.objects.update_or_create(
+        registration_id=token,
+        defaults={'user': request.user, 'device_type': device_type, 'is_active': True},
+    )
+    return Response({
+        'id': device.id,
+        'device_type': device.device_type,
+        'created': created,
+    }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def unregister_fcm_device(request):
+    """Remove an FCM device token."""
+    token = request.data.get('token', '').strip()
+    if not token:
+        return Response({'error': 'token is required'}, status=status.HTTP_400_BAD_REQUEST)
+    FCMDevice.objects.filter(registration_id=token, user=request.user).delete()
+    return Response({'success': True})

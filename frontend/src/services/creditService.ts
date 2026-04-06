@@ -78,4 +78,39 @@ export const creditService = {
       transaction: CreditTransaction
       balance: CreditBalance
     }>('/credits/payment/momo/verify/', data),
+
+  // Referrals
+  getReferralCode: () =>
+    apiClient.get<{
+      id: number
+      code: string
+      status: string
+      referrer_bonus: string
+      referee_bonus: string
+    }>('/credits/referral/'),
+
+  getReferralStats: () =>
+    apiClient.get<{
+      completed: number
+      pending: number
+      total_earned: string
+      referrals: Array<{
+        id: number
+        code: string
+        status: string
+        referrer_email: string
+        referred_email: string | null
+        referrer_bonus: string
+        referee_bonus: string
+        created_at: string
+        completed_at: string | null
+      }>
+    }>('/credits/referral/stats/'),
+
+  applyReferralCode: (data: { code: string; user_id: number }) =>
+    apiClient.post<{
+      success: boolean
+      referrer_bonus: string
+      referee_bonus: string
+    }>('/credits/referral/apply/', data),
 }

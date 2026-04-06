@@ -10,7 +10,8 @@ from .models import (
     CreditPackage,
     CreditTransaction,
     CreditPricing,
-    PropertyView
+    PropertyView,
+    Referral,
 )
 
 
@@ -215,5 +216,22 @@ class CreditPricingSerializer(serializers.ModelSerializer):
             'credits_required',
             'description',
             'is_active'
+        ]
+        read_only_fields = fields
+
+
+class ReferralSerializer(serializers.ModelSerializer):
+    """Serialize referral records"""
+
+    referrer_email = serializers.EmailField(source='referrer.email', read_only=True)
+    referred_email = serializers.EmailField(source='referred_user.email', read_only=True, allow_null=True)
+
+    class Meta:
+        model = Referral
+        fields = [
+            'id', 'code', 'status',
+            'referrer_email', 'referred_email',
+            'referrer_bonus', 'referee_bonus',
+            'created_at', 'completed_at',
         ]
         read_only_fields = fields

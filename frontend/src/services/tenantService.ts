@@ -49,4 +49,19 @@ export const tenantService = {
     apiClient.patch<TenantApplication>(`/tenants/applications/${id}/`, {
       status: 'withdrawn',
     }),
+
+  // Credit Score
+  getCreditScore: () =>
+    apiClient.get<{
+      total: number
+      max: number
+      grade: string
+      components: {
+        payment_history: number
+        verification: number
+        documents: number
+        lease_compliance: number
+        profile_completeness: number
+      }
+    }>('/tenants/credit-score/'),
 }

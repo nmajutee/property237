@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4; margin: 2cm; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #222; }
+  h1 { text-align: center; font-size: 18pt; margin-bottom: 4px; }
+  h2 { font-size: 13pt; border-bottom: 1px solid #999; padding-bottom: 4px; margin-top: 24px; }
+  .subtitle { text-align: center; color: #666; font-size: 10pt; margin-bottom: 24px; }
+  .header-info { text-align: center; margin-bottom: 20px; }
+  .header-info .lease-num { font-weight: bold; font-size: 12pt; }
+  table.details { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  table.details td { padding: 6px 10px; border: 1px solid #ddd; vertical-align: top; }
+  table.details td.label { background: #f5f5f5; font-weight: bold; width: 40%; }
+  .amount { font-weight: bold; }
+  .terms { white-space: pre-wrap; margin: 12px 0; padding: 12px; background: #fafafa; border: 1px solid #eee; font-size: 10pt; }
+  .signatures { margin-top: 40px; }
+  .sig-row { display: flex; justify-content: space-between; margin-top: 40px; }
+  .sig-block { width: 45%; }
+  .sig-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 4px; font-size: 10pt; }
+  .footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #999; border-top: 1px solid #ddd; padding-top: 8px; }
+  .signed-badge { display: inline-block; background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 9pt; }
+  .unsigned-badge { display: inline-block; background: #dc3545; color: white; padding: 2px 8px; border-radius: 4px; font-size: 9pt; }
+</style>
+</head>
+<body>
+
+<h1>LEASE AGREEMENT</h1>
+<p class="subtitle">Republic of Cameroon &mdash; Contrat de Bail</p>
+
+<div class="header-info">
+  <div class="lease-num">{{ lease.lease_number }}</div>
+  <div>Status: {{ lease.get_status_display }}</div>
+</div>
+
+<h2>1. Parties</h2>
+<table class="details">
+  <tr>
+    <td class="label">Landlord (Bailleur)</td>
+    <td>{{ lease.landlord.full_name }}<br>{{ lease.landlord.email }}<br>{{ lease.landlord.phone_number }}</td>
+  </tr>
+  <tr>
+    <td class="label">Tenant (Locataire)</td>
+    <td>{{ lease.tenant.user.full_name }}<br>{{ lease.tenant.user.email }}<br>{{ lease.tenant.user.phone_number }}</td>
+  </tr>
+  {% if lease.agent %}
+  <tr>
+    <td class="label">Agent</td>
+    <td>{{ lease.agent.user.full_name }}<br>{{ lease.agent.user.email }}</td>
+  </tr>
+  {% endif %}
+</table>
+
+<h2>2. Property</h2>
+<table class="details">
+  <tr>
+    <td class="label">Property</td>
+    <td>{{ lease.rental_property.title }}</td>
+  </tr>
+  <tr>
+    <td class="label">Address</td>
+    <td>{{ lease.rental_property.address }}{% if lease.rental_property.area %}, {{ lease.rental_property.area }}{% endif %}</td>
+  </tr>
+</table>
+
+<h2>3. Lease Terms</h2>
+<table class="details">
+  <tr>
+    <td class="label">Start Date</td>
+    <td>{{ lease.start_date|date:"F j, Y" }}</td>
+  </tr>
+  <tr>
+    <td class="label">End Date</td>
+    <td>{{ lease.end_date|date:"F j, Y" }}</td>
+  </tr>
+  <tr>
+    <td class="label">Monthly Rent</td>
+    <td class="amount">{{ lease.rent_amount|floatformat:0 }} {{ lease.currency }}</td>
+  </tr>
+  <tr>
+    <td class="label">Initial Months Payable</td>
+    <td>{{ lease.initial_months_payable }} month{{ lease.initial_months_payable|pluralize }}</td>
+  </tr>
+  <tr>
+    <td class="label">Security Deposit (Caution)</td>
+    <td class="amount">{{ lease.security_deposit|floatformat:0 }} {{ lease.currency }}{% if lease.caution_months %} ({{ lease.caution_months }} month{{ lease.caution_months|pluralize }}){% endif %}</td>
+  </tr>
+  {% if lease.agency_fee %}
+  <tr>
+    <td class="label">Agency Fee</td>
+    <td>{{ lease.agency_fee|floatformat:0 }} {{ lease.currency }}</td>
+  </tr>
+  {% endif %}
+  {% if lease.contract_registration_fee %}
+  <tr>
+    <td class="label">Contract Registration Fee</td>
+    <td>{{ lease.contract_registration_fee|floatformat:0 }} {{ lease.currency }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td class="label">Auto-Renewal</td>
+    <td>{{ lease.auto_renewal|yesno:"Yes,No" }}{% if lease.auto_renewal %} ({{ lease.renewal_notice_days }} days notice){% endif %}</td>
+  </tr>
+</table>
+
+<h2>4. Terms and Conditions</h2>
+{% if lease.terms %}
+<div class="terms">{{ lease.terms }}</div>
+{% else %}
+<p><em>Standard terms and conditions apply as per Cameroon property law.</em></p>
+{% endif %}
+
+<h2>5. Signatures</h2>
+<table class="details">
+  <tr>
+    <td class="label">Landlord Signature</td>
+    <td>
+      {% if lease.landlord_signed %}
+        <span class="signed-badge">SIGNED</span> on {{ lease.landlord_signature_date|date:"F j, Y H:i" }}
+      {% else %}
+        <span class="unsigned-badge">PENDING</span>
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td class="label">Tenant Signature</td>
+    <td>
+      {% if lease.tenant_signed %}
+        <span class="signed-badge">SIGNED</span> on {{ lease.tenant_signature_date|date:"F j, Y H:i" }}
+      {% else %}
+        <span class="unsigned-badge">PENDING</span>
+      {% endif %}
+    </td>
+  </tr>
+  {% if lease.agent %}
+  <tr>
+    <td class="label">Agent Signature</td>
+    <td>
+      {% if lease.agent_signed %}
+        <span class="signed-badge">SIGNED</span> on {{ lease.agent_signature_date|date:"F j, Y H:i" }}
+      {% else %}
+        <span class="unsigned-badge">PENDING</span>
+      {% endif %}
+    </td>
+  </tr>
+  {% endif %}
+</table>
+
+<div class="signatures">
+  <div style="display: flex; justify-content: space-between;">
+    <div style="width: 45%;">
+      <div class="sig-line">Landlord: {{ lease.landlord.full_name }}</div>
+    </div>
+    <div style="width: 45%;">
+      <div class="sig-line">Tenant: {{ lease.tenant.user.full_name }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Property237 &mdash; Cameroon Real Estate Platform<br>
+  Generated on {% now "F j, Y \a\t H:i" %} &bull; Lease #{{ lease.lease_number }}
+</div>
+
+</body>
+</html>

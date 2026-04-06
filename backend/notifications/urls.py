@@ -10,6 +10,8 @@ urlpatterns = [
     path('mark-all-read/', views.mark_all_read, name='mark-all-read'),
     path('preferences/', views.NotificationPreferenceAPIView.as_view(), name='preferences'),
     path('templates/', views.NotificationTemplateListAPIView.as_view(), name='templates'),
+    path('fcm/register/', views.register_fcm_device, name='fcm-register'),
+    path('fcm/unregister/', views.unregister_fcm_device, name='fcm-unregister'),
     path('<int:pk>/read/', views.mark_notification_read, name='mark-read'),
     path('<int:pk>/delete/', views.delete_notification, name='delete'),
 ]

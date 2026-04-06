@@ -1,14 +1,34 @@
 'use client'
 
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useLease } from '@/hooks/useLeases'
+import { leaseService } from '@/services/leaseService'
 
 export default function LeaseDetailPage() {
   const params = useParams()
   const leaseId = params.id as string
   const { data, isLoading, error } = useLease(leaseId)
   const lease = data as any
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownloadPdf = async () => {
+    try {
+      setDownloading(true)
+      const blob = await leaseService.downloadPdf(leaseId)
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `lease-${lease.lease_number || leaseId}.pdf`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      alert('Failed to download PDF')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   if (isLoading) return <div className="p-8 text-center text-gray-500">Loading lease...</div>
   if (error || !lease) return <div className="p-8 text-center text-gray-500">Lease not found</div>
@@ -38,9 +58,18 @@ export default function LeaseDetailPage() {
               <h1 className="text-2xl font-bold">Lease Agreement</h1>
               {lease.lease_number && <p className="text-gray-500">#{lease.lease_number}</p>}
             </div>
-            <span className={`px-3 py-1 rounded text-sm font-medium ${getStatusColor(lease.status)}`}>
-              {lease.status}
-            </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDownloadPdf}
+                disabled={downloading}
+                className="px-3 py-1 rounded bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+              >
+                {downloading ? 'Downloading...' : '📄 Download PDF'}
+              </button>
+              <span className={`px-3 py-1 rounded text-sm font-medium ${getStatusColor(lease.status)}`}>
+                {lease.status}
+              </span>
+            </div>
           </div>
         </div>
 

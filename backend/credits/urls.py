@@ -26,4 +26,9 @@ urlpatterns = [
     # Mobile Money Payments
     path('payment/momo/initiate/', views.initiate_momo_payment, name='momo-initiate'),
     path('payment/momo/verify/', views.verify_momo_payment, name='momo-verify'),
+
+    # Referrals
+    path('referral/', views.get_referral_code, name='referral-code'),
+    path('referral/stats/', views.referral_stats, name='referral-stats'),
+    path('referral/apply/', views.apply_referral_code, name='referral-apply'),
 ]

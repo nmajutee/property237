@@ -33,3 +33,4 @@ africastalking==1.2.8
 celery[redis]==5.4.0
 django-celery-beat==2.7.0
 django-celery-results==2.5.1
+weasyprint==68.1

@@ -24,10 +24,16 @@ load_dotenv(BASE_DIR.parent / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dw6k&j^^y6w#(!$4(-z*!vesg%5ih*++dn66m-gb^%rj9605-3')
+_DEFAULT_SECRET = 'django-insecure-dw6k&j^^y6w#(!$4(-z*!vesg%5ih*++dn66m-gb^%rj9605-3'
+SECRET_KEY = os.getenv('SECRET_KEY', _DEFAULT_SECRET)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
+
+# Crash loudly if production is missing critical env vars
+if not DEBUG:
+    if SECRET_KEY == _DEFAULT_SECRET:
+        raise ValueError('Set SECRET_KEY environment variable for production')
 
 # Allow hosts from environment variable or use defaults
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,property237.onrender.com').split(',')
@@ -193,10 +199,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ],
+    'DEFAULT_RENDERER_CLASSES': (
+        ['rest_framework.renderers.JSONRenderer', 'rest_framework.renderers.BrowsableAPIRenderer']
+        if DEBUG else ['rest_framework.renderers.JSONRenderer']
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': [
@@ -403,7 +409,7 @@ if os.getenv('REDIS_URL'):
             'LOCATION': os.getenv('REDIS_URL'),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'PARSER_CLASS': 'redis.connection.HiredisParser',
+                # Use HiredisParser if hiredis is installed for speed
                 'CONNECTION_POOL_KWARGS': {
                     'max_connections': 50,
                     'retry_on_timeout': True,

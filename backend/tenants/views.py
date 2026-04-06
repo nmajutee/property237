@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, filters, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Tenant, TenantDocument, TenantApplication
+from .models import Tenant, TenantDocument, TenantApplication, TenantProfile
 from .serializers import TenantSerializer, TenantDocumentSerializer, TenantApplicationSerializer
 
 
@@ -111,3 +111,20 @@ class TenantApplicationViewSet(viewsets.ModelViewSet):
             'success': True,
             'message': 'Contract signed successfully!'
         })
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def tenant_credit_score(request):
+    """Calculate and return the tenant's credit score."""
+    try:
+        profile = request.user.tenant_profile
+    except TenantProfile.DoesNotExist:
+        return Response(
+            {'error': 'Tenant profile not found'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    from .scoring import calculate_tenant_score
+    result = calculate_tenant_score(profile)
+    return Response(result)

@@ -7,13 +7,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Q
+from django.db import models
 from django.utils import timezone
 from .models import (
     CreditBalance,
     CreditPackage,
     CreditTransaction,
     CreditPricing,
-    PropertyView
+    PropertyView,
+    Referral,
 )
 from .serializers import (
     CreditBalanceSerializer,
@@ -22,7 +24,8 @@ from .serializers import (
     CreditPurchaseSerializer,
     CreditUsageSerializer,
     CreditPricingSerializer,
-    PropertyViewSerializer
+    PropertyViewSerializer,
+    ReferralSerializer,
 )
 from .services import CreditService
 
@@ -337,3 +340,112 @@ def verify_momo_payment(request):
             'success': False,
             'message': message
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ========================
+# Referral Endpoints
+# ========================
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_referral_code(request):
+    """Get or create the user's referral code."""
+    referral = Referral.objects.filter(
+        referrer=request.user, referred_user__isnull=True, status='pending',
+    ).first()
+    if not referral:
+        referral = Referral.objects.create(
+            referrer=request.user,
+            code=Referral.generate_code(),
+        )
+    return Response(ReferralSerializer(referral).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def referral_stats(request):
+    """Get referral statistics for the current user."""
+    completed = Referral.objects.filter(
+        referrer=request.user, status='completed'
+    ).count()
+    pending = Referral.objects.filter(
+        referrer=request.user, status='pending', referred_user__isnull=False,
+    ).count()
+    total_earned = Referral.objects.filter(
+        referrer=request.user, status='completed'
+    ).aggregate(total=models.Sum('referrer_bonus'))['total'] or 0
+    referrals = Referral.objects.filter(referrer=request.user).exclude(
+        status='pending', referred_user__isnull=True,
+    )
+    return Response({
+        'completed': completed,
+        'pending': pending,
+        'total_earned': str(total_earned),
+        'referrals': ReferralSerializer(referrals, many=True).data,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def apply_referral_code(request):
+    """
+    Apply a referral code during/after signup.
+    Body: {"code": "ABC123", "user_id": 42}
+    """
+    code = request.data.get('code', '').strip()
+    user_id = request.data.get('user_id')
+    if not code or not user_id:
+        return Response(
+            {'error': 'code and user_id required'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        referral = Referral.objects.select_related('referrer').get(
+            code=code, status='pending', referred_user__isnull=True,
+        )
+    except Referral.DoesNotExist:
+        return Response(
+            {'error': 'Invalid or already used referral code'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    try:
+        referred = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if referred == referral.referrer:
+        return Response(
+            {'error': 'Cannot refer yourself'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Mark referral complete
+    referral.referred_user = referred
+    referral.status = 'completed'
+    referral.completed_at = timezone.now()
+    referral.save()
+
+    # Award credits to both parties
+    from .models import CreditBalance
+    referrer_balance, _ = CreditBalance.objects.get_or_create(user=referral.referrer)
+    referrer_balance.add_credits(
+        amount=referral.referrer_bonus,
+        transaction_type=CreditTransaction.REFERRAL,
+        description=f'Referral bonus: {referred.email} signed up',
+    )
+    referee_balance, _ = CreditBalance.objects.get_or_create(user=referred)
+    referee_balance.add_credits(
+        amount=referral.referee_bonus,
+        transaction_type=CreditTransaction.REFERRAL,
+        description=f'Welcome bonus from referral by {referral.referrer.email}',
+    )
+
+    return Response({
+        'success': True,
+        'referrer_bonus': str(referral.referrer_bonus),
+        'referee_bonus': str(referral.referee_bonus),
+    })

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ClientThemeProvider } from "../design-system/ClientThemeProvider"
 import { QueryProvider } from "../providers/QueryProvider"
+import { I18nProvider } from "../lib/i18n"
 import localFont from 'next/font/local'
 import { DM_Sans } from 'next/font/google'
 import "./globals.css"
@@ -61,9 +62,11 @@ export default function RootLayout({
     <html lang="en" className={`${craftworkGrotesk.variable} ${dmSans.variable}`}>
       <body className={dmSans.className}>
         <QueryProvider>
-          <ClientThemeProvider>
-            {children}
-          </ClientThemeProvider>
+          <I18nProvider>
+            <ClientThemeProvider>
+              {children}
+            </ClientThemeProvider>
+          </I18nProvider>
         </QueryProvider>
       </body>
     </html>

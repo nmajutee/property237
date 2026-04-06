@@ -358,3 +358,45 @@ class PropertyView(models.Model):
 
     def __str__(self):
         return f"{self.user.email} viewed Property #{self.property.id}"
+
+
+class Referral(models.Model):
+    """
+    Referral tracking — invite link → credit bonus on signup.
+    """
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('expired', 'Expired'),
+    ]
+
+    referrer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='referrals_sent',
+    )
+    referred_user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='referred_by',
+        null=True, blank=True,
+    )
+    code = models.CharField(max_length=20, unique=True, db_index=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+
+    # Bonus amounts (configurable)
+    referrer_bonus = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('5.00'))
+    referee_bonus = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('3.00'))
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Referral {self.code} by {self.referrer.email}"
+
+    @classmethod
+    def generate_code(cls):
+        import secrets
+        while True:
+            code = secrets.token_urlsafe(8)[:10].upper()
+            if not cls.objects.filter(code=code).exists():
+                return code

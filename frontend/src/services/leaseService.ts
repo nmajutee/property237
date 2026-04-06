@@ -1,4 +1,4 @@
-import apiClient from './api'
+import apiClient, { getApiBaseUrl } from './api'
 import type {
   LeaseAgreement,
   LeaseAgreementCreate,
@@ -28,4 +28,17 @@ export const leaseService = {
     apiClient.patch<RentSchedule>(`/leases/rent-schedule/${id}/`, {
       is_paid: true,
     }),
+
+  // PDF download
+  downloadPdf: async (id: string | number) => {
+    const token = typeof window !== 'undefined'
+      ? localStorage.getItem('property237_access_token')
+      : null
+    const baseUrl = getApiBaseUrl()
+    const res = await fetch(`${baseUrl}/leases/leases/${id}/pdf/`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) throw new Error('PDF download failed')
+    return res.blob()
+  },
 }

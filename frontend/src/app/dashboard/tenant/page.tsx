@@ -18,6 +18,8 @@ import {
   WrenchScrewdriverIcon,
   CreditCardIcon,
   DocumentDuplicateIcon,
+  StarIcon,
+  ShareIcon,
 } from '@heroicons/react/24/outline'
 import { authAPI } from '../../../services/api'
 import { useTenantDashboard } from '@/hooks/useAnalytics'
@@ -176,6 +178,14 @@ export default function TenantDashboard() {
           <Link href="/payments" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <CreditCardIcon className="h-5 w-5" />
             Payments
+          </Link>
+          <Link href="/credit-score" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <StarIcon className="h-5 w-5" />
+            Credit Score
+          </Link>
+          <Link href="/referrals" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <ShareIcon className="h-5 w-5" />
+            Referrals
           </Link>
           <Link href="/notifications" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
             <BellIcon className="h-5 w-5" />

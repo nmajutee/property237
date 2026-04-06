@@ -6,6 +6,11 @@
 // DIRECT BACKEND APPROACH - No proxy, no redirects, no issues
 // Call the backend directly with proper CORS
 const getApiBaseUrl = (): string => {
+  // Use env var if available (set NEXT_PUBLIC_API_URL in Vercel dashboard)
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
   // In browser context
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;

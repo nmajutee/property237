@@ -60,6 +60,34 @@ export const paymentService = {
   getInvoices: () =>
     apiClient.get('/payments/invoices/'),
 
+  getInvoice: (invoiceNumber: string) =>
+    apiClient.get(`/payments/invoices/${invoiceNumber}/`),
+
+  // Currencies
+  getCurrencies: () =>
+    apiClient.get('/payments/currencies/'),
+
+  // Payment accounts detail
+  getAccount: (id: string | number) =>
+    apiClient.get(`/payments/accounts/${id}/`),
+
+  updateAccount: (id: string | number, data: Record<string, any>) =>
+    apiClient.put(`/payments/accounts/${id}/`, data),
+
+  deleteAccount: (id: string | number) =>
+    apiClient.delete(`/payments/accounts/${id}/`),
+
+  // Refunds
+  getRefunds: () =>
+    apiClient.get('/payments/refunds/'),
+
+  requestRefund: (data: {
+    transaction: number
+    reason: string
+    amount?: number
+  }) =>
+    apiClient.post('/payments/refunds/create/', data),
+
   // Wallet
   getWallet: () =>
     apiClient.get('/payments/wallet/'),

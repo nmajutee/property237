@@ -98,6 +98,9 @@ export const adService = {
   getPackages: () =>
     apiClient.get<AdPackage[]>('/ads/packages/'),
 
+  getPackage: (id: string | number) =>
+    apiClient.get<AdPackage>(`/ads/packages/${id}/`),
+
   getCampaigns: () =>
     apiClient.get<AdCampaign[]>('/ads/campaigns/'),
 
@@ -109,6 +112,12 @@ export const adService = {
 
   getCampaign: (id: string | number) =>
     apiClient.get<AdCampaign>(`/ads/campaigns/${id}/`),
+
+  submitCampaign: (id: string | number) =>
+    apiClient.post<AdCampaign>(`/ads/campaigns/${id}/submit/`, {}),
+
+  pauseCampaign: (id: string | number) =>
+    apiClient.post<AdCampaign>(`/ads/campaigns/${id}/pause/`, {}),
 
   cancelCampaign: (id: string | number) =>
     apiClient.patch<AdCampaign>(`/ads/campaigns/${id}/`, {

@@ -330,6 +330,10 @@ export const authAPI = {
   getProfile: () => apiClient.get('/auth/profile/'),
 
   updateProfile: (data: any) => apiClient.patch('/auth/profile/update/', data),
+
+  getPreferences: () => apiClient.get('/users/preferences/'),
+
+  updatePreferences: (data: Record<string, any>) => apiClient.put('/users/preferences/', data),
 };
 
 /**

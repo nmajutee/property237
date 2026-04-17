@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Building2, MapPin, Heart, Home, Key, MapPinned } from 'lucide-react'
 
 interface PropertyImage {
@@ -48,18 +48,22 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCardProps) {
+  const propertyImageSrc = property.primary_image || property.images[0]?.image_url || null
+
   if (viewMode === 'list') {
     // List view layout
     return (
       <Link
-        href={`/properties/${property.id}`}
+        href={`/properties/${property.slug || property.id}`}
         className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all flex flex-col sm:flex-row"
       >
         <div className="relative w-full sm:w-72 h-48 sm:h-auto bg-gray-200 dark:bg-gray-700 flex-shrink-0">
-          {property.primary_image || (property.images && property.images.length > 0) ? (
-            <img
-              src={property.primary_image || property.images[0]?.image_url || ''}
+          {propertyImageSrc ? (
+            <Image
+              src={propertyImageSrc}
               alt={property.title}
+              fill
+              sizes="(max-width: 640px) 100vw, 288px"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
@@ -128,14 +132,16 @@ export default function PropertyCard({ property, viewMode = 'grid' }: PropertyCa
   // Grid view layout (default)
   return (
     <Link
-      href={`/properties/${property.id}`}
+      href={`/properties/${property.slug || property.id}`}
       className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all"
     >
       <div className="relative h-56 bg-gray-200 dark:bg-gray-700">
-        {property.primary_image || (property.images && property.images.length > 0) ? (
-          <img
-            src={property.primary_image || property.images[0]?.image_url || ''}
+        {propertyImageSrc ? (
+          <Image
+            src={propertyImageSrc}
             alt={property.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (

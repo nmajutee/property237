@@ -100,7 +100,7 @@ export default function AgentDetailPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {(agentListings as any[]).map((prop: any) => (
-                <Link key={prop.id} href={`/properties/${prop.id}`} className="border rounded p-3 hover:shadow transition-shadow flex gap-3">
+                <Link key={prop.id} href={`/properties/${prop.slug || prop.id}`} className="border rounded p-3 hover:shadow transition-shadow flex gap-3">
                   <div className="w-24 h-20 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                     {(prop.primary_image || prop.images?.[0]?.image_url) ? (
                       <img src={prop.primary_image || prop.images[0].image_url} alt={prop.title} className="w-full h-full object-cover" />

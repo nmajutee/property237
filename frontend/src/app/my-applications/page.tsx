@@ -17,6 +17,7 @@ interface Application {
   id: number
   property: {
     id: number
+    slug?: string
     title: string
     location: string
     price: number
@@ -241,7 +242,7 @@ export default function MyApplicationsPage() {
 
                     <div className="flex gap-3">
                       <button
-                        onClick={() => router.push(`/properties/${application.property.id}`)}
+                        onClick={() => router.push(`/properties/${application.property.slug || application.property.id}`)}
                         className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                       >
                         View Property

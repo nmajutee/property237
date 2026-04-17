@@ -3,27 +3,7 @@
  * Connects frontend to Django backend with authentication and credit management
  */
 
-// DIRECT BACKEND APPROACH - No proxy, no redirects, no issues
-// Call the backend directly with proper CORS
-const getApiBaseUrl = (): string => {
-  // Use env var if available (set NEXT_PUBLIC_API_URL in Vercel dashboard)
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  // In browser context
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-
-    // Production: Call backend directly
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return 'https://property237.onrender.com/api';
-    }
-  }
-
-  // Development: localhost
-  return 'http://localhost:8000/api';
-};
+import { getApiBaseUrl } from '@/lib/site'
 
 // Export for debugging/testing purposes
 export { getApiBaseUrl };

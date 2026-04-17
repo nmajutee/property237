@@ -11,7 +11,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getApiBaseUrl } from '@/services/api';
 
 // Type definitions
@@ -78,37 +78,7 @@ export default function PropertyCategorySelector({
   const [selectedState, setSelectedState] = useState(initialValues.state || '');
   const [selectedTags, setSelectedTags] = useState<string[]>(initialValues.tags || []);
 
-  // Fetch parent categories on mount
-  useEffect(() => {
-    fetchParentCategories();
-    fetchStates();
-  }, []);
-
-  // Fetch subcategories when parent category changes
-  useEffect(() => {
-    if (selectedCategory) {
-      fetchSubcategories(selectedCategory);
-      fetchTagsForCategory(selectedCategory);
-    } else {
-      setSubcategories([]);
-      setTags([]);
-      setSelectedSubcategory('');
-      setSelectedTags([]);
-    }
-  }, [selectedCategory]);
-
-  // Notify parent component of changes
-  useEffect(() => {
-    onChange({
-      category: selectedCategory,
-      subcategory: selectedSubcategory,
-      state: selectedState,
-      tags: selectedTags,
-    });
-  }, [selectedCategory, selectedSubcategory, selectedState, selectedTags]);
-
-  // API calls
-  const fetchParentCategories = async () => {
+  const fetchParentCategories = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${apiBaseUrl}/categories/parents/`);
@@ -123,9 +93,9 @@ export default function PropertyCategorySelector({
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiBaseUrl]);
 
-  const fetchSubcategories = async (categorySlug: string) => {
+  const fetchSubcategories = useCallback(async (categorySlug: string) => {
     try {
       const response = await fetch(`${apiBaseUrl}/categories/${categorySlug}/subcategories/`);
       if (!response.ok) throw new Error('Failed to fetch subcategories');
@@ -136,9 +106,9 @@ export default function PropertyCategorySelector({
       console.error('Error fetching subcategories:', err);
       setSubcategories([]);
     }
-  };
+  }, [apiBaseUrl]);
 
-  const fetchStates = async () => {
+  const fetchStates = useCallback(async () => {
     try {
       const response = await fetch(`${apiBaseUrl}/states/`);
       if (!response.ok) throw new Error('Failed to fetch states');
@@ -150,9 +120,9 @@ export default function PropertyCategorySelector({
       console.error('Error fetching states:', err);
       setStates([]);
     }
-  };
+  }, [apiBaseUrl]);
 
-  const fetchTagsForCategory = async (categorySlug: string) => {
+  const fetchTagsForCategory = useCallback(async (categorySlug: string) => {
     try {
       const category = parentCategories.find(c => c.slug === categorySlug);
       if (!category) return;
@@ -167,7 +137,36 @@ export default function PropertyCategorySelector({
       console.error('Error fetching tags:', err);
       setTags([]);
     }
-  };
+  }, [apiBaseUrl, parentCategories]);
+
+  // Fetch parent categories on mount
+  useEffect(() => {
+    fetchParentCategories();
+    fetchStates();
+  }, [fetchParentCategories, fetchStates]);
+
+  // Fetch subcategories when parent category changes
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchSubcategories(selectedCategory);
+      fetchTagsForCategory(selectedCategory);
+    } else {
+      setSubcategories([]);
+      setTags([]);
+      setSelectedSubcategory('');
+      setSelectedTags([]);
+    }
+  }, [fetchSubcategories, fetchTagsForCategory, selectedCategory]);
+
+  // Notify parent component of changes
+  useEffect(() => {
+    onChange({
+      category: selectedCategory,
+      subcategory: selectedSubcategory,
+      state: selectedState,
+      tags: selectedTags,
+    });
+  }, [onChange, selectedCategory, selectedSubcategory, selectedState, selectedTags]);
 
   // Event handlers
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

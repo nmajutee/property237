@@ -1,6 +1,9 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 import { MapPin, X, Star, User } from 'lucide-react'
 
 // Leaflet will be dynamically imported in useEffect to avoid SSR issues
@@ -120,8 +123,8 @@ async function geocodeAddress(city: string, area: string): Promise<[number, numb
 
 export default function MapView({ show, height = 'h-96', properties = [] }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<any>(null)
-  const markersRef = useRef<any[]>([])
+  const mapInstanceRef = useRef<LeafletMap | null>(null)
+  const markersRef = useRef<LeafletMarker[]>([])
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [mounted, setMounted] = useState(false)
   const [propertyCoordinates, setPropertyCoordinates] = useState<Map<number, [number, number]>>(new Map())
@@ -168,7 +171,10 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
       if (!isMounted || !mapRef.current) return
 
       // Fix Leaflet default icon issue with Next.js
-      delete (L.Icon.Default.prototype as any)._getIconUrl
+      const defaultIconPrototype = L.Icon.Default.prototype as typeof L.Icon.Default.prototype & {
+        _getIconUrl?: string
+      }
+      delete defaultIconPrototype._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -278,6 +284,9 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
   }, [])
 
   if (!show || !mounted) return null
+
+  const selectedPropertyImageSrc =
+    selectedProperty?.primary_image || selectedProperty?.images[0]?.image_url || '/placeholder-property.jpg'
 
   if (loading) {
     return (
@@ -432,9 +441,11 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
 
           {/* Property Image */}
           <div className="relative h-48">
-            <img
-              src={selectedProperty.primary_image || selectedProperty.images[0]?.image_url || '/placeholder-property.jpg'}
+            <Image
+              src={selectedPropertyImageSrc}
               alt={selectedProperty.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 384px"
               className="w-full h-full object-cover"
             />
           </div>
@@ -466,9 +477,11 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
               <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0">
                   {selectedProperty.agent.user.profile_picture ? (
-                    <img
+                    <Image
                       src={selectedProperty.agent.user.profile_picture}
                       alt={`${selectedProperty.agent.user.first_name} ${selectedProperty.agent.user.last_name}`}
+                      width={40}
+                      height={40}
                       className="h-10 w-10 rounded-full object-cover"
                     />
                   ) : (
@@ -504,12 +517,12 @@ export default function MapView({ show, height = 'h-96', properties = [] }: MapV
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">per month</p>
               </div>
-              <a
+              <Link
                 href={`/properties/${selectedProperty.slug}`}
                 className="px-4 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors text-sm font-medium"
               >
                 View Details
-              </a>
+              </Link>
             </div>
           </div>
         </div>

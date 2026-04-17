@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.core.cache import cache
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth import get_user_model
@@ -7,6 +8,7 @@ from properties.models import Property, PropertyType, PropertyStatus
 from locations.models import Country, Region, City, Area
 from agents.models import AgentProfile
 from datetime import date
+from unittest.mock import patch
 
 User = get_user_model()
 
@@ -14,6 +16,7 @@ User = get_user_model()
 class PropertyAPITestCase(APITestCase):
     def setUp(self):
         """Set up test data"""
+        cache.clear()
         # Create test user
         self.user = User.objects.create_user(
             username='testuser',
@@ -80,6 +83,16 @@ class PropertyAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], 'Test Property')
 
+    def test_inactive_property_detail_hidden_from_public(self):
+        """Inactive properties should not be publicly retrievable by slug."""
+        self.property.is_active = False
+        self.property.save(update_fields=['is_active'])
+
+        url = reverse('properties:property-detail', kwargs={'slug': self.property.slug})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_property_create_api_authenticated(self):
         """Test property creation with authentication"""
         self.client.force_authenticate(user=self.user)
@@ -111,7 +124,7 @@ class PropertyAPITestCase(APITestCase):
         }
 
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_property_filter_by_price(self):
         """Test property filtering by price"""
@@ -128,3 +141,55 @@ class PropertyAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 1)
+
+    def test_property_sitemap_entries_endpoint_filters_public_listings(self):
+        """Sitemap feed should only expose active, non-draft listings."""
+        draft_status = PropertyStatus.objects.create(name='draft')
+        Property.objects.create(
+            title='Draft Property',
+            property_type=self.property_type,
+            status=draft_status,
+            listing_type='rent',
+            price=175000,
+            currency='XAF',
+            area=self.area,
+            agent=self.agent_profile,
+            description='Draft property',
+        )
+        Property.objects.create(
+            title='Inactive Property',
+            property_type=self.property_type,
+            status=self.property_status,
+            listing_type='rent',
+            price=175000,
+            currency='XAF',
+            area=self.area,
+            agent=self.agent_profile,
+            description='Inactive property',
+            is_active=False,
+        )
+
+        url = reverse('properties:property-sitemap-entries')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response['X-Property237-Sitemap-Source'], 'live')
+        self.assertEqual([entry['slug'] for entry in response.data], [self.property.slug])
+
+    def test_property_sitemap_entries_falls_back_to_cached_snapshot(self):
+        """Sitemap feed should serve the last known-good snapshot on transient failures."""
+        url = reverse('properties:property-sitemap-entries')
+        warm_response = self.client.get(url)
+
+        self.assertEqual(warm_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(warm_response['X-Property237-Sitemap-Source'], 'live')
+
+        with patch(
+            'properties.sitemap_entries.build_property_sitemap_entries_payload',
+            side_effect=RuntimeError('database unavailable'),
+        ):
+            stale_response = self.client.get(url)
+
+        self.assertEqual(stale_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(stale_response['X-Property237-Sitemap-Source'], 'stale-cache')
+        self.assertEqual([entry['slug'] for entry in stale_response.data], [self.property.slug])

@@ -20,6 +20,8 @@ urlpatterns = [
 
     # Property metadata and search BEFORE slug route
     path('search/', views.property_search, name='property-search'),
+    path('search/sync-status/', views.property_search_sync_status, name='property-search-sync-status'),
+    path('sitemap/entries/', views.PropertySitemapEntriesAPIView.as_view(), name='property-sitemap-entries'),
     path('nearby/', views.proximity_search, name='proximity-search'),
     path('types/', views.PropertyTypeListAPIView.as_view(), name='property-types'),
     path('statuses/', views.PropertyStatusListAPIView.as_view(), name='property-statuses'),

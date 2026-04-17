@@ -5,12 +5,15 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
 from utils.permissions import IsAgentOrReadOnly, IsOwnerOrReadOnly
 from agents.models import AgentProfile
-from .models import Property, PropertyType, PropertyStatus, PropertyViewing, PropertyFavorite
+from .models import Property, PropertyType, PropertyStatus, PropertyViewing, PropertyFavorite, PropertySearchSync
+from .sitemap_entries import get_property_sitemap_entries_payload
 from .serializers import (
     PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer,
-    PropertyTypeSerializer, PropertyStatusSerializer, PropertyViewingSerializer
+    PropertyTypeSerializer, PropertyStatusSerializer, PropertyViewingSerializer,
+    PropertySitemapEntrySerializer,
 )
 from .filters import PropertyFilter
 
@@ -128,12 +131,33 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     PUT/PATCH: Update property (owner/agent only)
     DELETE: Delete property (owner/agent only)
     """
-    queryset = Property.objects.select_related(
-        'property_type', 'status', 'area__city__region', 'agent__user'
-    ).prefetch_related('additional_features')  # media_files now available
     serializer_class = PropertyDetailSerializer
     lookup_field = 'slug'
     permission_classes = [IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Property.objects.select_related(
+            'property_type', 'status', 'area__city__region', 'agent__user'
+        ).prefetch_related('additional_features', 'images')
+
+        public_queryset = queryset.filter(is_active=True).exclude(status__name='draft')
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return public_queryset
+
+        if user.is_staff or getattr(user, 'user_type', None) == 'admin':
+            return queryset
+
+        try:
+            agent_profile = user.agents_profile
+        except AgentProfile.DoesNotExist:
+            agent_profile = None
+
+        if agent_profile:
+            return queryset.filter(Q(pk__in=public_queryset.values('pk')) | Q(agent=agent_profile)).distinct()
+
+        return public_queryset
 
     def get_object(self):
         obj = super().get_object()
@@ -221,9 +245,10 @@ class PropertyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def property_search(request):
     """Advanced property search with multiple filters"""
-    properties = Property.objects.filter(is_active=True).select_related(
+    properties = Property.objects.filter(is_active=True).exclude(status__name='draft').select_related(
         'property_type', 'status', 'area__city__region', 'agent__user'
     ).prefetch_related('images')
 
@@ -252,6 +277,27 @@ class PropertyStatusListAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
     queryset = PropertyStatus.objects.filter(is_active=True)
     serializer_class = PropertyStatusSerializer
+
+
+class PropertySitemapEntriesAPIView(generics.ListAPIView):
+    """Lean feed for sitemap generation on the web tier."""
+    permission_classes = [AllowAny]
+    serializer_class = PropertySitemapEntrySerializer
+    pagination_class = None
+
+    def list(self, request, *args, **kwargs):
+        try:
+            payload, source = get_property_sitemap_entries_payload()
+        except Exception:
+            return Response(
+                {'detail': 'Property sitemap entries are temporarily unavailable.'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        response = Response(payload)
+        response['Cache-Control'] = 'public, max-age=300, stale-while-revalidate=3600'
+        response['X-Property237-Sitemap-Source'] = source
+        return response
 
 
 class PropertyViewingCreateAPIView(generics.CreateAPIView):
@@ -332,11 +378,35 @@ def favorites_list(request):
         user=request.user
     ).values_list('property_id', flat=True)
 
-    properties = Property.objects.filter(id__in=fav_ids).select_related(
+    properties = Property.objects.filter(id__in=fav_ids, is_active=True).exclude(status__name='draft').select_related(
         'property_type', 'status', 'area__city__region', 'agent__user'
     ).prefetch_related('images')
     serializer = PropertyListSerializer(properties, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def property_search_sync_status(request):
+    """Operational view of the property search sync queue (admin only)."""
+    if request.user.user_type != 'admin' and not request.user.is_staff:
+        return Response({'error': 'Admin only'}, status=status.HTTP_403_FORBIDDEN)
+
+    queue_counts = {
+        row['status']: row['count']
+        for row in PropertySearchSync.objects.values('status').annotate(count=Count('id'))
+    }
+    oldest_pending = PropertySearchSync.objects.filter(
+        status=PropertySearchSync.Status.PENDING
+    ).order_by('created_at').values(
+        'id', 'property_slug', 'action', 'reason', 'created_at'
+    ).first()
+
+    return Response({
+        'backend': 'property_search_sync',
+        'queue_counts': queue_counts,
+        'oldest_pending': oldest_pending,
+    })
 
 
 @api_view(['POST', 'DELETE'])

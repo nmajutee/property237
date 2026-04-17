@@ -169,7 +169,7 @@ export default function MyFavoritesPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-400">per month</p>
                     </div>
                     <button
-                      onClick={() => router.push(`/properties/${property.id}`)}
+                      onClick={() => router.push(`/properties/${property.slug || property.id}`)}
                       className="px-4 py-2 bg-property237-primary text-white rounded-lg hover:bg-property237-dark transition-colors"
                     >
                       View Details

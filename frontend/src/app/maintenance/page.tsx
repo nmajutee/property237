@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { maintenanceService } from '@/services/maintenanceService'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function MaintenancePage() {
+  const router = useRouter()
+  const [isAuthed, setIsAuthed] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -14,13 +17,24 @@ export default function MaintenancePage() {
   })
   const queryClient = useQueryClient()
 
+  useEffect(() => {
+    const token = localStorage.getItem('property237_access_token')
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+    setIsAuthed(true)
+  }, [router])
+
   const { data: requestsData, isLoading } = useQuery({
     queryKey: ['maintenance-requests'],
     queryFn: () => maintenanceService.list(),
+    enabled: isAuthed,
   })
   const { data: categoriesData } = useQuery({
     queryKey: ['maintenance-categories'],
     queryFn: () => maintenanceService.getCategories(),
+    enabled: isAuthed,
   })
 
   const createRequest = useMutation({

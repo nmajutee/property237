@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import Country, Region, City, Area, PopularLocation
@@ -59,6 +59,7 @@ class AreaListAPIView(generics.ListAPIView):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def location_tree(request):
     """Get complete location hierarchy for dropdowns"""
     countries = Country.objects.prefetch_related(
@@ -107,5 +108,6 @@ def location_tree(request):
 
 class PopularLocationListAPIView(generics.ListAPIView):
     """List popular locations"""
+    permission_classes = [AllowAny]
     queryset = PopularLocation.objects.select_related('area__city__region').all()
     serializer_class = PopularLocationSerializer

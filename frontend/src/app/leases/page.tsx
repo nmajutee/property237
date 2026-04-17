@@ -1,20 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { leaseService } from '@/services/leaseService'
 import { useQuery } from '@tanstack/react-query'
 
 export default function LeasesPage() {
+  const router = useRouter()
+  const [isAuthed, setIsAuthed] = useState(false)
   const [tab, setTab] = useState<'leases' | 'schedule'>('leases')
+
+  useEffect(() => {
+    const token = localStorage.getItem('property237_access_token')
+    if (!token) {
+      router.push('/sign-in')
+      return
+    }
+    setIsAuthed(true)
+  }, [router])
 
   const { data: leasesData, isLoading } = useQuery({
     queryKey: ['leases'],
     queryFn: () => leaseService.list(),
+    enabled: isAuthed,
   })
   const { data: scheduleData } = useQuery({
     queryKey: ['rent-schedule'],
     queryFn: () => leaseService.getRentSchedule(),
+    enabled: isAuthed,
   })
 
   const leases = (leasesData as any)?.results || leasesData || []

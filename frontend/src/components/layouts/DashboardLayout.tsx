@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, ReactNode } from 'react'
+import type { Route } from 'next'
+import { useCallback, useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -22,33 +23,49 @@ interface DashboardLayoutProps {
   pageDescription?: ReactNode
 }
 
+interface DashboardUser {
+  first_name: string
+  last_name: string
+  email: string
+}
+
+type DashboardProfileResponse = DashboardUser | { user: DashboardUser }
+type NavigationItem = {
+  name: string
+  href: Route
+  icon: typeof HomeIcon
+}
+
+function isUnauthorizedError(error: unknown): error is { response?: { status?: number } } {
+  return typeof error === 'object' && error !== null && 'response' in error
+}
+
 export default function DashboardLayout({ children, pageTitle, pageDescription }: DashboardLayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<DashboardUser | null>(null)
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState(0)
 
-  useEffect(() => {
-    loadUser()
-  }, [])
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     try {
-      const profileData = await authAPI.getProfile()
-      setUser((profileData as any).user)
-      // In a real app, fetch unread notifications count
+      const profileData = await authAPI.getProfile() as DashboardProfileResponse
+      setUser('user' in profileData ? profileData.user : profileData)
       setNotifications(3)
-    } catch (err: any) {
-      if (err.response?.status === 401) {
+    } catch (error: unknown) {
+      if (isUnauthorizedError(error) && error.response?.status === 401) {
         router.push('/sign-in')
       }
     } finally {
       setLoading(false)
     }
-  }
+  }, [router])
 
-  const navigationItems = [
+  useEffect(() => {
+    loadUser()
+  }, [loadUser])
+
+  const navigationItems: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard/agent', icon: ChartBarIcon },
     { name: 'My Properties', href: '/dashboard/agent/properties', icon: HomeIcon },
     { name: 'Applications', href: '/dashboard/agent/applications', icon: UsersIcon },
@@ -90,7 +107,7 @@ export default function DashboardLayout({ children, pageTitle, pageDescription }
             return (
               <Link
                 key={item.name}
-                href={item.href as any}
+                href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive
                     ? 'bg-property237-primary/10 text-property237-primary font-medium'
@@ -105,7 +122,7 @@ export default function DashboardLayout({ children, pageTitle, pageDescription }
         </nav>
 
         <div className="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <Link href={"/dashboard/agent/settings" as any} className="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors">
+          <Link href="/dashboard/agent/settings" className="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors">
             <div className="h-10 w-10 rounded-full bg-property237-primary/10 flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-semibold text-property237-primary">
                 {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}

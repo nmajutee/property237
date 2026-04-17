@@ -447,6 +447,30 @@ CELERY_TASK_SOFT_TIME_LIMIT = 240  # 4 min soft limit
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # ==============================
+# Public URLs & Search Indexing
+# ==============================
+PUBLIC_APP_URL = os.getenv(
+    'PUBLIC_APP_URL',
+    'http://localhost:3000' if DEBUG else 'https://property237.com'
+).rstrip('/')
+PUBLIC_API_ORIGIN = os.getenv(
+    'PUBLIC_API_ORIGIN',
+    'http://localhost:8000' if DEBUG else 'https://property237.onrender.com'
+).rstrip('/')
+MEDIA_PUBLIC_BASE_URL = os.getenv('MEDIA_PUBLIC_BASE_URL', PUBLIC_API_ORIGIN).rstrip('/')
+
+PROPERTY_SEARCH_INDEX_BACKEND = os.getenv('PROPERTY_SEARCH_INDEX_BACKEND', 'noop')
+PROPERTY_SEARCH_INDEX_NAME = os.getenv('PROPERTY_SEARCH_INDEX_NAME', 'property237-listings')
+PROPERTY_SEARCH_AUTO_DISPATCH = os.getenv(
+    'PROPERTY_SEARCH_AUTO_DISPATCH',
+    'False' if DEBUG else 'True'
+).lower() in ['true', '1', 'yes']
+PROPERTY_SITEMAP_AUTO_DISPATCH = os.getenv(
+    'PROPERTY_SITEMAP_AUTO_DISPATCH',
+    'False' if DEBUG else 'True'
+).lower() in ['true', '1', 'yes']
+
+# ==============================
 # File Storage & Media
 # ==============================
 

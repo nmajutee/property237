@@ -56,6 +56,7 @@ class AgentListAPIView(generics.ListAPIView):
         is_verified=True
     ).select_related('user').prefetch_related('service_areas')
     serializer_class = AgentProfileSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -84,6 +85,7 @@ class AgentDetailAPIView(generics.RetrieveAPIView):
         is_verified=True
     ).select_related('user').prefetch_related('service_areas__city__region')
     serializer_class = AgentProfileSerializer
+    permission_classes = [AllowAny]
     lookup_field = 'id'
 
 

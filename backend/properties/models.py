@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.utils.text import slugify
 
 # Import category models
@@ -422,6 +423,58 @@ class Property(models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+
+class PropertySearchSync(models.Model):
+    """
+    Queue of property search indexing events.
+    This forms the handoff boundary between the transactional store and a future
+    dedicated search engine such as OpenSearch or Elasticsearch.
+    """
+
+    class Action(models.TextChoices):
+        UPSERT = 'upsert', 'Upsert'
+        DELETE = 'delete', 'Delete'
+
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        PROCESSING = 'processing', 'Processing'
+        COMPLETED = 'completed', 'Completed'
+        FAILED = 'failed', 'Failed'
+
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='search_sync_events',
+    )
+    property_slug = models.CharField(max_length=250, db_index=True)
+    action = models.CharField(max_length=10, choices=Action.choices)
+    status = models.CharField(
+        max_length=12,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+    reason = models.CharField(max_length=100, blank=True)
+    payload = models.JSONField(default=dict, blank=True)
+    retry_count = models.PositiveSmallIntegerField(default=0)
+    available_at = models.DateTimeField(default=timezone.now, db_index=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['available_at', 'created_at']
+        indexes = [
+            models.Index(fields=['status', 'available_at']),
+            models.Index(fields=['property_slug', 'status']),
+            models.Index(fields=['action', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.property_slug} [{self.action}:{self.status}]"
 
 
 class PropertyFeature(models.Model):

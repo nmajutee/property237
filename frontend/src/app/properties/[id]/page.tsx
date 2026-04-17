@@ -655,7 +655,7 @@ export default function PropertyDetailPage() {
               {similarProperties.map((sp: any) => (
                 <Link
                   key={sp.id}
-                  href={`/properties/${sp.id}`}
+                  href={`/properties/${sp.slug || sp.id}`}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden"
                 >
                   <div className="h-40 bg-gray-200 dark:bg-gray-700 overflow-hidden">

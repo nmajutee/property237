@@ -109,6 +109,12 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PropertySitemapEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = ['slug', 'created_at', 'updated_at']
+
+
 class PropertyCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating properties"""
     images = serializers.ListField(

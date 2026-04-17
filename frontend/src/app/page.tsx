@@ -1,10 +1,10 @@
-'use client'
-
-import React from 'react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Navbar from '../components/navigation/Navbar'
 import { Button } from '../components/ui/Button'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { PromotedPropertyCards, AdBanner } from '@/components/ads/AdPlacements'
+import { absoluteUrl } from '@/lib/site'
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -15,6 +15,15 @@ import {
   ChartBarIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline'
+
+export const metadata: Metadata = {
+  title: 'Find Verified Properties in Cameroon',
+  description:
+    'Browse verified apartments, houses, and commercial properties across Cameroon with Property237.',
+  alternates: {
+    canonical: absoluteUrl('/'),
+  },
+}
 
 export default function HomePage() {
   const features = [
@@ -56,8 +65,35 @@ export default function HomePage() {
     { name: 'Limbe', count: 75 }
   ]
 
+  const websiteStructuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${absoluteUrl('/')}#website`,
+        url: absoluteUrl('/'),
+        name: 'Property237',
+        description:
+          'Property237 is a real estate marketplace for verified listings across Cameroon.',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${absoluteUrl('/properties')}?search={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${absoluteUrl('/')}#organization`,
+        name: 'Property237',
+        url: absoluteUrl('/'),
+      },
+    ],
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
+      <JsonLd data={websiteStructuredData} />
+
       {/* Navigation */}
       <Navbar />
 

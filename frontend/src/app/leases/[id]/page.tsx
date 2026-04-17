@@ -81,7 +81,7 @@ export default function LeaseDetailPage() {
               <p><span className="text-gray-500">Property:</span> {lease.property?.title || lease.property_name || 'N/A'}</p>
               <p><span className="text-gray-500">Address:</span> {lease.property?.address || lease.address || 'N/A'}</p>
               {lease.property?.id && (
-                <Link href={`/properties/${lease.property.id}`} className="text-green-600 hover:underline text-sm">
+                <Link href={`/properties/${lease.property.slug || lease.property.id}`} className="text-green-600 hover:underline text-sm">
                   View Property →
                 </Link>
               )}
